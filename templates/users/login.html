@@ -1,0 +1,30 @@
+{% extends 'base_login.html'%}
+{% load static %}
+
+{% block content %}
+<header>
+    <p class="app-name">Moja MBP</p>
+</header>
+<main>
+    <div class="login mt-5">
+        <form method="post">{%csrf_token%}
+            <div>
+                {% for error in form.non_field_errors %}
+                <p class="text-danger">{{error}}</p>
+                {% endfor %}
+            </div>
+            <div class="login-form">
+                <p class="login-input"><i class="fas fa-user"></i>{{form.username}}</p>
+                <p class="login-input"><i class="fa fa-lock"></i>{{form.password}}</p>
+                <div class="buttons">
+                    <button type="submit">Zaloguj się</button>
+                </div>
+                <a class="password-link" href="{%url 'reset_password' %}">Zapomniane hasło?</a>
+            </div>
+        </form>
+    </div>
+    <div class="logo">
+        <a href="https://mbp.opole.pl/"><img src="../static/img/mbp_logo.png"></a>
+    </div>
+</main>
+{%endblock content%}

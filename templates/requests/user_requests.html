@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{%include 'includes/navbar.html'%}
+
+<section class="page-section">
+        <div class="all_employees_list mt-5">
+        <h4 class="table-title">Twoje wnioski urlopowe</h4>
+        <table class="table js-serial table-responsive">
+            <thead>
+            <tr>
+                <th scope="col">Data złożenia</th>
+                <th scope="col">Nazwisko i imię</th>
+             
+                <th scope="col">Od</th>
+                <th scope="col">Do</th>
+                <th scope="col" class="text-center">Liczba {% if user.working_hours < 1 %}godzin {%else%}dni {%endif%}</th>
+                <th scope="col">Zastępujący</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+             {% for request in user_requests_holiday %}
+            <tr>
+                <td>{{request.created|date:"d.m.y"}}</td>
+                <td>{{request.author.first_name}} {{request.author.last_name}}</td>
+               
+                <td>{{request.start_date|date:"d.m.y"}}</td>
+                <td>{{request.end_date|date:"d.m.y"}}</td>
+                <td class="text-center">{{ request.days}}</td>
+                <td>{{request.substitute}}</td>
+                <td>{{request.status}}</td>
+                {% if request.status == "oczekujący" %}
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#deleteModal{{request.id}}">
+                        Wycofaj
+                    </button>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteModal{{request.id}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Czy na pewno chcesz wycofać wniosek <br> od {{request.start_date|date:"d.m.y"}} do {{request.end_date|date:"d.m.y"}}?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
+                                    <form method="POST" action="{% url 'requests_app:delete_request' request.id %}">{%csrf_token%}
+                                    <button type="submit" class="btn btn-info">Tak, wycofuję.</button>
+                                    </form>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </td>
+                {%else%}
+                 <td>przez {{request.signed_by}}</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </section>
+<section class="page-section">
+    <div class="all_employees_list mt-3">
+        <h4 class="table-title">Twoje wnioski o dni wolne za pracę w soboty/niedziele/święta</h4>
+        <table class="table js-serial table-responsive">
+            <thead>
+            <tr>
+                <th scope="col">Data złożenia</th>
+                <th scope="col">Nazwisko i imię</th>
+            
+                <th scope="col">Od</th>
+                <th scope="col">Do</th>
+                <th scope="col">Rodzaj</th>
+                <th scope="col">Za pracę dnia</th>
+                <th scope="col">Zastępujący</th>
+                <th scope="col">Status</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for request in user_requests_others %}
+            <tr>
+                <td>{{request.created|date:"d.m.y"}}</td>
+                <td>{{request.author.first_name}} {{request.author.last_name}}</td>
+           
+                <td>{{request.start_date|date:"d.m.y"}}</td>
+                <td>{{request.end_date|date:"d.m.y"}}</td>
+                <td>{{request.type}}</td>
+                <td>{{request.work_date|date:"d.m.y"}}</td>
+                <td>{{request.substitute}}</td>
+                <td>{{request.status}}</td>
+                {% if request.status == "oczekujący" %}
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#deleteModal{{request.id}}">
+                        Wycofaj
+                    </button>
+                    
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteModal{{request.id}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Czy na pewno chcesz wycofać wniosek <br> od {{request.start_date|date:"d.m.y"}} do {{request.end_date|date:"d.m.y"}}?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
+                                    <form method="POST" action="{% url 'requests_app:delete_request' request.id %}">{%csrf_token%}
+                                    <button type="submit" class="btn btn-info">Tak, wycofuję.</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </td>
+                {%else%}
+                 <td>przez {{request.signed_by}}</td>
+                {% endif %}
+            </tr>
+            {%endfor%}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock content %}

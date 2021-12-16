@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{%include 'includes/navbar.html'%}
+{% load crispy_forms_tags %}
+
+<div class="container mt-5">
+
+    <h3>Dodaj zwolnienie lekarskie</h3>
+    <p>Jeżeli okres zwolnienia lekarskiego pokrywa się z okresem urlopu wypoczynkowego, proszę skorygować bieżący urlop pracownika (panel admin).</p>
+
+    <form method="POST">{% csrf_token%}
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.employee|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.type|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.issue_date|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.doc_number|as_crispy_field }}
+            </div>     
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.start_date|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.end_date|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{form.additional_info|as_crispy_field}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-info" type = "submit">Dodaj zwolnienie</button>
+        </div>
+    </form>
+</div>
+
+
+
+{% endblock content %}

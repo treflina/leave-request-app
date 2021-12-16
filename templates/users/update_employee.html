@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{% include 'includes/navbar.html'%}
+{% load crispy_forms_tags %}
+
+<div class="container mt-5">
+
+    <h3>Edytuj dane pracownika</h3>
+
+    <form method="POST">{% csrf_token%}
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.first_name|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.last_name|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.username|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.role|as_crispy_field }}
+            </div>     
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.email|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.work_email|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.position|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.position_addinfo|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.workplace|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.working_hours|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.manager|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.contract_end|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                {{ form.annual_leave|as_crispy_field }}
+            </div>
+            <div class="col-lg-6">
+                {{ form.current_leave|as_crispy_field }}
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                {{form.additional_info|as_crispy_field}}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-secondary" type = "submit">Zmień</button>
+        </div>
+    </form>
+</div>
+
+
+{% endblock content%}

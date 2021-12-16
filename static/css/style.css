@@ -1,0 +1,147 @@
+*,
+::before,
+::after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 95vh;
+  position: relative;
+  padding-bottom: 50px;
+}
+
+.welcome {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.8rem;
+  font-family: "Signika Negative", sans-serif;
+  text-align: center;
+}
+
+.page-section {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  scroll-padding-top: 200px;
+  padding-bottom: 5rem;
+}
+
+.requests {
+  position: relative;
+  padding-top: 8rem;
+  max-width: 100%;
+}
+
+.all_employees_list {
+  position: relative;
+  max-width: 100%;
+}
+
+.table-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.report-title {
+  margin-bottom: 2.5rem;
+}
+
+input.search,
+input.search2 {
+  position: relative;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+  width: 35%;
+  margin-bottom: 16px;
+}
+
+.page-footer {
+  background-color: #fff;
+  color: black;
+  position: absolute;
+  height: 30px;
+  bottom: 0;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+/* Navigation */
+.navbar {
+  background-color: #787a91;
+  padding: 1% 3%;
+  z-index: 1;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+.info {
+  font-size: 1.8rem;
+  font-family: "Signika Negative", sans-serif;
+  color: #fff;
+  margin-top: 15px;
+}
+
+.nav-link {
+  font-size: 1.2rem;
+}
+
+.hide {
+  display: none;
+}
+
+@media (max-width: 410px) {
+  .palm {
+    display: none;
+  }
+}
+
+@media (min-width: 360px) {
+  .page-section {
+    scroll-padding-top: 160px;
+  }
+}
+
+@media (min-width: 992px) {
+  .page-section {
+    scroll-padding-top: 150px;
+  }
+}
+
+@media (min-width: 1250px) {
+  .page-section {
+    scroll-padding-top: 105px;
+  }
+}
+
+/* Tables */
+.css-serial {
+  counter-reset: serial-number;
+  /* Set the serial number counter to 0 */
+}
+
+.css-serial td:first-child:before {
+  counter-increment: serial-number;
+  /* Increment the serial number counter */
+  content: counter(serial-number);
+  /* Display the counter */
+}
+
+.empl_table > thead > tr > th {
+  padding-right: 30px;
+}
+
+.empl_table > tbody > tr > td {
+  padding-right: 30px;
+}

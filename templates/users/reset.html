@@ -1,0 +1,34 @@
+{% load static %}
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wnioski urlopowe</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style_login.css' %}">
+    <script src="https://kit.fontawesome.com/455e063248.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header><p>Moja MBP</p></header>
+   
+    <main>
+        <div class ="container reset">
+            <h4>Wprowadź nowe hasło</h4>
+            <div class="form-group">
+                <form class="reset-form" method="POST"> {%csrf_token%}
+                    {{form|crispy}}
+                    <button class = "btn btn-sm btn-light" type="submit">Wyślij</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

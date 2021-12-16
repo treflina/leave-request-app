@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{% include 'includes/navbar.html' %}
+
+
+<section class="page-section mt-5">
+    <div >
+        <h3 >Lista pracowników
+            <a href="{%url 'users_app:user-register'%}" role="button" class="btn ml-3 btn-sm btn-success">Dodaj pracownika</a>
+            <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn ml-3 btn-sm btn-info">Dodaj zwolnienie lekarskie</a>
+        </h3>
+    
+        <table class="table js-serial table-responsive mt-5">
+            <thead>
+            <tr >
+                <th scope="col">Nazwisko i imię</th>
+                <th scope="col">Stanowisko</th>
+                <th scope="col" class="text-center">K*</th>
+                <th scope="col" class="text-center ml-1 mr-1">Urlop</th>
+                <th scope="col" class="text-center">Etat</th>
+                <th scope="col" class="text-center">Miejsce pracy</th>
+                <th scope="col" class="text-center">Umowa do:</th>
+                <th scope="col" class="text-center">Uwagi</th>
+                <th scope="col" class="text-center">Akcja</th>
+            </tr>
+            </thead>
+    
+            <tbody>
+    
+            <tr>
+    
+            {% for employee in employees %}
+            <tr>
+    
+                <td>{{ employee.last_name}} {{employee.first_name}}</td>
+                <td>{{ employee.position }}</td>
+                <td class="text-center">{{ employee.is_manager }}</td>
+                <td class="text-center ml-1 mr-1">{{ employee.current_leave }}</td>
+                <td class="text-center">{{ employee.working_hours }}</td>
+                <td class="text-center">{{ employee.workplace }}</td>
+                <td class="text-center">{{ employee.contract_end|date:"d.m.y"}}</td>
+                <td class="text-center">{{ employee.additional_info|truncatechars:10 }}</td>
+                <td>
+
+                    <div class="btn-group btn-group-sm">
+                        <a href="{%url 'users_app:update_employee' employee.id%}" class="btn btn-sm btn-light" type="submit">Edytuj</a>  
+                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#deleteModal{{employee.id}}">Usuń</button>
+                    </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteModal{{employee.id}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Czy na pewno chcesz usunąć pracownika? <br>{{employee.first_name}} {{employee.last_name}}</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                    <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
+                                    <form method="POST" action="{% url 'users_app:delete_employee' employee.id %}">{%csrf_token%}
+                                    <button type="submit" class="btn btn-info">Tak, usuń</button>
+                                    </form>
+                                </div>
+                        </div>
+                    </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p>*K - Kierownik placówki/działu (poza jednoosobowymi)</p>
+    
+    </div>
+    </section>
+    
+
+
+{% endblock content %}

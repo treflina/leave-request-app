@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{%include 'includes/navbar.html'%}
+
+<section class="page-section">
+    <div class="all_employees_list mt-3">
+        <div>
+            <h3 class="table-title">Lista pracowników</h3>
+            <input class="form-control search" id="myInput1" type="text" placeholder="Wyszukaj...">
+        </div>
+        <table class="table js-serial table-responsive empl_table" id="present">
+            <thead>
+            <tr>
+                <th scope="col">Nazwisko i imię</th>
+                <th scope="col">Stanowisko</th>
+                <th scope="col">Miejsce pracy</th>
+                <th scope="col" class="text-center">Etat</th>
+                <th scope="col" class="text-center">Umowa do:</th>
+                <th scope="col" class="text-center">Dziś<span class="text-danger">*</span></th>
+                <th scope="col">Inne</th>
+            </tr>
+            </thead>
+            <tbody id="myTable1">
+
+                {% for employee in all_employees %}
+
+            <tr>
+                <td>{{ employee.last_name }} {{employee.first_name}}</td>
+                <td>{{ employee.position }}</td>
+                <td class="text-center">{{ employee.workplace}}</td>
+                <td class="text-center">{{ employee.working_hours }}</td>
+                <td class="text-center">{%if employee.contract_end %}{{ employee.contract_end|date:"d.m.y" }} {%endif%}</td>
+
+
+<!-- place to inform if an employee is at work today: -->
+                <td class="text-center"> {{ employee.today_note }}</td>
+
+                <td> {{ employee.additional_info }}</td>
+            </tr>
+
+            {% endfor %}
+            </tbody>
+        </table>
+        <span class="text-danger">*</span> ✓ - w pracy, W - urlop wypoczynkowy, WS/WN - wolne za pracę w
+        sobotę/niedzielę, DW - wolne za święto przypadające w sobotę, C- zwolnienie lekarskie
+    </div>
+</section>
+
+
+
+{% endblock content %}

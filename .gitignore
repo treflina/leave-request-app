@@ -1,0 +1,8 @@
+.vscode
+__pycache__
+
+/secret.json
+
+/applications/users/migrations/0001_initial.py
+/applications/requests/migrations/0001_initial.py
+/applications/sickleaves/migrations/0001_initial.py

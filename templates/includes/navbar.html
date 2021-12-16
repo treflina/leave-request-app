@@ -1,0 +1,63 @@
+{% load  static %}
+{% load custom_tags %}
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark w-100">
+    <div class="container-fluid">
+            <a href="{%url 'home_app:index'%}" class="navbar-brand ml-1" id="nav_urlop"><img src="{%static 'img/mbp_logo.png'%}" class="d-inline-block align-center"  style="padding-right: 15px;"></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ml-auto">
+             {%if user.role != 'S'%}
+                     <li class="nav-item">
+                    <a class="nav-link link-hide" href="{% url 'requests_app:request'%}">Złóż wniosek</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link link-hide" href="{%url 'requests_app:user_requests'%}">Twoje wnioski</a>
+                </li>
+                {%endif%}
+            {%if user.role != 'P'%}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="{% url 'requests_app:allrequests'%}" id="navbardrop" data-toggle="dropdown">Wnioski pracowników<span style='color:orange;'>{{requests_list}}</span>
+              </a>
+              <div class="dropdown-menu">
+                  <a class="dropdown-item link-hide" href="{% anchor 'requests_app:allrequests' 'to_accept'%}">Do zaopiniowania</a>
+                  <a class="dropdown-item link-hide" href="{% anchor 'requests_app:allrequests' 'holiday'%}">Wnioski urlopowe</a>
+                  <a class="dropdown-item link-hide" href="{% anchor 'requests_app:allrequests' 'saturday'%}">Wolne za soboty</a>
+              </div>
+          </li>
+            {%endif%}
+            {% if user.role == "S" %}
+              <li class="nav-item">
+              <a class="nav-link link-hide" href="{%url 'users_app:all-employees'%}">Lista pracowników</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link link-hide" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
+              </li>
+            {% endif %}
+          {%if user.is_staff%}
+          <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbardrop2" data-toggle="dropdown">
+                Admin</a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item link-hide" href="{%url 'users_app:admin-all-employees'%}">Pracownicy: dodaj/zmień</a>
+                <a class="dropdown-item link-hide" href="{%url 'requests_app:allrequests'%}">Wnioski pracowników</a>
+                <a class="dropdown-item link-hide" href="{%url 'requests_app:report'%}">Generuj raport</a>
+                <a class="dropdown-item link-hide" href="{%url 'users_app:all-employees'%}">Lista dyrektora</a>
+                <a class="dropdown-item link-hide" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
+              </div>
+          </li>
+        {%endif%}
+        <li class="nav-item">
+            <a class="nav-link link-hide" href="{%url 'users_app:user-update'%}">Zmień hasło</a>
+        </li>
+        {%if user.is_authenticated%}
+             
+            <li class="nav-item">
+                <a class="nav-link link-hide" href="{%url 'users_app:user-logout'%}">Wyloguj się</a>
+            </li>
+            {%endif%}
+    </ul>
+    </div>
+</div>
+</nav>
