@@ -21,15 +21,43 @@ Place file called secret.json in base directory. The content should look this wa
 
 
 
-One way of configuration with nginx, gunicorn, supervisor is to create eg. gunicorn_start file in virtual environment bin (project files are located inside virtual environment folder):
+SERVER SETUP WITH NGINX, GUNICORN, SUPERVISOR
+
+sudo apt-get update && sudo apt-get upgrade
+pip3 install pip --upgrade
+(export PYTHONIOENCODING="UTF-8")
+
+sudo apt install git nginx supervisor
+
+mkdir /webapps
+cd webapps
+
+sudo apt-get python3-venv
+python3 -m venv wnioskivenv
+
+cd wnioskivenv
+git clone https://github.com/../wnioski
+
+source bin/activate
+
+cd wnioski 
+python3 install -r requirements.txt
+pip freeze --local 
+python3 install gunicorn
+
+cd ..
+cd bin 
+touch gunicorn_start
+
+GUNICORN_START
 
 #!/bin/bash
 
 NAME="wnioski"                                  # Name of the application
-DJANGODIR=/directory/virtualenv/wnioski             # Django project directory
-SOCKFILE=/directory/virtualenv/run/gunicorn.sock  # we will communicte using this unix socket
-USER=root                                        # the user to run as (it's not recommandable to leave it as root)
-GROUP=root                                     # the group to run as (it's not recommandable to leave it as root)
+DJANGODIR=/webapps/wnioskivenv/wnioski             # Django project directory
+SOCKFILE=/webapps/wnioskivenv/run/gunicorn.sock  # we will communicte using this unix socket
+USER=root                                        # the user to run as (it's not recommandable to have root as user)
+GROUP=root                                     # the group to run as (it's not recommandable to have root as user)
 NUM_WORKERS=3                                     # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=wnioski.settings             # which settings file should Django use
 DJANGO_WSGI_MODULE=wnioski.wsgi                     # WSGI module name
@@ -55,12 +83,36 @@ exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --bind=unix:$SOCKFILE \
   --log-level=debug \
   --log-file=-
-  
-  
-  
-  
 
-NGINX CONFIGURATION (example with webapps as directory, wnioskivenv as project virtual environment)
+
+
+chmod u+x gunicorn_start #add permissions 
+gunicorn_start  #check if it works
+
+SUPERVISOR
+
+cd /etc/supervisor/conf.d/
+touch wnioski.conf 
+
+[program:wnioski]
+command = /webapps/wnioskivenv/bin/gunicorn_start                    ; Command to start app
+user = root                                                          ; User to run as
+stdout_logfile = /webapps/wnioskivenv/logs/gunicorn_supervisor.log   ; Where to write log messages
+redirect_stderr = true                                                ; Save stderr in the same log
+environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8                       ; Set UTF-8 as default encoding
+
+cd /webapps/wnioskivenv
+mkdir logs
+touch logs/gunicorn_supervisor.log
+
+supervisorctl reread  #wnioski:available (correct response)
+supervisorctl update # wnioski: added process group
+
+
+NGINX
+
+cd /etc/nginx/sites-available/
+touch wnioski
 
 upstream wnioski_server {
   server unix:/webapps/wnioskivenv/run/gunicorn.sock fail_timeout=0;
@@ -75,7 +127,7 @@ server {
     error_log /webapps/wnioskivenv/logs/nginx-error.log;
  
     location /static/ {
-        alias   /webapps/wnioskivenv/wnioski/static/;
+        alias   /webapps/wnioskivenv/wnioski/staticfiles/;
     }
     
     location /media/ {
@@ -94,16 +146,20 @@ server {
     }
 }
 
+cd 
+ln -s /etc/nginx/sites-available/wnioski /etc/nginx/sites-enabled/wnioski
 
+service nginx restart
+supervisorctl restart wnioski #to check
 
-SUPERVISOR:
+cd webapps/wnioskivenv/logs
+touch nginx-access.log
+touch nginx-error.log
 
-[program:wnioski]
-command = /webapps/wnioskivenv/bin/gunicorn_start                    ; Command to start app
-user = root                                                          ; User to run as
-stdout_logfile = /webapps/wnioskivenv/logs/gunicorn_supervisor.log   ; Where to write log messages
-redirect_stderr = true                                                ; Save stderr in the same log
-environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8                       ; Set UTF-8 as default encoding
-
-
+cd ..
+cd wnioski
+python manage.py collectstatic             #to create staticfiles - STATIC_ROOT in settings
+python manage.py makemigrations
+python manage.py migrate
+python manage.py createsuperuser
 
