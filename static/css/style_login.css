@@ -121,6 +121,7 @@ i.fas {
 button:hover {
   background-color: #dedfdb;
   color: #343a40;
+  font-weight: 600;
   cursor: pointer;
 }
 
