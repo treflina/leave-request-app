@@ -6,22 +6,22 @@
 {% load crispy_forms_tags %}
 
 <div class="container p-3">
-    <div class="text-center" style = "color: rgb(101, 207, 101); font-size:20px; margin-bottom:16px;">
+    <div class="text-center" style="color: rgb(101, 207, 101); font-size:20px; margin-bottom:16px;">
         {% if messages %}
         {% for message in messages %}
-            {{ message }} 
+        {{ message }}
         {% endfor %}
         {% endif %}
     </div>
     <h3 class="mt-3 mb-3"> Wniosek o udzielenie urlopu/ dnia wolnego</h3>
-    <form action="", method="POST", autocomplete="off">{%csrf_token%}
+    <form action="" , method="POST" , autocomplete="off">{%csrf_token%}
         <div class="form-group row">
             <label for="person" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Imię i nazwisko:</label>
             <div class="col">
                 <input type="text" readonly class="form-control-plaintext" id="person" value="{{user.get_full_name}}">
             </div>
-        </div> 
-       
+        </div>
+
         <div class="form-group row">
             <label for="position" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Stanowisko:</label>
             <div class="col">
@@ -30,76 +30,80 @@
         </div>
         <div class="row">
             <div class="col-lg-2 col-md-3">
-            <p class="font-weight-bold ">Proszę o:</p>
-            <!-- {% for error in form.errors %}
+                <p class="font-weight-bold ">Proszę o:</p>
+                <!-- {% for error in form.errors %}
             <p style="color: red;">
               {{ error|escape }}
             </p>
           {% endfor %} -->
-        </div>
-        <div class="col">
-        <div class="form-check">
-            <input class="form-check-input active" type="radio" name="type" id="id_type_0" value="W" checked>
-            <label class="form-check-label" for="id_type_0"> Urlop wypoczynkowy (W) </label>
-        </div>
-        <div class="form-check">
-            <div class="row">
-                <div class="col">
-                    <input class="form-check-input" type="radio" name="type" id="id_type_1" value="WS" >
-                    <label class="form-check-label" for="id_type_1"> Wolne za pracę w wolną sobotę (WS)<span class="text-danger">*</span> </label>
+            </div>
+            <div class="col">
+                <div class="form-check">
+                    <input class="form-check-input active" type="radio" name="type" id="id_type_0" value="W" checked>
+                    <label class="form-check-label" for="id_type_0"> Urlop wypoczynkowy (W) </label>
+                </div>
+                <div class="form-check">
+                    <div class="row">
+                        <div class="col">
+                            <input class="form-check-input" type="radio" name="type" id="id_type_1" value="WS">
+                            <label class="form-check-label" for="id_type_1"> Wolne za pracę w wolną sobotę
+                                (WS)<span class="text-danger">*</span> </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-check ">
+                    <input class="form-check-input" type="radio" name="type" id="id_type_2" value="WN">
+                    <label class="form-check-label" for="id_type_2"> Wolne za pracę w niedzielę/święto
+                        (WN)<span class="text-danger">*</span> </label>
+                </div>
+                <div class="form-check ">
+                    <input class="form-check-input" type="radio" name="type" id="id_type_3" value="DW">
+                    <label class="form-check-label " for="id_type_3"> Wolne za święto przypadające w wolną sobotę
+                        (DW) </label>
+                </div>
+
+                <div class="form-group row box_ws hide">
+
+                    <label class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
+                    <div class="col-lg-6">
+                        {{form.work_date|as_crispy_field}}
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="form-check ">
-            <input class="form-check-input" type="radio" name="type" id="id_type_2" value="WN"  >
-            <label class="form-check-label" for="id_type_2"> Wolne za pracę w niedzielę/święto (WN)<span class="text-danger">*</span> </label>
-        </div>
-        <div class="form-check ">
-            <input class="form-check-input" type="radio" name="type" id="id_type_3" value="DW" >
-            <label class="form-check-label " for="id_type_3"> Wolne za święto przypadające w wolną sobotę
-                (DW) </label>
-        </div>
-
-        <div class="form-group row box_ws hide">
-        
-            <label class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
-            {{form.work_date|as_crispy_field}}
-    
-        </div>
-    </div>
-</div>
 
         <div class="form-group row mt-2">
-            
-            <label class="col-lg-2 col-form-label font-weight-bold">W okresie:</label>
-            <div class="input-group col-lg-6 " id="d">
+
+            <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">W okresie:</label>
+            <div class="input-group col-lg-6 col-md-9" id="d">
                 {{form.start_date|as_crispy_field}}
                 <span class="input-group-addon ml-2 mr-2">do</span>
-                {{form.end_date|as_crispy_field}}
-            </div>
+                {{form.end_date|as_crispy_field}}</div>
+
         </div>
         <div class="form-group row box_w">
             <label for="number_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W wymiarze:</label>
-            <div class="col-lg-2 col-md-2 col-sm-2">
+
+            <div class="col col-lg-2 col-md-2 col-sm-2">
                 {{form.days|as_crispy_field}}
             </div>
             <div class="col">
                 <label class="col-form-label">{%if part%}godzin{%else%}dni roboczych{%endif%}</label>
             </div>
         </div>
-       
+
         <div class="form-group row">
             <label for="substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
             <div class="col">
                 {{form.substitute|as_crispy_field}}
             </div>
         </div>
-     
+
         <div class="form-group row">
             <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wyślij do:</label>
             <div class="col">
                 {{form.send_to_person|as_crispy_field}}
-             
+
             </div>
         </div>
         <div class="form-group row">
@@ -110,8 +114,7 @@
 
     </form>
 
-</div> 
+</div>
 
 
 {% endblock content %}
-

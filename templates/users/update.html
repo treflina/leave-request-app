@@ -2,11 +2,9 @@
 {% load static %}
 
 {% block content %}
-<header>
-    <p>Moja MBP</p>
-</header>
-<main>
-    <div class="login mt-5">
+
+<main class="d-flex" >
+    <div class="login">
         <form method="post">{%csrf_token%}
             <div>
                 {% for error in form.errors %}

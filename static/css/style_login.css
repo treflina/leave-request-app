@@ -21,30 +21,7 @@ body {
   );
   width: 100%;
   height: 100vh;
-}
-
-header {
-  color: #fff;
-  font-weight: 600;
-  font-size: 2em;
-  padding: 2% 10%;
-}
-
-.app-name {
-  display: block;
-  animation: moveRight 1s ease-out;
-}
-
-@keyframes moveRight {
-  0% {
-    opacity: 0;
-    transform: translateX(-100px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  margin-top: 50px;
 }
 
 main {
@@ -59,6 +36,7 @@ main {
   align-items: center;
   -ms-flex-wrap: wrap-reverse;
   flex-wrap: wrap-reverse;
+  position: relative;
   height: 100%;
   margin-bottom: 10%;
 }
@@ -70,6 +48,23 @@ main {
 
 .logo {
   padding-left: 4%;
+}
+
+.app-logo {
+  display: block;
+  animation: moveRight 1s ease-out;
+}
+
+@keyframes moveRight {
+  0% {
+    opacity: 0;
+    transform: translateX(150px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .text-danger {
@@ -151,8 +146,13 @@ button:hover {
 }
 
 @media (max-width: 600px) {
+  main {
+    flex-direction: column-reverse;
+  }
+
   .login {
     border-right: 0px;
+    padding-right: 0;
   }
   .reset-form input[type="password"] {
     width: 100%;
