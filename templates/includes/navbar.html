@@ -7,7 +7,7 @@
       aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <div class="burger collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav ml-auto">
         {%if user.role != 'S'%}
         <li class="nav-item">
@@ -22,9 +22,9 @@
           <a class="nav-link dropdown-toggle" href="{% url 'requests_app:allrequests'%}" id="navbardrop" data-toggle="dropdown">Wnioski pracowników<span style='color:orange;'>{{requests_list}}</span>
               </a>
           <div class="dropdown-menu">
-            <a class="dropdown-item link-hide" href="{% anchor 'requests_app:allrequests' 'to_accept'%}">Do zaopiniowania</a>
-            <a class="dropdown-item link-hide" href="{% anchor 'requests_app:allrequests' 'holiday'%}">Wnioski urlopowe</a>
-            <a class="dropdown-item link-hide" href="{% anchor 'requests_app:allrequests' 'saturday'%}">Wolne za soboty</a>
+            <a class="dropdown-item link-hide js-scroll-trigger" href="{% anchor 'requests_app:allrequests' 'to_accept'%}">Do zaopiniowania</a>
+            <a class="dropdown-item link-hide js-scroll-trigger" href="{% anchor 'requests_app:allrequests' 'holiday'%}">Wnioski urlopowe</a>
+            <a class="dropdown-item link-hide js-scroll-trigger" href="{% anchor 'requests_app:allrequests' 'saturday'%}">Wolne za soboty</a>
           </div>
         </li>
         {%endif%}

@@ -13,6 +13,10 @@ body {
   padding-bottom: 50px;
 }
 
+h3 {
+  text-align: center;
+}
+
 .welcome {
   position: absolute;
   top: 50%;
@@ -105,10 +109,10 @@ input.search2 {
   .palm {
     display: none;
   }
-
 }
 
 @media (min-width: 360px) {
+
   .page-section {
     scroll-padding-top: 160px;
   }

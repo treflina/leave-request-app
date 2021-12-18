@@ -18,12 +18,12 @@
     </div>
 
     {% if show_director %}
-    <div class="btn-group btn-group mt-5">
+    <div class="index-btns mt-5">
         <a href="{%url 'users_app:all-employees'%}" role="button" class="btn btn-success mr-1">Lista pracowników</a>
         <a href="{%url 'sickleaves_app:sickleaves'%}" role="button" class="btn btn-danger">Zwolnienia lekarskie</a>
     </div>
     {% else %}
-    <div class="mt-5">
+    <div class="index-btns mt-5">
         <a href="{% url 'requests_app:user_requests'%}" role="button" class="btn btn-secondary mr-1">Twoje wnioski</a>
         {%if show_manager %}
         <a href="{% url 'requests_app:allrequests'%}" role="button" class="btn btn-warning mr-1">Zaopiniuj wnioski</a>

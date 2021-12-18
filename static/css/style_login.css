@@ -44,6 +44,7 @@ main {
 .login {
   padding-right: 4%;
   border-right: 2px solid #eee;
+  margin-top: 50px;
 }
 
 .logo {
@@ -52,10 +53,10 @@ main {
 
 .app-logo {
   display: block;
-  animation: moveRight 1s ease-out;
+  animation: moveLeft 1s ease-out;
 }
 
-@keyframes moveRight {
+@keyframes moveLeft {
   0% {
     opacity: 0;
     transform: translateX(150px);
@@ -68,7 +69,7 @@ main {
 }
 
 .text-danger {
-  color: red;
+  color: rgb(236, 141, 141);
   width: 250px;
   margin-bottom: 10px;
   text-align: center;
