@@ -6,72 +6,85 @@
 
 
 <section class="page-section mt-5">
-    <div >
+    <div>
         <div>
-        <h3 class="table-title">Zwolnienia lekarskie <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn ml-3 btn-sm btn-info">Dodaj zwolnienie lekarskie</a></h3>
-        <form method="GET">{%csrf_token%}
-            <div class="input-search">
-                <input class="form-control search2" id="myInput1" name="kword" type="text" placeholder="Wyszukaj ...">
-            </div>
-          
-        </form>
+            <h3 class="table-title">Zwolnienia lekarskie
+                <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn ml-3 btn-sm btn-info">Dodaj zwolnienie lekarskie</a>
+            </h3>
+            <form method="GET">{%csrf_token%}
+                <div class="input-search">
+                    <input class="form-control search2" id="myInput1" name="kword" type="text"
+                        placeholder="Wyszukaj ...">
+                </div>
+
+            </form>
         </div>
-        <table class="table js-serial table-responsive empl_table" id="present">
+        <table class="js-serial" id="present">
             <thead>
-            <tr>
-                <th scope="col">Nazwisko i imię</th>
-                <th scope="col" class="text-center">Numer dokumentu</th>
-                <th scope="col" class="text-center">Data wystawienia</th>
-                <th scope="col" class="text-center">Rodzaj<span class="text-danger">*</span></th>
-                <th scope="col" class="text-center">Od</th>
-                <th scope="col" class="text-center">Do</th>
-                <th scope="col" class="text-center">Inne</th>
-                <th scope="col" class="text-center"></th>
-            </tr>
+                <tr>
+                    <th scope="col">Nazwisko i imię</th>
+                    <th scope="col" class="content-center">Numer dokumentu</th>
+                    <th scope="col" class="content-center">Data wystawienia</th>
+                    <th scope="col" class="content-center">Rodzaj<span class="text-danger">*</span></th>
+                    <th scope="col" class="content-center">Od</th>
+                    <th scope="col" class="content-center">Do</th>
+                    <th scope="col" class="content-center">Inne</th>
+                    <th scope="col" class="content-center"></th>
+                </tr>
             </thead>
             <tbody id="myTable1">
                 {% for sickleave in sickleaves %}
-            <tr>
-                <td>{{ sickleave.employee.last_name}} {{ sickleave.employee.first_name}} </td>
-                <td class="text-center">{{ sickleave.doc_number }}</td>
-                <td class="text-center">{{ sickleave.issue_date|date:"d.m.y"}}</td>
-                <td class="text-center">{{ sickleave.type }}</td>
-                <td class="text-center">{{ sickleave.start_date|date:"d.m.y" }}</td>
-                <td class="text-center">{{ sickleave.end_date|date:"d.m.y" }}</td>
-                <td class="text-center"> {{ sickleave.additional_info }}</td>
-                <td>
-                    <div class="btn-group btn-group-sm">
-                        <a href="{%url 'sickleaves_app:update_sickleave' sickleave.id%}" role="button" class="btn btn-sm btn-light" >Popraw</a>  
-                        <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#deleteModal{{sickleave.id}}">
-                            Usuń
-                        </button>
-                        
-                        <!-- Modal -->
-                        <div class="modal fade" id="deleteModal{{sickleave.id}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                <tr>
+                    <td data-title="Nazwisko i imię:">{{ sickleave.employee.last_name}}
+                        {{ sickleave.employee.first_name}} </td>
+                    <td data-title="Numer dokumentu:" class="content-center">{{ sickleave.doc_number }}</td>
+                    <td data-title="Data wystawienia:" class="content-center">{{ sickleave.issue_date|date:"d.m.y"}}
+                    </td>
+                    <td data-title="Rodzaj:" class="content-center">{{ sickleave.type }}</td>
+                    <td data-title="Od:" class="content-center">{{ sickleave.start_date|date:"d.m.y" }}</td>
+                    <td data-title="Do:" class="content-center">{{ sickleave.end_date|date:"d.m.y" }}</td>
+                    <td data-title="Inne:" class="content-center"> {{ sickleave.additional_info }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{%url 'sickleaves_app:update_sickleave' sickleave.id%}" role="button" class="btn btn-sm btn-light" >Popraw</a>
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                data-target="#deleteModal{{sickleave.id}}">
+                                Usuń
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="deleteModal{{sickleave.id}}" tabindex="-1"
+                                aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
                                         </div>
                                         <div class="modal-body">
-                                            <p>Czy na pewno chcesz usunąć zwolnienie lekarskie? <br>{{sickleave.employee.first_name}} {{sickleave.employee.last_name}} od {{sickleave.start_date|date:"d.m.y"}} do {{sickleave.end_date|date:"d.m.y"}}?</p>
+                                            <p>Czy na pewno chcesz usunąć zwolnienie lekarskie?
+                                                <br>{{sickleave.employee.first_name}} {{sickleave.employee.last_name}}
+                                                od {{sickleave.start_date|date:"d.m.y"}} do
+                                                {{sickleave.end_date|date:"d.m.y"}}?</p>
                                         </div>
                                         <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
-                                        <form method="POST" action="{% url 'sickleaves_app:delete_sickleave' sickleave.id %}">{%csrf_token%}
-                                        <button type="submit" class="btn btn-info">Tak, usuń</button>
-                                        </form>
+                                            <button type="button" class="btn btn-light"
+                                                data-dismiss="modal">Wróć</button>
+                                            <form method="POST"
+                                                action="{% url 'sickleaves_app:delete_sickleave' sickleave.id %}">
+                                                {%csrf_token%}
+                                                <button type="submit" class="btn btn-info">Tak, usuń</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                </td>
-            </tr>
-            {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
         <span class="text-danger">*</span> C - chorobowe, O - opieka, K -kwarantanna, I - izolacja

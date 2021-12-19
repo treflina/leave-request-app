@@ -10,37 +10,38 @@
             <h3 class="table-title">Lista pracowników</h3>
             <input class="form-control search" id="myInput1" type="text" placeholder="Wyszukaj...">
         </div>
-        <table class="table js-serial table-responsive empl_table" id="present">
+        <table class="js-serial" id="present">
             <thead>
-            <tr>
-                <th scope="col">Nazwisko i imię</th>
-                <th scope="col">Stanowisko</th>
-                <th scope="col">Miejsce pracy</th>
-                <th scope="col" class="text-center">Etat</th>
-                <th scope="col" class="text-center">Umowa do:</th>
-                <th scope="col" class="text-center">Dziś<span class="text-danger">*</span></th>
-                <th scope="col">Inne</th>
-            </tr>
+                <tr>
+                    <th scope="col">Nazwisko i imię</th>
+                    <th scope="col">Stanowisko</th>
+                    <th scope="col">Miejsce pracy</th>
+                    <th scope="col" class="content-center">Etat</th>
+                    <th scope="col" class="content-center">Umowa do:</th>
+                    <th scope="col" class="content-center">Dziś<span class="text-danger">*</span></th>
+                    <th scope="col">Inne</th>
+                </tr>
             </thead>
             <tbody id="myTable1">
 
                 {% for employee in all_employees %}
 
-            <tr>
-                <td>{{ employee.last_name }} {{employee.first_name}}</td>
-                <td>{{ employee.position }}</td>
-                <td class="text-center">{{ employee.workplace}}</td>
-                <td class="text-center">{{ employee.working_hours }}</td>
-                <td class="text-center">{%if employee.contract_end %}{{ employee.contract_end|date:"d.m.y" }} {%endif%}</td>
+                <tr>
+                    <td data-title="Nazwisko i imię:">{{ employee.last_name }} {{employee.first_name}}</td>
+                    <td data-title="Stanowisko:">{{ employee.position }}</td>
+                    <td data-title="Miejsce pracy:" class="content-center">{{ employee.workplace}}</td>
+                    <td data-title="Etat:" class="content-center">{{ employee.working_hours }}</td>
+                    <td data-title="Umowa do:" class="content-center">
+                        {%if employee.contract_end %}{{ employee.contract_end|date:"d.m.y" }} {%endif%}</td>
 
 
-<!-- place to inform if an employee is at work today: -->
-                <td class="text-center"> {{ employee.today_note }}</td>
+                    <!-- place to inform if an employee is at work today: -->
+                    <td data-title="Dziś:" class="content-center"> {{ employee.today_note }}</td>
 
-                <td> {{ employee.additional_info }}</td>
-            </tr>
+                    <td> {{ employee.additional_info }}</td>
+                </tr>
 
-            {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
         <span class="text-danger">*</span> ✓ - w pracy, W - urlop wypoczynkowy, WS/WN - wolne za pracę w

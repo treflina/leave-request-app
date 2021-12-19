@@ -10,6 +10,7 @@ from django.db.models.query_utils import Q
 
 from applications.users.mixins import TopManagerPermisoMixin
 from applications.users.models import User
+from wnioski.settings import get_secret
 from .models import Sickleave
 from .forms import SickleaveForm
 
@@ -39,21 +40,22 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
 
         subject = f"chorobowe {employee.first_name} {employee.last_name} ({start_date} - {end_date})"
         message = f"Dzień dobry,\r\n {employee.first_name} {employee.last_name} przebywa na zwolnieniu lekarskim ({type}) w dniach {start_date} - {end_date}.\r\n \r\nWiadomość wygenerowana automatycznie."
-        send = User.objects.filter(Q(role='S') | Q(id=employee.manager.id))
-        # print(send)
-        send_to_people = User.objects.filter(
-            Q(role='S') | Q(id=employee.manager.id)).distinct()
-        # print(send_to_people)
-        send_to_people_list = [person.work_email for person in send_to_people]
-        # print(send_to_people_list)
+        EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
+        if employee.manager:
+            send_to_people = User.objects.filter(
+                Q(role='S') | Q(id=employee.manager.id)).distinct()
+            # print(send_to_people)
+            send_to_people_list = [
+                person.work_email for person in send_to_people] + [EMAIL_HOST_USER]
+            # print(send_to_people_list)
 
-        send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            send_to_people_list,
-            fail_silently=False,
-        )
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                send_to_people_list,
+                fail_silently=False,
+            )
 
         return super(SickleaveCreateView, self).form_valid(form)
 

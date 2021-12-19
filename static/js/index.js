@@ -124,3 +124,5 @@ function search2() {
     }
   }
 }
+
+// inspired by http://jsfiddle.net/arunpjohny/564Lxosz/1/
