@@ -139,7 +139,8 @@ button:hover {
 }
 
 .password-link {
-  color: rgb(83, 154, 197);
+  color: rgb(46, 82, 104);
+  font-size: 14px;
 }
 
 .password-link:hover {
