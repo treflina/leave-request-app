@@ -8,11 +8,11 @@
 
 <div class="container welcome">
 
-    <h2>Witaj {{user.first_name}} {{user.last_name}}!</h2>
-    <h5>({{user.position}})</h5>
+    <h2>Witaj {{request.user.first_name}} {{request.user.last_name}}!</h2>
+    <h5>({{request.user.position}})</h5>
     <div class="mt-4">
         <h1>{%if onedayleft%}Został Ci{%else%}Zostało Ci{%endif%}
-            <span style="font-weight: bold; color:green;  margin: 0 10px;">{{user.current_leave}} </span>
+            <span style="font-weight: bold; color:green;  margin: 0 10px;">{{request.user.current_leave}} </span>
             {%if part%}godzin urlopu{%else%}{%if onedayleft%}dzień{%else%}dni{%endif%}
             urlopu{%endif%}<span class="palm">🌴</span> </h1>
     </div>
