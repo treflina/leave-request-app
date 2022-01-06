@@ -48,6 +48,6 @@ def create_pdf(data, fileName, title, start_date, end_date, person, position):
     table.setStyle(style_table)
     elems.append(Spacer(1, 20))
     elems.append(
-        Paragraph("Wygenerowano automatycznie z Moja MBP", style=style1))
+        Paragraph("Wygenerowano automatycznie z Pracownik MBP", style=style1))
 
     pdf.build(elems)

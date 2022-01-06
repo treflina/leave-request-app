@@ -177,6 +177,10 @@ td {
     text-align: left;
   }
 
+  .wider {
+    margin: 0 15px;
+  }
+  
   .all_employees_list {
     width: 100%;
   }

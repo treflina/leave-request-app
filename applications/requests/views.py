@@ -32,7 +32,8 @@ class RequestFormView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
 
         context = super(RequestFormView, self).get_context_data(**kwargs)
-        context['form'].fields['send_to_person'].queryset = User.objects.filter((Q(id=self.request.user.manager_id)|Q(role='S')|Q(role='T'))&Q(is_active=True)).exclude(id=self.request.user.id).order_by('-role')
+        context['form'].fields['send_to_person'].queryset = User.objects.filter((Q(id=self.request.user.manager_id) | Q(
+            role='S') | Q(role='T')) & Q(is_active=True)).exclude(id=self.request.user.id).order_by('role')
         if self.request.user.working_hours < 1:
             context['part'] = True
         return context

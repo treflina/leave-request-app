@@ -192,7 +192,7 @@ class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
     login_url = reverse_lazy('users_app:user-login')
 
     fields = ['username', 'email', 'work_email', 'first_name', 'last_name', 'position', 'position_addinfo',
-              'workplace', 'role', 'manager', 'working_hours', 'annual_leave', 'current_leave', 'contract_end', 'is_active', 'is_superuser',
+              'workplace', 'role', 'manager', 'working_hours', 'annual_leave', 'current_leave', 'contract_end', 'is_active', 'is_staff',
               'additional_info', ]
 
     success_url = reverse_lazy('users_app:admin-all-employees')

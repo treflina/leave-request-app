@@ -32,13 +32,13 @@ class User(AbstractBaseUser):
     role = models.CharField('Stanowisko kierownicze',
                             null=True, max_length=10, choices=ROLE_CHOICES)
     manager = models.ForeignKey(
-        'self', null=True, blank=True, related_name='user', on_delete=models.SET_NULL)
+        'self', verbose_name="Przełożony", null=True, blank=True, related_name='user', on_delete=models.SET_NULL)
     working_hours = models.DecimalField(
         'Wymiar etatu', max_digits=3, decimal_places=2, default=1)
     annual_leave = models.IntegerField('Roczny wymiar urlopu', default=26)
     current_leave = models.IntegerField('Urlop (pozostało)', default=0)
     contract_end = models.DateField('Umowa do:', null=True, blank=True)
-    is_staff = models.BooleanField('is_staff', default=False)
+    is_staff = models.BooleanField('Dostęp do zakładki admin', default=False)
     is_active = models.BooleanField('Obecnie zatrudniony', default=True)
     is_superuser = models.BooleanField(
         'Uprawnienia administratora', default=False)

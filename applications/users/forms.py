@@ -47,11 +47,11 @@ class UserRegisterForm(forms.ModelForm):
             'contract_end',
             'additional_info',
             'is_active',
-            'is_superuser',
+            'is_staff',
         )
         widgets = {
             'contract_end': forms.DateInput(
-                format='%d.%m.%y',
+                format='%d.%m.%Y',
                 attrs={
                     'type': 'date',
                 },
