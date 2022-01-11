@@ -174,7 +174,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
         pdf_buffer = BytesIO()
 
         urlop_data = [["Lp.", "Data złożenia", "Nazwisko i imię",
-                       "Od", "Do", "Status", "Podpisany przez:"]]
+                       "Od", "Do", "Wymiar", "Status", "Podpisany przez:"]]
         other_data = [
             ["Lp.", "Data złożenia", "Nazwisko i imię", "W dniu", "Rodzaj", "Za pracę dnia", "Status",
              "Podpisany przez:"]]
@@ -185,7 +185,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
             x = 1
             if person == "all_employees":
                 requests_data = Request.objects.filter(Q(type='W') & Q(
-                    start_date__gte=start_date) & Q(start_date__lte=end_date)).order_by('created').all()
+                    start_date__gte=start_date) & Q(start_date__lte=end_date)).order_by('author').all()
                 name = ""
                 position = ""
                 employee = "- wszyscy pracownicy"
@@ -200,7 +200,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
                 employee_repr = item.author.last_name+" " + \
                     item.author.first_name+" "+item.author.position_addinfo
                 data = [x, created_newformat, employee_repr, item.start_date,
-                        item.end_date, item.status, item.signed_by]
+                        item.end_date, item.days, item.status, item.signed_by]
                 urlop_data.append(data)
                 x = x + 1
             title = "Wnioski urlopowe"

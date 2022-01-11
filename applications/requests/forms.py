@@ -118,6 +118,9 @@ class RequestForm(forms.ModelForm):
 
 class ReportForm(forms.Form):
 
+
+    now = datetime.now()
+
     CHOICES = (("W", "urlop wypoczynkowy"), ("WS",
                "dni wolne za pracujące soboty oraz inne (WS, WN, DW)"), ("C", "zwolnienia lekarskie"),)
 
@@ -141,7 +144,7 @@ class ReportForm(forms.Form):
         label="Do",
         widget=forms.SelectDateWidget(
             attrs={'style': 'width: 33%; display: inline-block;'}),
-        # initial="2022-12-31",
+        initial=now.strftime("%Y")+"-12-31"
     )
 
     def __init__(self, *args, **kwargs):
