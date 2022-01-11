@@ -16,8 +16,10 @@ Place file called secret.json in base directory. The content should look this wa
     "EMAIL_HOST": "",
     "EMAIL_HOST_USER": "",
     "EMAIL_HOST_PASSWORD": "",
-    "EMAIL_PORT": ""
+    "EMAIL_PORT": "", 
+    "DEBUG": "False",
 }
+DEBUG MODE should be set to FALSE in production!
 
 
 

@@ -22,7 +22,7 @@ def get_secret(secret_name, secrets=secret):
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-DEBUG = True
+DEBUG = get_secret('DEBUG')
 
 ALLOWED_HOSTS = get_secret('ALLOWED_HOSTS')
 
