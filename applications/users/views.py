@@ -134,7 +134,8 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
     def get_context_data(self, **kwargs):
 
         context = super(AllEmployeesList, self).get_context_data(**kwargs)
-        all_employees = User.objects.filter(is_active=True)
+        all_employees = User.objects.filter(
+            is_active=True).exclude(username="admin")
         today = date.today()
 
         for employee in all_employees:
