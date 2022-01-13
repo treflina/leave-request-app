@@ -63,7 +63,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
             send_to_person=send_to_person
         ).save()
         subject = f"{user} prosi o akceptację wniosku ({start_date}- {end_date})"
-        message = f" {user} prosi o akceptację wniosku o wolne ({type}) w okresie {start_date} - {end_date}.\r\n \r\nZaopiniuj otrzymany wniosek. \r\n \r\nWiadomość wygenerowana automatycznie."
+        message = f" {user} prosi o akceptację wniosku o wolne ({type}) w okresie {start_date} - {end_date}.\r\n \r\nZaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/. \r\n \r\nWiadomość wygenerowana automatycznie."
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
         send_mail(
             subject,
