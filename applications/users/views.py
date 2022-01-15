@@ -38,6 +38,7 @@ from applications.sickleaves.models import Sickleave
 
 
 class UserRegisterView(TopManagerPermisoMixin, FormView):
+    """Employee register form page"""
 
     template_name = 'users/register.html'
     form_class = UserRegisterForm

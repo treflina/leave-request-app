@@ -1,10 +1,22 @@
-# wnioskimbp
-Python 3.6 or later is required. 
+# Electronic requests approval workflow with other features (WebApp)
 
-Settings are configured to work with MySQL ( installation of mysqlclient driver is needed ).
+This app enables an electronic requests approval workflow. 
+Other main functions:
+- information about the amount of time off left 
+- employee listing for a manager that gives details like eg. date of a contract end, quick check if an empoyee should be present at work today 
+- e-mail notifications to a manager that a request's been sent
+- pdf report generator about days off, sickleaves
+- sickleaves registration page
 
+Written in Django. Responsive (including tables).
 
-Place file called secret.json in base directory. The content should look this way:
+Python 3.6 or later is required.
+Settings are configured to work with MySQL database ( installation of mysqlclient driver is needed ).
+
+## Configuration on Ubuntu 18.04 server with NGINX, Gunicorn & Supervisor
+
+Place a file called secret.json in base directory. The content should look this way:
+```
 {
     "FILENAME": "secret.json",
     "SECRET_KEY": "yoursecretkey",
@@ -17,20 +29,22 @@ Place file called secret.json in base directory. The content should look this wa
     "EMAIL_HOST_USER": "",
     "EMAIL_HOST_PASSWORD": "",
     "EMAIL_PORT": "", 
-    "DEBUG": "False",
+    "DEBUG": "False"
 }
-DEBUG MODE should be set to FALSE in production!
+```
+DEBUG MODE should be set to FALSE in production.
 
-
-
-SERVER SETUP WITH NGINX, GUNICORN, SUPERVISOR
-
+```
 sudo apt-get update && sudo apt-get upgrade
 pip3 install pip --upgrade
-(export PYTHONIOENCODING="UTF-8")
-
 sudo apt install git nginx supervisor
 
+export PYTHONIOENCODING="UTF-8" 
+```
+
+## Create folders, virtual environment and copy the source code
+
+```
 mkdir /webapps
 cd webapps
 
@@ -38,27 +52,29 @@ sudo apt-get python3-venv
 python3 -m venv wnioskivenv
 
 cd wnioskivenv
-git clone https://github.com/../wnioski
+git clone https://github.com/treflina/wnioski.git
 
 source bin/activate
 
 cd wnioski 
 pip3 install -r requirements.txt
-(pip freeze --local)
+<!-- pip freeze --local -->
+```
 
-#in case there's a problem with installing pillow:
-#apt install libjpeg8-dev zlib1g-dev libtiff-dev libfreetype6 libfreetype6-dev libwebp-dev libopenjp2-7-dev libopenjp2-7-dev -y
-#pip3 install pillow --global-option="build_ext" --global-option="--enable-zlib" --global-option="--enable-jpeg" --global-option="--enable-tiff" --global-option="--enable-freetype" --global-option="--enable-webp" --global-option="--enable-webpmux" --global-option="--enable-jpeg2000"
+### In case there's a problem with installing Pillow:
+```
+apt install libjpeg8-dev zlib1g-dev libtiff-dev libfreetype6 libfreetype6-dev libwebp-dev libopenjp2-7-dev libopenjp2-7-dev -y
 
-
+pip3 install pillow --global-option="build_ext" --global-option="--enable-zlib" --global-option="--enable-jpeg" --global-option="--enable-tiff" --global-option="--enable-freetype" --global-option="--enable-webp" --global-option="--enable-webpmux" --global-option="--enable-jpeg2000"
+```
+## Gunicorn 
+```
 pip3 install gunicorn
+```
 
-cd ..
-cd bin 
-touch gunicorn_start
+Create a file called "gunicorn_start" in /webapps/wnioskivenv/bin:
 
-GUNICORN_START
-
+```
 #!/bin/bash
 
 NAME="wnioski"                                  # Name of the application
@@ -92,36 +108,48 @@ exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --log-level=debug \
   --log-file=-
 
+```
+#### Add permissions
+```
+chmod u+x gunicorn_start  
+```
+#### Check if it works
+```
+gunicorn_start  
+```
 
+## Supervisor
 
-chmod u+x gunicorn_start #add permissions 
-gunicorn_start  #check if it works
-
-SUPERVISOR
-
-cd /etc/supervisor/conf.d/
-touch wnioski.conf 
-
+```
+cd /etc/supervisor/conf.d/ 
+```
+Create a file called "wnioski.conf":
+```
 [program:wnioski]
 command = /webapps/wnioskivenv/bin/gunicorn_start                    ; Command to start app
 user = root                                                          ; User to run as
 stdout_logfile = /webapps/wnioskivenv/logs/gunicorn_supervisor.log   ; Where to write log messages
 redirect_stderr = true                                                ; Save stderr in the same log
 environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8                       ; Set UTF-8 as default encoding
-
+```
+```
 cd /webapps/wnioskivenv
 mkdir logs
 touch logs/gunicorn_supervisor.log
+```
+Check if supervisor works:  
+```supervisorctl reread```  
+correct response: "wnioski: available" \
+```supervisorctl update``` \
+correct response: "wnioski: added process group"
 
-supervisorctl reread  #wnioski:available (correct response)
-supervisorctl update # wnioski: added process group
-
-
-NGINX
-
+## NGINX
+```
 cd /etc/nginx/sites-available/
-touch wnioski
+```
+Create a file called "wnioski":
 
+```
 upstream wnioski_server {
   server unix:/webapps/wnioskivenv/run/gunicorn.sock fail_timeout=0;
 }
@@ -154,20 +182,34 @@ server {
     }
 }
 
+```
+```
 cd 
-ln -s /etc/nginx/sites-available/wnioski /etc/nginx/sites-enabled/wnioski
-
+ln -s /etc/nginx/sites-available/wnioski /etc/nginx/sites-enabled/wnioski 
+```
+```
 service nginx restart
-supervisorctl restart wnioski #to check
+```
+Check:
+```
+supervisorctl restart wnioski 
+```
 
+Create a place for logs:
+```
 cd webapps/wnioskivenv/logs
 touch nginx-access.log
 touch nginx-error.log
+```
 
-cd ..
-cd wnioski
-python manage.py collectstatic             #to create staticfiles - STATIC_ROOT in settings
+## Create staticfiles, make migrations to database, createsuperuser 
+```
+cd webapps/wnioskivenv/wnioski
+```
+```
+python manage.py collectstatic          
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
+```
 
