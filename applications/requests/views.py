@@ -23,6 +23,7 @@ from .models import Request
 
 
 class RequestFormView(LoginRequiredMixin, FormView):
+    """Leave request form."""
 
     form_class = RequestForm
     template_name = 'requests/send_request.html'
@@ -79,6 +80,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
 
 
 class UserRequestsListView(LoginRequiredMixin, ListView):
+    """Employee requests listing page."""
 
     template_name = "requests/user_requests.html"
     model = Request
@@ -96,6 +98,7 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
 
 
 class RequestsListView(TopManagerPermisoMixin, ListView):
+    """All employees requests listing page. It contains all requests except those sent by current user itself."""
 
     template_name = "requests/allrequests.html"
     model = Request
@@ -123,7 +126,7 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
 
 
 def accept_request(request, pk):
-
+    """Accepts the employee request."""
     user = request.user
     request_to_accept = Request.objects.get(id=pk)
     request_to_accept.status = 'zaakceptowany'
@@ -133,7 +136,7 @@ def accept_request(request, pk):
 
 
 def reject_request(request, pk):
-
+    """Rejects the employee request."""
     user = request.user
     request_to_reject = Request.objects.get(id=pk)
     if request_to_reject.type == 'W':
@@ -148,7 +151,7 @@ def reject_request(request, pk):
 
 
 def delete_request(request, pk):
-
+    """Withdraws the request."""
     user = request.user
     request_to_delete = Request.objects.get(id=pk)
     if request_to_delete.type == 'W':
@@ -159,7 +162,8 @@ def delete_request(request, pk):
 
 
 class ReportView(TopManagerPermisoMixin, FormView):
-
+    """Creates pdf report about requests and sickleaves in chosen period."""
+    
     form_class = ReportForm
     template_name = 'requests/report.html'
     success_url = '.'

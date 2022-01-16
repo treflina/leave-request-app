@@ -16,6 +16,7 @@ from .forms import SickleaveForm
 
 
 class SickleavesListView(TopManagerPermisoMixin, ListView):
+    """Sick leaves listing page."""
 
     context_object_name = 'sickleaves'
     template_name = "sickleaves/sickleaves.html"
@@ -26,6 +27,8 @@ class SickleavesListView(TopManagerPermisoMixin, ListView):
 
 
 class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
+    """Sick leave registration form."""
+
     template_name = "sickleaves/add_sickleave.html"
     model = Sickleave
     form_class = SickleaveForm
@@ -61,6 +64,7 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
 
 
 class SickleaveUpdateView(TopManagerPermisoMixin, UpdateView):
+    """Registered sick leave update form."""
     model = Sickleave
     template_name = "sickleaves/update_sickleave.html"
     fields = "__all__"
@@ -69,5 +73,6 @@ class SickleaveUpdateView(TopManagerPermisoMixin, UpdateView):
 
 
 def delete_sickleave(request, pk):
+    """Deletes sick leave."""
     sickleave_to_delete = Sickleave.objects.get(id=pk).delete()
     return HttpResponseRedirect(reverse('sickleaves_app:sickleaves'))

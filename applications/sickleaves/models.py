@@ -6,6 +6,8 @@ from .managers import SickleavesSearchManager
 
 # Create your models here.
 class Sickleave(models.Model):
+    """Sickleave table model."""
+    
     TYPE_CHOICES = (
         ('C', 'Chorobowe'),
         ('O', 'Opieka'),

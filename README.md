@@ -6,8 +6,8 @@ Other main functions:
 - information about the amount of time off left
 - employee listing for a manager that gives details like eg. a contract end date, a possibility to quickly check if an empoyee should be present at work today
 - e-mail notifications to a manager that a request's been sent
-- pdf report generator about days off, sickleaves
-- sickleaves registration page
+- pdf report generator about days off, sick leaves
+- sick leaves registration page
 
 Written in Python with Django 3.2. Responsive (including tables).
 

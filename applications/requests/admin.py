@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import Request
 
 class RequestsAdmin(admin.ModelAdmin):
+    '''Admin panel content for requests.'''
+
     list_display = (
         'author',
         'work_date',
@@ -13,6 +15,5 @@ class RequestsAdmin(admin.ModelAdmin):
 
     search_fields = ('author__last_name', 'author__first_name')
     list_filter = ('type', )
-
 
 admin.site.register(Request, RequestsAdmin)

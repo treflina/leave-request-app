@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from applications.users.models import User
 
 class HomePage(LoginRequiredMixin, TemplateView):
- 
+    
     template_name = "home/index.html"
     model =User 
     login_url = reverse_lazy('users_app:user-login')

@@ -9,7 +9,7 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser):
-
+    """User table model"""
     # check if AUTH_USER in base.py
 
     ROLE_CHOICES = (

@@ -4,6 +4,8 @@ from django.contrib import admin
 from .models import User
 
 class EmployeeAdmin(admin.ModelAdmin):
+    '''Admin panel content for users'''
+    
     list_display = (
         'last_name',
         'first_name',

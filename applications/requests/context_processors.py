@@ -3,6 +3,7 @@ from .models import Request
 from .managers import RequestManager
 
 def number_requests_received(request):
+    """It counts employees requests received by user that are still not accepted or rejected."""
     if request.user.is_authenticated:
         return {'requests_list': Request.objects.requests_received_counter(request.user)}
     else:

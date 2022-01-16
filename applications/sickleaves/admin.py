@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import Sickleave
 
 class SickleavesAdmin(admin.ModelAdmin):
+    """Sick leave admin panel content."""
+
     list_display = (
         'employee',
         'type',

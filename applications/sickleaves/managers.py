@@ -2,7 +2,7 @@ from django.db import models
 from django.db.models import Q
 
 class SickleavesSearchManager(models.Manager):
-    '''Managers for Sickleaves Model'''
+    '''Search manager for Sickleave Model'''
 
     def sickleaves_search(self, kword):
         result = self.filter(Q

@@ -38,7 +38,7 @@ from applications.sickleaves.models import Sickleave
 
 
 class UserRegisterView(TopManagerPermisoMixin, FormView):
-    """Employee register form page"""
+    """Employee register form page."""
 
     template_name = 'users/register.html'
     form_class = UserRegisterForm
@@ -70,6 +70,7 @@ class UserRegisterView(TopManagerPermisoMixin, FormView):
 
 
 class LoginUser(FormView):
+    """User login page"""
 
     template_name = 'users/login.html'
     form_class = LoginForm
@@ -126,6 +127,7 @@ def update_password(request):
 
 
 class AllEmployeesList(TopManagerPermisoMixin, ListView):
+    """Employees listing page for head/manager"""
 
     template_name = "users/all_employees.html"
     model = User
@@ -163,6 +165,7 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
 
 
 class AdminEmployeesList(TopManagerPermisoMixin, ListView):
+    """Employees listing page for admin"""
 
     template_name = "users/admin_all_employees.html"
     model = User
@@ -188,6 +191,7 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
 
 
 class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
+    """Employee details update form."""
 
     model = User
     template_name = "users/update_employee.html"

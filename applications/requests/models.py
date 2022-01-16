@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 
-
-#
 from model_utils.models import TimeStampedModel
 from applications.users.models import User
 
@@ -10,6 +8,7 @@ from .managers import RequestManager
 
 
 class Request(TimeStampedModel):
+    """Request table model."""
 
     TYPE_CHOICES = (
         ('W', 'Urlop wypoczynkowy (W)'),
