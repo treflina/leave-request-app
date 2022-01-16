@@ -1,45 +1,27 @@
 # Electronic requests approval workflow with other features (WebApp)
 
-This app enables an electronic requests approval workflow. 
+This app enables an electronic requests approval workflow.
 Other main functions:
-- information about the amount of time off left 
-- employee listing for a manager that gives details like eg. date of a contract end, quick check if an empoyee should be present at work today 
+
+- information about the amount of time off left
+- employee listing for a manager that gives details like eg. a contract end date, a possibility to quickly check if an empoyee should be present at work today
 - e-mail notifications to a manager that a request's been sent
 - pdf report generator about days off, sickleaves
 - sickleaves registration page
 
-Written in Django. Responsive (including tables).
+Written in Python with Django 3.2. Responsive (including tables).
 
 Python 3.6 or later is required.
 Settings are configured to work with MySQL database ( installation of mysqlclient driver is needed ).
 
 ## Configuration on Ubuntu 18.04 server with NGINX, Gunicorn & Supervisor
 
-Place a file called secret.json in base directory. The content should look this way:
-```
-{
-    "FILENAME": "secret.json",
-    "SECRET_KEY": "yoursecretkey",
-    "DB_NAME": "yourdatabasename",
-    "DB_USER": "databaseuser",
-    "DB_PASSWORD": "databasepassword",
-    "ALLOWED_HOSTS": ["localhost", "127.0.0.1", "other IP adresses"],
-    "DEFAULT_FROM_EMAIL": "",
-    "EMAIL_HOST": "",
-    "EMAIL_HOST_USER": "",
-    "EMAIL_HOST_PASSWORD": "",
-    "EMAIL_PORT": "", 
-    "DEBUG": "False"
-}
-```
-DEBUG MODE should be set to FALSE in production.
-
 ```
 sudo apt-get update && sudo apt-get upgrade
 pip3 install pip --upgrade
 sudo apt install git nginx supervisor
 
-export PYTHONIOENCODING="UTF-8" 
+export PYTHONIOENCODING="UTF-8"
 ```
 
 ## Create folders, virtual environment and copy the source code
@@ -56,18 +38,42 @@ git clone https://github.com/treflina/wnioski.git
 
 source bin/activate
 
-cd wnioski 
+cd wnioski
 pip3 install -r requirements.txt
 <!-- pip freeze --local -->
 ```
 
-### In case there's a problem with installing Pillow:
+In case there's a problem with installing Pillow:
+
 ```
 apt install libjpeg8-dev zlib1g-dev libtiff-dev libfreetype6 libfreetype6-dev libwebp-dev libopenjp2-7-dev libopenjp2-7-dev -y
 
 pip3 install pillow --global-option="build_ext" --global-option="--enable-zlib" --global-option="--enable-jpeg" --global-option="--enable-tiff" --global-option="--enable-freetype" --global-option="--enable-webp" --global-option="--enable-webpmux" --global-option="--enable-jpeg2000"
 ```
-## Gunicorn 
+
+Place a file called secret.json in this base directory. The content should look this way:
+
+```
+{
+    "FILENAME": "secret.json",
+    "SECRET_KEY": "yoursecretkey",
+    "DB_NAME": "yourdatabasename",
+    "DB_USER": "databaseuser",
+    "DB_PASSWORD": "databasepassword",
+    "ALLOWED_HOSTS": ["localhost", "127.0.0.1", "other IP adresses"],
+    "DEFAULT_FROM_EMAIL": "",
+    "EMAIL_HOST": "",
+    "EMAIL_HOST_USER": "",
+    "EMAIL_HOST_PASSWORD": "",
+    "EMAIL_PORT": "",
+    "DEBUG": "False"
+}
+```
+
+DEBUG MODE should be set to FALSE in production.
+
+## Gunicorn
+
 ```
 pip3 install gunicorn
 ```
@@ -109,21 +115,27 @@ exec ../bin/gunicorn ${DJANGO_WSGI_MODULE}:application \
   --log-file=-
 
 ```
-#### Add permissions
+
+Add permissions
+
 ```
-chmod u+x gunicorn_start  
+chmod u+x gunicorn_start
 ```
-#### Check if it works
+
+Check if it works
+
 ```
-gunicorn_start  
+gunicorn_start
 ```
 
 ## Supervisor
 
 ```
-cd /etc/supervisor/conf.d/ 
+cd /etc/supervisor/conf.d/
 ```
+
 Create a file called "wnioski.conf":
+
 ```
 [program:wnioski]
 command = /webapps/wnioskivenv/bin/gunicorn_start                    ; Command to start app
@@ -132,44 +144,48 @@ stdout_logfile = /webapps/wnioskivenv/logs/gunicorn_supervisor.log   ; Where to 
 redirect_stderr = true                                                ; Save stderr in the same log
 environment=LANG=en_US.UTF-8,LC_ALL=en_US.UTF-8                       ; Set UTF-8 as default encoding
 ```
+
 ```
 cd /webapps/wnioskivenv
 mkdir logs
 touch logs/gunicorn_supervisor.log
 ```
+
 Check if supervisor works:  
-```supervisorctl reread```  
+`supervisorctl reread`  
 correct response: "wnioski: available" \
-```supervisorctl update``` \
+`supervisorctl update` \
 correct response: "wnioski: added process group"
 
 ## NGINX
+
 ```
 cd /etc/nginx/sites-available/
 ```
+
 Create a file called "wnioski":
 
 ```
 upstream wnioski_server {
   server unix:/webapps/wnioskivenv/run/gunicorn.sock fail_timeout=0;
 }
- 
+
 server {
- 
+
     listen   80;
     server_name 46.41.138.161;
- 
+
     access_log /webapps/wnioskivenv/logs/nginx-access.log;
     error_log /webapps/wnioskivenv/logs/nginx-error.log;
- 
+
     location /static/ {
         alias   /webapps/wnioskivenv/wnioski/staticfiles/;
     }
-    
+
     location /media/ {
         alias   /webapps/wnioskivenv/wnioski/media/;
     }
- 
+
     location / {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header Host $http_host;
@@ -183,33 +199,39 @@ server {
 }
 
 ```
+
 ```
-cd 
-ln -s /etc/nginx/sites-available/wnioski /etc/nginx/sites-enabled/wnioski 
+cd
+ln -s /etc/nginx/sites-available/wnioski /etc/nginx/sites-enabled/wnioski
 ```
+
 ```
 service nginx restart
 ```
+
 Check:
+
 ```
-supervisorctl restart wnioski 
+supervisorctl restart wnioski
 ```
 
 Create a place for logs:
+
 ```
 cd webapps/wnioskivenv/logs
 touch nginx-access.log
 touch nginx-error.log
 ```
 
-## Create staticfiles, make migrations to database, createsuperuser 
+## Create staticfiles, make migrations to database, createsuperuser
+
 ```
 cd webapps/wnioskivenv/wnioski
 ```
+
 ```
-python manage.py collectstatic          
+python manage.py collectstatic
 python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 ```
-
