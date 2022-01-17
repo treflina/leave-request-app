@@ -60,7 +60,7 @@ Place a file called secret.json in this base directory. The content should look 
     "DB_NAME": "yourdatabasename",
     "DB_USER": "databaseuser",
     "DB_PASSWORD": "databasepassword",
-    "ALLOWED_HOSTS": ["localhost", "127.0.0.1", "other IP adresses"],
+    "ALLOWED_HOSTS": ["localhost", "127.0.0.1", "other IP adresses", "domain"],
     "DEFAULT_FROM_EMAIL": "",
     "EMAIL_HOST": "",
     "EMAIL_HOST_USER": "",
@@ -173,7 +173,7 @@ upstream wnioski_server {
 server {
 
     listen   80;
-    server_name 46.41.138.161;
+    server_name  YOUR IP ADDRESS;
 
     access_log /webapps/wnioskivenv/logs/nginx-access.log;
     error_log /webapps/wnioskivenv/logs/nginx-error.log;

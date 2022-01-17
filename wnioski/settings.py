@@ -2,12 +2,10 @@ from django.core.exceptions import ImproperlyConfigured
 import json
 import os
 
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from unipath import Path
 BASE_DIR = Path(__file__).ancestor(2)
 
-# key = os.path.join(BASE_DIR.child('wnioski'), "secret.json")
+
 with open(os.path.join(BASE_DIR, 'secret.json')) as f:
     secret = json.loads(f.read())
 
@@ -19,8 +17,6 @@ def get_secret(secret_name, secrets=secret):
         msg = f"Nie mam dostępu do zmiennej {secret_name}"
         raise ImproperlyConfigured(msg)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-
 
 DEBUG = get_secret('DEBUG')
 
@@ -28,8 +24,6 @@ ALLOWED_HOSTS = get_secret('ALLOWED_HOSTS')
 
 SECRET_KEY = get_secret('SECRET_KEY')
 
-
-# Application definition
 
 DJANGO_APPS = [
     'django.contrib.admin',
@@ -137,7 +131,7 @@ AUTH_USER_MODEL = 'users.User'
 
 LANGUAGE_CODE = 'pl-PL'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
