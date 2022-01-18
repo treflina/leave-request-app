@@ -46,11 +46,9 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
         if employee.manager:
             send_to_people = User.objects.filter(
-                Q(role='S') | Q(id=employee.manager.id)).distinct()
-            # print(send_to_people)
+                Q(role='S') | Q(id=employee.manager.id) | Q(position="starszy kustosz - instruktor")).distinct()
             send_to_people_list = [
                 person.work_email for person in send_to_people] + [EMAIL_HOST_USER]
-            # print(send_to_people_list)
 
             send_mail(
                 subject,
