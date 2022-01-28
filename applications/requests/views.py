@@ -163,7 +163,7 @@ def delete_request(request, pk):
 
 class ReportView(TopManagerPermisoMixin, FormView):
     """Creates pdf report about requests and sickleaves in chosen period."""
-    
+
     form_class = ReportForm
     template_name = 'requests/report.html'
     success_url = '.'
@@ -178,7 +178,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
         pdf_buffer = BytesIO()
 
         urlop_data = [["Lp.", "Data złożenia", "Nazwisko i imię",
-                       "Od", "Do", "Wymiar", "Status", "Podpisany przez:"]]
+                       "Od", "Do", "Dni/godz.", "Status", "Podpisany przez:"]]
         other_data = [
             ["Lp.", "Data złożenia", "Nazwisko i imię", "W dniu", "Rodzaj", "Za pracę dnia", "Status",
              "Podpisany przez:"]]

@@ -118,7 +118,6 @@ class RequestForm(forms.ModelForm):
 
 class ReportForm(forms.Form):
 
-
     now = datetime.now()
 
     CHOICES = (("W", "urlop wypoczynkowy"), ("WS",
@@ -136,15 +135,17 @@ class ReportForm(forms.Form):
     start_date = forms.DateField(
         label="Od",
         widget=forms.SelectDateWidget(
-            attrs={'style': 'width: 33%; display: inline-block;'}),
-
-
+            attrs={'style': 'width: 33%; display: inline-block;'},
+            years=range(2021, 2035)),
+        initial=now.strftime("%Y")+"-01-01"
     )
     end_date = forms.DateField(
         label="Do",
         widget=forms.SelectDateWidget(
-            attrs={'style': 'width: 33%; display: inline-block;'}),
-        initial=now.strftime("%Y")+"-12-31"
+            attrs={'style': 'width: 33%; display: inline-block;'},
+            years=range(2022, 2035)),
+        initial=now.date()
+        #
     )
 
     def __init__(self, *args, **kwargs):

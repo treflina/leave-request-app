@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render
 from django.urls import path, reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView
@@ -38,17 +39,49 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
     def form_valid(self, form):
         employee = form.cleaned_data["employee"]
         start_date = form.cleaned_data["start_date"]
+        start_date = start_date.strftime("%d-%m-%y")
         end_date = form.cleaned_data["end_date"]
+        end_date = end_date.strftime("%d-%m-%y")
         type = form.cleaned_data["type"]
+        head = form.cleaned_data["head"]
+        manager = form.cleaned_data["manager"]
+        instructor = form.cleaned_data["instructor"]
+        text_info = ""
+        if type == "O":
+            text = "na opiece nad chorym członkiem rodziny"
+            text_subj = f"opieka"
+        elif type == "K":
+            text = "na kwarantannie"
+            text_subj = f"kwarantanna"
+            text_info = f"Podane daty mogą ulec zmianie."
+        elif type == "I":
+            text = "na izolacji"
+            text_subj = f"izolacja"
+        else:
+            text = f"na zwolnieniu lekarskim ({type})"
+            text_subj = f"chorobowe"
 
-        subject = f"chorobowe {employee.first_name} {employee.last_name} ({start_date} - {end_date})"
-        message = f"Dzień dobry,\r\n {employee.first_name} {employee.last_name} przebywa na zwolnieniu lekarskim ({type}) w dniach {start_date} - {end_date}.\r\n \r\nWiadomość wygenerowana automatycznie."
+        subject = f"{text_subj} {employee.first_name} {employee.last_name} ({start_date} - {end_date})"
+        message = f"Dzień dobry,\r\n{employee.first_name} {employee.last_name} przebywa {text} w dniach {start_date} do {end_date}. {text_info}\r\n \r\nWiadomość wygenerowana automatycznie."
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
         if employee.manager:
-            send_to_people = User.objects.filter(
-                Q(role='S') | Q(id=employee.manager.id) | Q(position="starszy kustosz - instruktor")).distinct()
-            send_to_people_list = [
-                person.work_email for person in send_to_people] + [EMAIL_HOST_USER]
+            send_to_people = []
+            if head:
+                person = User.objects.filter(
+                    Q(role='S')).first()
+                send_to_people.append(person.work_email)
+            if manager:
+                person = User.objects.filter(
+                    Q(id=employee.manager.id)).first()
+                send_to_people.append(person.work_email)
+            if instructor:
+                person = User.objects.filter(
+                    Q(position="starszy kustosz - instruktor")).first()
+                send_to_people.append(person.work_email)
+            # send_to_people = User.objects.filter(
+            #     Q(role='S') | Q(id=employee.manager.id) | Q(position="starszy kustosz - instruktor")).distinct()
+            send_to_people_list = [p for p in set(
+                send_to_people)] + [EMAIL_HOST_USER]
 
             send_mail(
                 subject,
