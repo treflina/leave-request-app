@@ -50,6 +50,10 @@ class SickleaveForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(SickleaveForm, self).__init__(*args, **kwargs)
+
+        self.fields['head'].initial = True
+        self.fields['manager'].initial = True
+        self.fields['instructor'].initial = True
         self.fields['employee'] = forms.ModelChoiceField(
             label='Osoba',
             queryset=User.objects.all())
