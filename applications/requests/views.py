@@ -51,20 +51,36 @@ class RequestFormView(LoginRequiredMixin, FormView):
             days = 0
         start_date = form.cleaned_data["start_date"]
         end_date = form.cleaned_data["end_date"]
+        work_date = form.cleaned_data["work_date"]
         send_to_person = form.cleaned_data['send_to_person']
 
         request = Request(
             author=user,
             type=type,
-            work_date=form.cleaned_data["work_date"],
+            work_date=work_date,
             start_date=start_date,
             end_date=end_date,
             days=days,
             substitute=form.cleaned_data['substitute'],
             send_to_person=send_to_person
         ).save()
-        subject = f"{user} prosi o akceptację wniosku ({start_date}- {end_date})"
-        message = f" {user} prosi o akceptację wniosku o wolne ({type}) w okresie {start_date} - {end_date}.\r\n \r\nZaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/. \r\n \r\nWiadomość wygenerowana automatycznie."
+        start_date = start_date.strftime("%d.%m.%y")
+        end_date = end_date.strftime("%d.%m.%y")
+        if work_date:
+            work_date = work_date.strftime("%d.%m.%y")
+        if type == "W" and start_date == end_date:
+            text_msg = f"urlop wypoczynkowy w dniu {start_date}"
+        elif type == "W":
+            text_msg = f"urlop wypoczynkowy w okresie {start_date} - {end_date}"
+        elif (type == "WS" or type == "WN"):
+            text_msg = f"dzień wolny ({type}) {start_date} za pracę {work_date}"
+        elif type == "DW":
+            text_msg = f"dzień wolny {start_date} za święto przypadające w sobotę"
+        else:
+            text_msg = f"wolne ({type}) w okresie {start_date} - {end_date}"
+
+        subject = f"{user} prosi o akceptację wniosku ({start_date}-{end_date})"
+        message = f"{user} prosi o akceptację wniosku o {text_msg}.\r\n \r\nZaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/. \r\n \r\nWiadomość wygenerowana automatycznie."
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
         send_mail(
             subject,

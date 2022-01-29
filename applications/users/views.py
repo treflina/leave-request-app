@@ -144,19 +144,24 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
         for employee in all_employees:
             if employee.working_hours == 1.00:
                 employee.working_hours = 1
-
             today_sick = Sickleave.objects.filter(Q(start_date__lte=today) & Q(
                 end_date__gte=today) & Q(employee__id=employee.id)).all()
             today_requests = Request.objects.filter(Q(start_date__lte=today) & Q(
                 end_date__gte=today) & Q(author__id=employee.id)).exclude(status="odrzucony").all()
-
-            if len(today_sick) != 0:
-                employee.today_note = "C"
-
+            if "rodz" in employee.additional_info or "wych" in employee.additional_info or "macierz" in employee.additional_info:
+                employee.today_note = ""
+            elif len(today_sick) > 0:
+                if today_sick[0].type == "O":
+                    employee.today_note = "O"
+                elif today_sick[0].type == "K":
+                    employee.today_note = "K"
+                elif today_sick[0].type == "I":
+                    employee.today_note = "I"
+                else:
+                    employee.today_note = "C"
             elif len(today_requests) != 0:
                 list_req = [tr.type for tr in today_requests]
                 employee.today_note = list_req[0]
-
             else:
                 employee.today_note = "✓"
 

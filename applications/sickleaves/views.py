@@ -39,9 +39,9 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
     def form_valid(self, form):
         employee = form.cleaned_data["employee"]
         start_date = form.cleaned_data["start_date"]
-        start_date = start_date.strftime("%d-%m-%y")
+        start_date = start_date.strftime("%d.%m.%y")
         end_date = form.cleaned_data["end_date"]
-        end_date = end_date.strftime("%d-%m-%y")
+        end_date = end_date.strftime("%d.%m.%y")
         type = form.cleaned_data["type"]
         head = form.cleaned_data["head"]
         manager = form.cleaned_data["manager"]
