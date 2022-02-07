@@ -30,7 +30,7 @@
                         <tr>
                             <td data-title="Data złożenia:" class="content-center">{{request.created|date:"d.m.y"}}</td>
                             <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
-                                {{request.author.position_info}}</td>
+                                {{request.author.position_addinfo}}</td>
                             <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
                             <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
                             <td data-title="Liczba dni:" class="content-center">
@@ -94,7 +94,8 @@
                         {% for request in requests_holiday %}
                         <tr>
                             <td data-title="Data złożenia:" class="content-center">{{request.created|date:"d.m.y"}}</td>
-                            <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
+                            <td data-title="Nazwisko i imię:">{{request.author.last_name}}
+                                {{request.author.first_name}} {{request.author.position_addinfo}}
                             </td>
                             <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
                             <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
@@ -156,7 +157,8 @@
                             <td data-title="Data złożenia:" class="search content-center">
                                 {{request.created|date:"d.m.y"}}
                             </td>
-                            <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
+                            <td data-title="Nazwisko i imię:">{{request.author.last_name}}
+                                {{request.author.first_name}} {{request.author.position_addinfo}}
                             </td>
                             <td data-title="Od:" class="search">{{request.start_date|date:"d.m.y"}}</td>
                             <td data-title="Do:" class="content-center">{{request.type}}</td>

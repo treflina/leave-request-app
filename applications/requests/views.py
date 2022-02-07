@@ -233,7 +233,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
             x = 1
             if person == "all_employees":
                 requests_data = Request.objects.filter(~Q(type='W') & Q(
-                    start_date__gte=start_date) & Q(start_date__lte=end_date)).order_by('created').all()
+                    start_date__gte=start_date) & Q(start_date__lte=end_date)).order_by('author').all()
                 name = ""
                 position = ""
                 employee = "- wszyscy pracownicy"
