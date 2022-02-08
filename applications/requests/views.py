@@ -114,7 +114,7 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
 
 
 class RequestsListView(TopManagerPermisoMixin, ListView):
-    """All employees requests listing page. It contains all requests except those sent by current user itself."""
+    """All employees requests listing page. It contains all requests except those sent by current user themselves."""
 
     template_name = "requests/allrequests.html"
     model = Request

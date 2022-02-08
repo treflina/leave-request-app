@@ -13,22 +13,22 @@ class RequestManager(models.Manager):
 
     def requests_holiday_topmanager(self, user):
         result = self.filter(
-           Q(type = 'W')).exclude(author = user).order_by('-created')
+           Q(type = 'W')).exclude(author = user).order_by('-end_date')
         return result
 
     def requests_holiday(self, user):
         result = self.filter(
-            Q(author__manager = user)&Q(type = 'W')).order_by('-created')
+            Q(author__manager = user)&Q(type = 'W')).order_by('-end_date')
         return result
 
     def requests_others_topmanager(self, user):
         result = self.filter(
-            Q(type = 'WS')|Q(type = 'WN')|Q(type = 'DW')).exclude(author = user).order_by('-created')
+            Q(type = 'WS')|Q(type = 'WN')|Q(type = 'DW')).exclude(author = user).order_by('-end_date')
         return result
 
     def requests_others(self, user):
         result = self.filter(
-            Q(author__manager = user)&(Q(type = 'WS')|Q(type = 'WN')|Q(type = 'DW'))).order_by('-created')
+            Q(author__manager = user)&(Q(type = 'WS')|Q(type = 'WN')|Q(type = 'DW'))).order_by('-end_date')
         return result
 
     # managers for listing user requests
