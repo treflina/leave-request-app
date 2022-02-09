@@ -148,9 +148,8 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
                 end_date__gte=today) & Q(employee__id=employee.id)).all()
             today_requests = Request.objects.filter(Q(start_date__lte=today) & Q(
                 end_date__gte=today) & Q(author__id=employee.id)).exclude(status="odrzucony").all()
-            if ("rodz" or "wych" or "mac" or "rehab" or "urlop" or "bezpł") in employee.additional_info:
-                employee.today_note = ""
-            elif len(today_sick) > 0:
+
+            if len(today_sick) > 0:
                 if today_sick[0].type == "O":
                     employee.today_note = "O"
                 elif today_sick[0].type == "K":
@@ -164,6 +163,11 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
                 employee.today_note = list_req[0]
             else:
                 employee.today_note = "✓"
+
+            add_infolist = ["wych", "rodz", "mac", "rehab", "urlop", "bezpł"]
+            for info in add_infolist:
+                if info in employee.additional_info:
+                    employee.today_note = ""
 
         context['all_employees'] = all_employees
         return context
