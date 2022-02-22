@@ -263,7 +263,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
             x = 1
             if person == "all_employees":
                 sickleaves_data = Sickleave.objects.filter(Q(start_date__gte=start_date) & Q(
-                    start_date__lte=end_date)).order_by('start_date').all()
+                    start_date__lte=end_date)).order_by('employee__last_name', 'start_date').all()
                 name = ""
                 position = ""
                 employee = "- wszyscy pracownicy"
