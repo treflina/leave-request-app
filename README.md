@@ -66,7 +66,7 @@ Place a file called secret.json in this base directory. The content should look 
     "EMAIL_HOST_USER": "",
     "EMAIL_HOST_PASSWORD": "",
     "EMAIL_PORT": "",
-    "DEBUG": "False"
+    "DEBUG": false
 }
 ```
 
