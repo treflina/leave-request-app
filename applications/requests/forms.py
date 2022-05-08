@@ -72,17 +72,16 @@ class RequestForm(forms.ModelForm):
         return start_date
 
     def clean_end_date(self):
-        start_date = self.cleaned_data.get('start_date')
-        end_date = self.cleaned_data.get('end_date')
-        if end_date == None:
+        start_date = self.cleaned_data['start_date']
+        end_date = self.cleaned_data['end_date']
+        type = self.cleaned_data['type']
+        if not end_date:
             end_date = start_date
         if not end_date >= start_date:
             raise forms.ValidationError(
                 'Data końcowa nie może być wcześniejsza od daty początkowej.')
-            # Nie działa: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1:
-        if end_date > start_date:
-            if type == 'WS':
-                raise forms.ValidationError(
+        if (end_date != start_date) and (type == 'WS' or type == "WN"):
+            raise forms.ValidationError(
                     'Data końcowa nie powinna się różnić od daty początkowej w przypadku wolnego za pracującą sobotę lub niedzielę.')
         return end_date
 

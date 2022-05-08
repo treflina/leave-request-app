@@ -1,3 +1,4 @@
+from distutils.log import error
 from io import BytesIO
 
 from django.core.exceptions import ValidationError
@@ -9,7 +10,6 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from applications.users.mixins import TopManagerPermisoMixin
 from django.views.generic import FormView, ListView
 
 from pdf_creator import create_pdf
@@ -17,6 +17,8 @@ from wnioski.settings import get_secret
 
 from applications.users.models import User
 from applications.sickleaves.models import Sickleave
+from applications.users.mixins import TopManagerPermisoMixin
+
 from .forms import RequestForm, ReportForm
 from .managers import RequestManager
 from .models import Request
@@ -108,16 +110,15 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
         user = self.request.user
         context['user_requests_holiday'] = Request.objects.user_requests_holiday(
             user)
-        context['user_requests_others'] = Request.objects.user_requests_others(
+        context['user_requests_other'] = Request.objects.user_requests_other(
             user)
         return context
 
 
 class RequestsListView(TopManagerPermisoMixin, ListView):
-    """All employees requests listing page. It contains all requests except those sent by current user themselves."""
-
-    template_name = "requests/allrequests.html"
+    """All employees (except those sent by current user themselves) 30 first requests sent for the last 2 months and the next 3 weeks. """
     model = Request
+    template_name = "requests/allrequests.html"
     login_url = reverse_lazy('users_app:user-login')
 
     def get_context_data(self, **kwargs):
@@ -127,18 +128,57 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
         context['requests_received'] = Request.objects.requests_to_accept(user)
         if len(context['requests_received']) == 0:
             context['no_request'] = True
-
         if user.role == "T" or user.role == "S" or user.is_staff:
             context['requests_holiday'] = Request.objects.requests_holiday_topmanager(
-                user)
-            context['requests_others'] = Request.objects.requests_others_topmanager(
-                user)
+                user)[:30]
+            context['requests_other'] = Request.objects.requests_other_topmanager(
+                user)[:30]
         else:
             context['requests_holiday'] = Request.objects.requests_holiday(
-                user)
-            context['requests_others'] = Request.objects.requests_others(user)
-
+                user)[:30]
+            context['requests_other'] = Request.objects.requests_other(user)[:30]
         return context
+
+class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
+    """All employees requests listing page for HR department. It contains all requests except those sent by current user themselves."""
+    model = Request
+    template_name = "requests/hrallrequests.html"
+    login_url = reverse_lazy('users_app:user-login')
+
+    def get_context_data(self, **kwargs):
+
+        context = super(HRAllRequestsListView, self).get_context_data(**kwargs)
+        context['requests_holiday'] = Request.objects.hrallrequests_holiday()
+        context['requests_other'] = Request.objects.hrallrequests_other()
+        return context
+
+class AllHolidayRequestsListView(TopManagerPermisoMixin, ListView):
+    """All holiday employees requests listing page. It contains all requests except those sent by current user themselves."""
+    model = Request
+    template_name = "requests/holiday-allrequests.html"
+    login_url = reverse_lazy('users_app:user-login')
+    context_object_name = "requests_holiday"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == "T" or user.role == "S" or user.is_staff:
+            return Request.objects.allrequests_holiday_topmanager(user)
+        else:
+            return Request.objects.allrequests_holiday(user)
+
+class AllOtherRequestsListView(TopManagerPermisoMixin, ListView):
+    """All other employees requests listing page. It contains all requests except those sent by current user themselves."""
+    model = Request
+    template_name = "requests/other-allrequests.html"
+    login_url = reverse_lazy('users_app:user-login')
+    context_object_name = "requests_other"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == "T" or user.role == "S" or user.is_staff:
+            return Request.objects.allrequests_other_topmanager(user)
+        else:
+            return Request.objects.allrequests_other(user)
 
 
 def accept_request(request, pk):
@@ -222,7 +262,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
                 data = [x, created_newformat, employee_repr, item.start_date,
                         item.end_date, item.days, item.status, item.signed_by]
                 urlop_data.append(data)
-                x = x + 1
+                x += 1
             title = "Wnioski urlopowe"
             create_pdf(urlop_data, pdf_buffer, title,
                        start_date, end_date, name, position)
@@ -251,7 +291,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
                 data1 = [x, created_newformat, employee_repr, item.start_date,
                          item.type, item.work_date, item.status, item.signed_by]
                 other_data.append(data1)
-                x = x + 1
+                x += 1
 
             title = "Wnioski o dni wolne za pracujące soboty (niedziele, święta)"
             create_pdf(other_data, pdf_buffer, title,
@@ -279,7 +319,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
                 data2 = [x, item.issue_date, item.doc_number, employee_repr,
                          item.type, item.start_date, item.end_date, item.additional_info]
                 c_data.append(data2)
-                x = x + 1
+                x += 1
             title = "Zwolnienia lekarskie"
             create_pdf(c_data, pdf_buffer, title,
                        start_date, end_date, name, position)

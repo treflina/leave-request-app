@@ -57,7 +57,7 @@
             </div>
             {% if no_request %}
 
-            <p style="margin: 3% 0%">Brak wniosków otrzymanych do zaopiniowania.</p>
+            <p class="mt-4 mb-4">Brak wniosków otrzymanych do zaopiniowania.</p>
 
             {% endif %}
 
@@ -74,6 +74,7 @@
         <div class="requests">
             <div>
                 <h4 class="table-title">Wnioski urlopowe pracowników</h4>
+                <h6 class="text-center"><a href="{% url 'requests_app:allholidayrequests'%}">Zobacz wszystkie</a></h6>
                 <input class="form-control search" id="myInput" type="text" onkeyup="search()"
                     placeholder="Wyszukaj...">
             </div>
@@ -127,6 +128,7 @@
             <div><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                 czasu pracy.
             </div>
+
         </div>
     </section>
 
@@ -134,7 +136,7 @@
         <div class="requests">
             <div>
                 <h4 class="table-title">Wnioski pracowników o dni wolne za pracę w soboty/niedziele, inne</h4>
-
+                <h6 class="text-center"><a href="{% url 'requests_app:allotherrequests'%}">Zobacz wszystkie</a></h6>
                 <input class="form-control search" id="myInput2" type="text" onkeyup="search2()"
                     placeholder="Wyszukaj...">
             </div>
@@ -153,7 +155,7 @@
                     </thead>
                     <tbody class="myTable2" id="myTable2">
                         <tr>
-                            {%for request in requests_others%}
+                            {%for request in requests_other%}
                             <td data-title="Data złożenia:" class="search content-center">
                                 {{request.created|date:"d.m.y"}}
                             </td>
@@ -165,7 +167,7 @@
                             <td data-title="Za pracę dnia:" class="content-center">{{request.work_date|date:"d.m.y"}}
                             </td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
-                            <td id="action_others">
+                            <td id="action_other">
                                 {% if request.status == 'oczekujący'%}
                                 <div class="btn-group btn-group-sm">
                                     <form method="POST" action="{% url 'requests_app:accept_request' request.id %}">

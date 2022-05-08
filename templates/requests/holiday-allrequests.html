@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{%include 'includes/navbar.html'%}
+<main>
+    <section class="page-section" id="holiday">
+        <div class="allrequests mt-4">
+            <div>
+                <h4 class="table-title">Wnioski urlopowe pracowników</h4>
+                <input class="form-control search" id="myInput" type="text" onkeyup="search()"
+                    placeholder="Wyszukaj...">
+            </div>
+            <div class="main-table">
+                <table class="js-serial">
+                    <thead>
+                        <tr>
+                            <th scope="col">Data złożenia</th>
+                            <th scope="col">Nazwisko i imię</th>
+                            <th class="content-center" scope="col">Od</th>
+                            <th class="content-center" scope="col">Do</th>
+                            <th scope="col">Liczba dni<span class="text-danger">*</span></th>
+                            <th scope="col">Zastępuje</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="myTable" id="myTable">
+                        {% for request in requests_holiday %}
+                        <tr>
+                            <td data-title="Data złożenia:" class="content-center">{{request.created|date:"d.m.y"}}</td>
+                            <td data-title="Nazwisko i imię:">{{request.author.last_name}}
+                                {{request.author.first_name}} {{request.author.position_addinfo}}
+                            </td>
+                            <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
+                            <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
+                            <td data-title="Liczba dni:" class="content-center">{{request.days}}</td>
+                            <td data-title="Zastępuje:">{{request.substitute}}</td>
+                            <td>
+                                {% if request.status == 'oczekujący'%}
+                                <div class="btn-group btn-group-sm">
+                                    <form method="POST" action="{% url 'requests_app:accept_request' request.id %}">
+                                        {%csrf_token%}
+                                        <button class="btn btn-sm btn-success mr-1" type="submit">Zaakceptuj</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'requests_app:reject_request' request.id %}">
+                                        {%csrf_token%}
+                                        <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
+                                    </form>
+                                </div>
+                                {%else%}
+                                {{request.status}} {{request.signed_by}}
+                                {%endif%}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
+                czasu pracy.
+            </div>
+        </div>
+    </section>
+
+
+</main>
+
+{% endblock content %}

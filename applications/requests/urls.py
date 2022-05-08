@@ -20,6 +20,21 @@ urlpatterns = [
         name='allrequests',
     ),
     path(
+        'hrallrequests/', 
+        views.HRAllRequestsListView.as_view(),
+        name='hrallrequests',
+    ),
+    path(
+        'allholidayrequests/', 
+        views.AllHolidayRequestsListView.as_view(),
+        name='allholidayrequests',
+    ),
+    path(
+        'allotherrequests/', 
+        views.AllOtherRequestsListView.as_view(),
+        name='allotherrequests',
+    ),
+    path(
         'request-reject/<int:pk>/', 
         views.reject_request,
         name='reject_request',

@@ -98,7 +98,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for request in user_requests_others %}
+                    {% for request in user_requests_other %}
                     <tr>
                         <td class="content-center" data-title="Data złożenia:">{{request.created|date:"d.m.y"}}</td>
                         <td data-title="Nazwisko i imię:">{{request.author.first_name}} {{request.author.last_name}}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load  static %}
+
+{% block content %}
+{%include 'includes/navbar.html'%}
+<main>
+    <section class="page-section" id="saturday">
+        <div class="allrequests mt-4">
+            <div>
+                <h4 class="table-title">Wnioski pracowników o dni wolne za pracę w soboty/niedziele, inne</h4>
+                <input class="form-control search" id="myInput2" type="text" onkeyup="search2()"
+                    placeholder="Wyszukaj...">
+            </div>
+            <div class="main-table">
+                <table class="js-serial">
+                    <thead>
+                        <tr>
+                            <th scope="col">Data złożenia</th>
+                            <th class="content-center" scope="col">Nazwisko i imię</th>
+                            <th class="content-center" scope="col">Na dzień</th>
+                            <th scope="col">Rodzaj</th>
+                            <th scope="col">Za pracę dnia</th>
+                            <th scope="col">Zastępuje</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="myTable2" id="myTable2">
+                        <tr>
+                            {%for request in requests_other%}
+                            <td data-title="Data złożenia:" class="search content-center">
+                                {{request.created|date:"d.m.y"}}
+                            </td>
+                            <td data-title="Nazwisko i imię:">{{request.author.last_name}}
+                                {{request.author.first_name}} {{request.author.position_addinfo}}
+                            </td>
+                            <td data-title="Od:" class="search">{{request.start_date|date:"d.m.y"}}</td>
+                            <td data-title="Do:" class="content-center">{{request.type}}</td>
+                            <td data-title="Za pracę dnia:" class="content-center">{{request.work_date|date:"d.m.y"}}
+                            </td>
+                            <td data-title="Zastępuje:">{{request.substitute}}</td>
+                            <td id="action_other">
+                                {% if request.status == 'oczekujący'%}
+                                <div class="btn-group btn-group-sm">
+                                    <form method="POST" action="{% url 'requests_app:accept_request' request.id %}">
+                                        {%csrf_token%}
+                                        <button class="btn btn-sm btn-success mr-1" type="submit">Zaakceptuj</button>
+                                    </form>
+                                    <form method="POST" action="{% url 'requests_app:reject_request' request.id %}">
+                                        {%csrf_token%}
+                                        <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
+                                    </form>
+                                </div>
+                                {%else%}
+                                {{request.status}} {{request.signed_by}}
+                                {%endif%}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+
+
+                </table>
+            </div>
+        </div>
+        </div>
+    </section>
+</main>
+
+{% endblock content %}
