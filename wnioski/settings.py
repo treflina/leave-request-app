@@ -1,6 +1,8 @@
-from django.core.exceptions import ImproperlyConfigured
 import json
 import os
+
+from django.core.exceptions import ImproperlyConfigured
+from django.contrib.messages import constants as messages
 
 from unipath import Path
 BASE_DIR = Path(__file__).ancestor(2)
@@ -127,6 +129,11 @@ STATIC_ROOT = BASE_DIR.child('staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR.child('media')
 
+MESSAGE_TAGS = {
+        messages.SUCCESS: 'alert-success',
+        messages.ERROR: 'alert-danger',
+ }
+
 AUTH_USER_MODEL = 'users.User'
 
 LANGUAGE_CODE = 'pl-PL'
@@ -140,3 +147,8 @@ USE_L10N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+
+

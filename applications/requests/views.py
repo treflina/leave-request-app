@@ -56,6 +56,10 @@ class RequestFormView(LoginRequiredMixin, FormView):
         work_date = form.cleaned_data["work_date"]
         send_to_person = form.cleaned_data['send_to_person']
 
+        if Request.objects.filter(Q(author=user)&Q(work_date = work_date)&~Q(status="odrzucony")).exists():
+            messages.error(self.request, 'Błąd. Wniosek o odebranie dnia wolnego za wskazaną pracującą sobotę/niedzielę już został złożony.')
+            return self.form_invalid(form)
+
         request = Request(
             author=user,
             type=type,
@@ -128,7 +132,7 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
         context['requests_received'] = Request.objects.requests_to_accept(user)
         if len(context['requests_received']) == 0:
             context['no_request'] = True
-            
+
         if user.role == "T" or user.role == "S" or user.is_staff:
             context['requests_holiday'] = Request.objects.requests_holiday_topmanager(
                 user)[:30]

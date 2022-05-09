@@ -7,7 +7,7 @@
 
 <div class="container p-3">
     {% for message in messages %}
-    <div class="alert alert-success" role="alert">
+    <div class="alert {{ message.tags }}" role="alert">
         {{ message }}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
