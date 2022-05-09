@@ -74,7 +74,7 @@
         <div class="requests">
             <div>
                 <h4 class="table-title">Wnioski urlopowe pracowników</h4>
-                <h6 class="text-center"><a href="{% url 'requests_app:allholidayrequests'%}">Zobacz wszystkie</a></h6>
+                {%if showall_holiday %}<h6 class="text-center"><a href="{% url 'requests_app:allholidayrequests'%}">Zobacz wszystkie</a></h6>{% endif %}
                 <input class="form-control search" id="myInput" type="text" onkeyup="search()"
                     placeholder="Wyszukaj...">
             </div>
@@ -136,7 +136,7 @@
         <div class="requests">
             <div>
                 <h4 class="table-title">Wnioski pracowników o dni wolne za pracę w soboty/niedziele, inne</h4>
-                <h6 class="text-center"><a href="{% url 'requests_app:allotherrequests'%}">Zobacz wszystkie</a></h6>
+                {%if showall_other %}<h6 class="text-center"><a href="{% url 'requests_app:allotherrequests'%}">Zobacz wszystkie</a></h6> {%endif%}
                 <input class="form-control search" id="myInput2" type="text" onkeyup="search2()"
                     placeholder="Wyszukaj...">
             </div>

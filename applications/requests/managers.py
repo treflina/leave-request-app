@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from django.db import models
 from django.db.models import Q
@@ -7,8 +7,8 @@ from django.db.models import Q
 class RequestManager(models.Manager):
     '''Managers for Request Model'''
 
-    mindate = date.today() - timedelta(days=60)
-    maxdate = mindate + timedelta(days=21)
+    mindate = datetime.strptime(f"{date.today().year}-01-01", "%Y-%M-%d").date()
+    maxdate = date.today() + timedelta(days=21)
 
     # manager for listing employees requests
     def requests_to_accept(self, user):

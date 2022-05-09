@@ -116,7 +116,7 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
 
 
 class RequestsListView(TopManagerPermisoMixin, ListView):
-    """All employees (except those sent by current user themselves) 30 first requests sent for the last 2 months and the next 3 weeks. """
+    """All employees (except those sent by current user themselves) 30 latest requests sent from the beginning of the year and for the next 3 weeks. """
     model = Request
     template_name = "requests/allrequests.html"
     login_url = reverse_lazy('users_app:user-login')
@@ -128,15 +128,30 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
         context['requests_received'] = Request.objects.requests_to_accept(user)
         if len(context['requests_received']) == 0:
             context['no_request'] = True
+            
         if user.role == "T" or user.role == "S" or user.is_staff:
             context['requests_holiday'] = Request.objects.requests_holiday_topmanager(
                 user)[:30]
             context['requests_other'] = Request.objects.requests_other_topmanager(
                 user)[:30]
+
+            if len(context['requests_other']) < len(Request.objects.allrequests_other_topmanager(
+            user).all()):
+                context["showall_other"] = True
+            if len(context['requests_holiday']) < len(Request.objects.allrequests_holiday_topmanager(
+            user).all()):
+                context["showall_holiday"] = True
+                
         else:
             context['requests_holiday'] = Request.objects.requests_holiday(
-                user)[:30]
-            context['requests_other'] = Request.objects.requests_other(user)[:30]
+                user)[:3]
+            context['requests_other'] = Request.objects.requests_other(user)[:3]
+            if len(context['requests_holiday']) < len(Request.objects.requests_holiday(
+                user).all()):
+                context["showall_holiday"] = True
+            if len(context['requests_other']) < len(Request.objects.allrequests_other(user).all()):
+                context["showall_other"] = True
+
         return context
 
 class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
