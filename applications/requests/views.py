@@ -56,9 +56,9 @@ class RequestFormView(LoginRequiredMixin, FormView):
         work_date = form.cleaned_data["work_date"]
         send_to_person = form.cleaned_data['send_to_person']
 
-#         if Request.objects.filter(Q(author=user)&Q(work_date = work_date)&~Q(status="odrzucony")).exists() and (type == "WS" or type == "WN):
-#             messages.error(self.request, 'Błąd. Wniosek o odebranie dnia wolnego za wskazaną pracującą sobotę/niedzielę już został złożony.')
-#             return self.form_invalid(form)
+        if (type == "WS" or type == "WN") and Request.objects.filter(Q(author=user)&Q(work_date = work_date)&~Q(status="odrzucony")).exists():
+            messages.error(self.request, 'Błąd. Wniosek o odebranie dnia wolnego za wskazaną pracującą sobotę/niedzielę już został złożony.')
+            return self.form_invalid(form)
 
         request = Request(
             author=user,
