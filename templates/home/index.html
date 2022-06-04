@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% load  static %}
 
 {% block content %}
@@ -30,10 +29,12 @@
         {% endif %}
         <a href="{% url 'requests_app:request'%}" role="button" class="btn btn-success">Złóż wniosek</a>
     </div>
-
     {% endif %}
-
-
-
+    <a class="text-dark" href="{% url 'home_app:documents'%}">
+        <div class="documents-link position-absolute mt-3">
+            <img class="doc-img" src="{%static 'img/doc-img.png'%}" alt="segregatory z dokumentami">
+            <p style="font-size: 0.6em;">Niezbędnik</p>
+        </div>
+    </a>
 </div>
 {% endblock content %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load  static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% include 'includes/navbar.html'%}
+
+
+<div class="container documents mt-5">
+    {% for category, documents in categories %}
+    <ul class="mt-5">
+        <h5>{{category}}</h5>
+        {% for file in documents %}
+        <li class="ml-5">
+            <a href="{{ file.file.url }}" class="file-link">{{ file.description}}</a>
+            {%if request.user.is_staff or request.user.role == "T" or request.user.role == "I"%}
+            <button type="button" class="btn btn-light btn-sm ml-2 delete" data-toggle="modal"
+                data-target="#deleteModal{{file.id}}">✘</button>
+            {%endif%}
+        </li> <!-- Modal -->
+        <div class="modal fade" id="deleteModal{{file.id}}" tabindex="-1" aria-labelledby="deleteModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Czy na pewno chcesz usunąć {{file.description}}
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
+                        <form method="POST" action="{% url 'home_app:delete-file' file.id %}">
+                            {%csrf_token%}
+                            <button type="submit" class="btn btn-info">Tak, usuń.</button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+    </ul>
+    {%endfor%}
+</div>
+{%if request.user.is_staff or request.user.role == "T" or request.user.role == "I"%}
+<div class="container mt-5">
+    <div>
+        {% if form.file.errors %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ form.file.errors }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <form method="post" , enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-lg-3">
+                {{ form.file|as_crispy_field }}
+            </div>
+            <div class="col-lg-3">
+                {{ form.description|as_crispy_field }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.category|as_crispy_field }}
+            </div>
+            <div class="col-lg-2">
+                {{ form.priority|as_crispy_field }}
+            </div>
+            <div class="col-lg-1">
+                <button class="btn btn-md position-relative" style="top:30px;" type="submit">Wyślij</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

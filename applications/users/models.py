@@ -10,13 +10,13 @@ from .managers import UserManager
 
 class User(AbstractBaseUser):
     """User table model"""
-    # check if AUTH_USER in base.py
 
     ROLE_CHOICES = (
         ('P', 'Nie'),
         ('K', 'Kierownik - przełożony'),
         ('T', 'Instruktor, Zastępca Dyrektora'),
-        ('S', 'Dyrektor')
+        ('S', 'Dyrektor'),
+        ('I', 'Informatyk'),
     )
 
     username = models.CharField(

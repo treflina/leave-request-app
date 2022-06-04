@@ -1,14 +1,21 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView 
+from django.views.generic import TemplateView, CreateView
+
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
 
 from applications.users.models import User
+from .models import UploadFile, CATEGORY_CHOICES
+
 
 class HomePage(LoginRequiredMixin, TemplateView):
-    
+
     template_name = "home/index.html"
-    model =User 
+    model = User
     login_url = reverse_lazy('users_app:user-login')
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         if self.request.user.working_hours < 1:
@@ -21,4 +28,30 @@ class HomePage(LoginRequiredMixin, TemplateView):
             context['show_manager'] = True
         return context
 
-   
+
+class UploadFileView(CreateView):
+
+    model = UploadFile
+    template_name = 'home/files.html'
+    fields = ["file", "description", "category", "priority"]
+    success_url = "."
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        titles = [category[1] for category in CATEGORY_CHOICES]
+        data = []
+        cat_dict = {}
+        for category in CATEGORY_CHOICES:
+            cat_files = UploadFile.objects.filter(
+                category=category[0]).order_by('priority')
+            cat_dict[category[1]] = cat_files
+            data.append(cat_dict[category[1]])
+        context["categories"] = zip(titles, data)
+        return context
+
+
+def delete_file(request, pk):
+    """Deletes the file."""
+    file_to_delete = UploadFile.objects.get(id=pk)
+    file_to_delete.delete()
+    return HttpResponseRedirect(reverse('home_app:documents'))

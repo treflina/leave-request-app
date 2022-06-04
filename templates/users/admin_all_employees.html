@@ -4,14 +4,12 @@
 {% block content %}
 {% include 'includes/navbar.html' %}
 
-
 <section class="page-section mt-5">
     <div>
         <h3 class="mb3">Lista pracowników
             <a href="{%url 'users_app:user-register'%}" role="button" class="btn ml-3 btn-sm btn-success">Dodaj pracownika</a>
             <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn ml-3 btn-sm btn-info">Dodaj zwolnienie lekarskie</a>
         </h3>
-
         <table class="js-serial">
             <thead>
                 <tr>
@@ -26,14 +24,9 @@
                     <th scope="col" class="content-center">Akcja</th>
                 </tr>
             </thead>
-
             <tbody>
-
-
-
                 {% for employee in employees %}
                 <tr>
-
                     <td data-title="Nazwisko i imię:">{{ employee.last_name}} {{employee.first_name}}</td>
                     <td data-title="Stanowisko:">{{ employee.position }}</td>
                     <td data-title="Kierownik:" class="content-center">{{ employee.is_manager }}</td>
@@ -43,7 +36,6 @@
                     <td data-title="Umowa do:" class="content-center">{{ employee.contract_end|date:"d.m.y"}}</td>
                     <td data-title="Uwagi:" class="content-center">{{ employee.additional_info|truncatechars:10 }}</td>
                     <td>
-
                         <div class="btn-group btn-group-sm">
                             <a href="{%url 'users_app:update_employee' employee.id%}" class="btn btn-sm btn-light" type="submit">Edytuj</a>
                             <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
@@ -62,7 +54,8 @@
                                     </div>
                                     <div class="modal-body">
                                         <p>Czy na pewno chcesz usunąć pracownika? <br>{{employee.first_name}}
-                                            {{employee.last_name}} <br> UWAGA! Zostaną usunięte z bazy również jego wszystkie
+                                            {{employee.last_name}} <br> UWAGA! Zostaną usunięte z bazy również jego
+                                            wszystkie
                                             wnioski oraz zwolnienia lekarskie. <br> Możliwe alternatywne rozwiązanie:
                                             zmiana wartości ustawienia "Obecnie zatrudniony" w Edytuj. </p>
                                     </div>
@@ -81,11 +74,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        <p>*K - Kierownik placówki/działu (poza jednoosobowymi)</p>
 
+        <p>*K - Kierownik placówki/działu (poza jednoosobowymi)</p>
     </div>
 </section>
-
-
 
 {% endblock content %}

@@ -4,11 +4,9 @@
 {% block content %}
 {%include 'includes/navbar.html'%}
 
-
 <main>
     <section class="page-section" id="to_accept">
-
-        <div class="requests">
+        <div class="listing requests">
             <h4 class="table-title">Wnioski otrzymane do zaopiniowania</h4>
             <div class="main-table">
                 <table class="js-serial" id="wnioski-table">
@@ -56,11 +54,8 @@
                 </table>
             </div>
             {% if no_request %}
-
             <p class="mt-4 mb-4">Brak wniosków otrzymanych do zaopiniowania.</p>
-
             {% endif %}
-
             <div><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                 czasu pracy.
                 <br>
@@ -71,10 +66,11 @@
     </section>
 
     <section class="page-section" id="holiday">
-        <div class="requests">
+        <div class="listing requests">
             <div>
                 <h4 class="table-title">Wnioski urlopowe pracowników</h4>
-                {%if showall_holiday %}<h6 class="text-center"><a href="{% url 'requests_app:allholidayrequests'%}">Zobacz wszystkie</a></h6>{% endif %}
+                {%if showall_holiday %}<h6 class="text-center">
+                    <a href="{% url 'requests_app:allholidayrequests'%}">Zobacz wszystkie</a></h6>{% endif %}
                 <input class="form-control search" id="myInput" type="text" onkeyup="search()"
                     placeholder="Wyszukaj...">
             </div>
@@ -118,9 +114,7 @@
                                 {{request.status}} {{request.signed_by}}
                                 {%endif%}
                             </td>
-
                         </tr>
-
                         {% endfor %}
                     </tbody>
                 </table>
@@ -128,15 +122,15 @@
             <div><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                 czasu pracy.
             </div>
-
         </div>
     </section>
 
     <section class="page-section" id="saturday">
-        <div class="requests">
+        <div class="listing requests">
             <div>
                 <h4 class="table-title">Wnioski pracowników o dni wolne za pracę w soboty/niedziele, inne</h4>
-                {%if showall_other %}<h6 class="text-center"><a href="{% url 'requests_app:allotherrequests'%}">Zobacz wszystkie</a></h6> {%endif%}
+                {%if showall_other %}<h6 class="text-center">
+                    <a href="{% url 'requests_app:allotherrequests'%}">Zobacz wszystkie</a></h6> {%endif%}
                 <input class="form-control search" id="myInput2" type="text" onkeyup="search2()"
                     placeholder="Wyszukaj...">
             </div>
@@ -183,20 +177,14 @@
                                 {{request.status}} {{request.signed_by}}
                                 {%endif%}
                             </td>
-
                         </tr>
-
                         {% endfor %}
                     </tbody>
-
-
                 </table>
             </div>
         </div>
         </div>
     </section>
-
 </main>
-
 
 {% endblock content %}

@@ -5,7 +5,7 @@
 {%include 'includes/navbar.html'%}
 <main>
     <section class="page-section">
-        <div class="all_employees_list mt-5">
+        <div class="listing all_employees_list mt-5">
             <h4 class="table-title">Twoje wnioski urlopowe</h4>
             <table class="js-serial">
                 <thead>
@@ -81,7 +81,7 @@
         </div>
     </section>
     <section class="page-section">
-        <div class="all_employees_list mt-3">
+        <div class="listing all_employees_list mt-3">
             <h4 class="table-title">Twoje wnioski o dni wolne za pracę w soboty/niedziele/święta</h4>
             <table class="js-serial">
                 <thead>
@@ -103,7 +103,6 @@
                         <td class="content-center" data-title="Data złożenia:">{{request.created|date:"d.m.y"}}</td>
                         <td data-title="Nazwisko i imię:">{{request.author.first_name}} {{request.author.last_name}}
                         </td>
-
                         <td class="content-center" data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
                         <td class="content-center" data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
                         <td class="content-center" data-title="Rodzaj:">{{request.type}}</td>
@@ -116,7 +115,6 @@
                                 data-target="#deleteModal{{request.id}}">
                                 Wycofaj
                             </button>
-
                             <!-- Modal -->
                             <div class="modal fade" id="deleteModal{{request.id}}" tabindex="-1"
                                 aria-labelledby="deleteModalLabel" aria-hidden="true">

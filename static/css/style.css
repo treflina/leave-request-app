@@ -38,21 +38,58 @@ h3 {
     scroll-padding-top: 200px;
 }
 
+.listing {
+    position: relative;
+    max-width: 100%;
+}
 
 .requests {
-    position: relative;
     padding-top: 8rem;
-    max-width: 100%;
 }
 
-.allrequests {
-  position: relative;
-  max-width: 100%;
+.doc-img {
+    width: 100px;
+    height: 80px;
 }
 
-.all_employees_list {
+.documents ul {
+    display: block;
+    margin-left: -10px;
+}
+
+.documents li {
+    display: block;
     position: relative;
-    max-width: 100%;
+}
+
+.documents li:before {
+    content: "";
+    position: absolute;
+    top: 1.4em;
+    left: -30px;
+    margin-top: -0.9em;
+    background: linear-gradient(
+        52deg,
+        rgba(24, 134, 66, 1) 0%,
+        rgba(253, 187, 45, 0.8662815467984069) 100%
+    );
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+}
+
+.documents a.file-link {
+    color: black;
+    text-decoration: none;
+}
+
+.documents a.file-link:hover {
+    color: rgb(26, 160, 26);
+}
+
+.documents button.delete {
+    background-color: transparent;
+    border: none;
 }
 
 .table-title {

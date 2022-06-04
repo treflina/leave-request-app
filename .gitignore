@@ -1,4 +1,7 @@
+venv
+desktop.ini
 .vscode
+.idea
 __pycache__
 
 /secret.json
@@ -6,3 +9,6 @@ __pycache__
 /applications/users/migrations/*
 /applications/requests/migrations/*
 /applications/sickleaves/migrations/*
+/applications/home/migrations/*
+
+/media/documents/*

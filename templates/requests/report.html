@@ -1,41 +1,30 @@
 {% extends "base.html" %}
 {% load  static %}
-
 {% block content %}
 {% include 'includes/navbar.html'%}
 {% load crispy_forms_tags %}
 
-<section class="page-section mt-5" id="to_accept" >
+<section class="page-section mt-5" id="to_accept">
     <div class="container">
-  <h3 class="report-title">Wykaz dni wolnych/zwolnień lekarskich</h3>
-       <form method="POST">{%csrf_token%}
-        <div class="form-group">
-      
-            {{form.person|as_crispy_field}}
-        </div>
-        <div class="form-group">
-    
-            {{form.type|as_crispy_field}}
-        </div>
-
-        <div class="form-group">
-            <div class="row mb-2">
-      <div class="col-lg-6">
-        {{form.start_date|as_crispy_field}}
-
-    </div>
-    <div class="col-lg-6">
-                {{form.end_date|as_crispy_field}}
+        <h3 class="report-title">Wykaz dni wolnych/zwolnień lekarskich</h3>
+        <form method="POST">{%csrf_token%}
+            <div class="form-group">
+                {{form.person|as_crispy_field}}
             </div>
-        </div>
-
-
-        <div class="form-group mt-3">
-            <button class="btn btn-info" type="submit">Generuj raport PDF</button>
-        </div>
-
-</form>
-
-
-
+            <div class="form-group">
+                {{form.type|as_crispy_field}}
+            </div>
+            <div class="form-group">
+                <div class="row mb-2">
+                    <div class="col-lg-6">
+                        {{form.start_date|as_crispy_field}}
+                    </div>
+                    <div class="col-lg-6">
+                        {{form.end_date|as_crispy_field}}
+                    </div>
+                </div>
+                <div class="form-group mt-3">
+                    <button class="btn btn-info" type="submit">Generuj raport PDF</button>
+                </div>
+            </form>
 {% endblock content%}
