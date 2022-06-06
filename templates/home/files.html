@@ -13,10 +13,10 @@
         {% for file in documents %}
         <li class="ml-5">
             <a href="{{ file.file.url }}" class="file-link">{{ file.description}}</a>
-            {%if request.user.is_staff or request.user.role == "T" or request.user.role == "I"%}
+            {% if request.user.is_staff or request.user.role == "T" or informatyk %}
             <button type="button" class="btn btn-light btn-sm ml-2 delete" data-toggle="modal"
                 data-target="#deleteModal{{file.id}}">✘</button>
-            {%endif%}
+            {% endif %}
         </li> <!-- Modal -->
         <div class="modal fade" id="deleteModal{{file.id}}" tabindex="-1" aria-labelledby="deleteModalLabel"
             aria-hidden="true">
