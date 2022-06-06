@@ -26,6 +26,8 @@ class HomePage(LoginRequiredMixin, TemplateView):
             context['show_director'] = True
         if self.request.user.role == "T" or self.request.user.role == "K":
             context['show_manager'] = True
+        if "informatyk" in self.request.user.position:
+            context['informatyk'] = True
         return context
 
 
