@@ -66,7 +66,7 @@ class UserRegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
         self.fields['manager'] = forms.ModelChoiceField(
-            queryset=User.objects.filter(~Q(role="P") & Q(is_active=True)).order_by('last_name'), required=False
+            queryset=User.objects.filter(~Q(role="P") & Q(is_active=True)).order_by('last_name'), required=False, label="Przełożony"
         )
 
 

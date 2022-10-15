@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Request
 
+
 class RequestsAdmin(admin.ModelAdmin):
     '''Admin panel content for requests.'''
 

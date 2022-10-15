@@ -47,9 +47,12 @@
                                         <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
                                     </form>
                                 </div>
-                                {%else%}
+                                {% elif request.status == 'zaakceptowany' or request.status == 'odrzucony' %}
                                 {{request.status}} {{request.signed_by}}
+                                {%else%}
+                                {{request.status}}
                                 {%endif%}
+                            </td>
                             </td>
 
                         </tr>

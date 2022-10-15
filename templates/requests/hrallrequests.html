@@ -38,7 +38,11 @@
                             <td data-title="Liczba dni:" class="content-center">{{request.days}}</td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
                             <td>
+                                {% if request.status == 'zaakceptowany' or request.status == 'odrzucony' %}
                                 {{request.status}} {{request.signed_by}}
+                                {%else%}
+                                {{request.status}}
+                                {%endif%}
                             </td>
                         </tr>
                         {% endfor %}
@@ -87,21 +91,20 @@
                             </td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
                             <td id="action_other">
+                                {% if request.status == 'zaakceptowany' or request.status == 'odrzucony' %}
                                 {{request.status}} {{request.signed_by}}
+                                {%else%}
+                                {{request.status}}
+                                {%endif%}
                             </td>
-
                         </tr>
-
                         {% endfor %}
                     </tbody>
-
-
                 </table>
             </div>
         </div>
         </div>
     </section>
-
 </main>
 
 

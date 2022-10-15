@@ -32,7 +32,7 @@ class User(AbstractBaseUser):
     role = models.CharField('Stanowisko kierownicze',
                             null=True, max_length=10, choices=ROLE_CHOICES)
     manager = models.ForeignKey(
-        'self', verbose_name="Przełożony", null=True, blank=True, related_name='user', on_delete=models.SET_NULL)
+        'self', null=True, blank=True, related_name='user', on_delete=models.SET_NULL, verbose_name='przełożony')
     working_hours = models.DecimalField(
         'Wymiar etatu', max_digits=3, decimal_places=2, default=1)
     annual_leave = models.IntegerField('Roczny wymiar urlopu', default=26)

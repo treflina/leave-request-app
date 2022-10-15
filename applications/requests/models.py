@@ -38,6 +38,12 @@ class Request(TimeStampedModel):
 
     objects = RequestManager()
 
+    def __str__(self):
+        if self.type == "W":
+            return f"Wniosek ({self.type} od {self.start_date} do {self.end_date})"
+        else:
+            return f"Wniosek ({self.type}) {self.start_date}"
+
     class Meta:
         verbose_name = 'Wnioski'
         verbose_name_plural = 'Wnioski'

@@ -151,8 +151,8 @@ mkdir logs
 touch logs/gunicorn_supervisor.log
 ```
 
-Check if supervisor works:  
-`supervisorctl reread`  
+Check if supervisor works:
+`supervisorctl reread`
 correct response: "wnioski: available" \
 `supervisorctl update` \
 correct response: "wnioski: added process group"
@@ -230,8 +230,8 @@ cd webapps/wnioskivenv/wnioski
 ```
 
 ```
-python manage.py collectstatic
-python manage.py makemigrations
-python manage.py migrate
-python manage.py createsuperuser
+python3 manage.py collectstatic
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py createsuperuser
 ```

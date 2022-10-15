@@ -7,7 +7,7 @@ from .managers import SickleavesSearchManager
 # Create your models here.
 class Sickleave(models.Model):
     """Sickleave table model."""
-    
+
     TYPE_CHOICES = (
         ('C', 'Chorobowe'),
         ('O', 'Opieka'),
@@ -36,4 +36,4 @@ class Sickleave(models.Model):
         ordering = ['issue_date']
 
     def __str__(self):
-        return self.employee.last_name + " " + self.employee.first_name + " " + str(self.start_date) + " " + str(self.end_date)
+        return self.employee.last_name + " " + self.employee.first_name + " od " + str(self.start_date) + " do " + str(self.end_date)
