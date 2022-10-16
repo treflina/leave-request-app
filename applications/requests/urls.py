@@ -5,54 +5,53 @@ app_name = "requests_app"
 
 urlpatterns = [
     path(
-        'sendrequest/', 
+        "sendrequest/",
         views.RequestFormView.as_view(),
-        name='request',
+        name="request",
     ),
     path(
-        'user-requests/', 
+        "user-requests/",
         views.UserRequestsListView.as_view(),
-        name='user_requests',
+        name="user_requests",
     ),
     path(
-        'allrequests/', 
+        "allrequests/",
         views.RequestsListView.as_view(),
-        name='allrequests',
+        name="allrequests",
     ),
     path(
-        'hrallrequests/', 
+        "hrallrequests/",
         views.HRAllRequestsListView.as_view(),
-        name='hrallrequests',
+        name="hrallrequests",
     ),
     path(
-        'allholidayrequests/', 
+        "allholidayrequests/",
         views.AllHolidayRequestsListView.as_view(),
-        name='allholidayrequests',
+        name="allholidayrequests",
     ),
     path(
-        'allotherrequests/', 
+        "allotherrequests/",
         views.AllOtherRequestsListView.as_view(),
-        name='allotherrequests',
+        name="allotherrequests",
     ),
     path(
-        'request-reject/<int:pk>/', 
+        "request-reject/<int:pk>/",
         views.reject_request,
-        name='reject_request',
+        name="reject_request",
     ),
     path(
-        'request-accept/<int:pk>/', 
+        "request-accept/<int:pk>/",
         views.accept_request,
-        name='accept_request',
+        name="accept_request",
     ),
     path(
-        'request-delete/<int:pk>/', 
+        "request-delete/<int:pk>/",
         views.delete_request,
-        name='delete_request',
+        name="delete_request",
     ),
     path(
-        'report/', 
+        "report/",
         views.ReportView.as_view(),
-        name='report',
+        name="report",
     ),
-
 ]

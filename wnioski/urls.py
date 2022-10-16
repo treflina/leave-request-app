@@ -6,32 +6,37 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('applications.requests.urls')),
-    path('', include('applications.users.urls')),
-    path('', include('applications.sickleaves.urls')),
-    path('', include('applications.home.urls')),
+    path("admin/", admin.site.urls),
+    path("", include("applications.requests.urls")),
+    path("", include("applications.users.urls")),
+    path("", include("applications.sickleaves.urls")),
+    path("", include("applications.home.urls")),
     path(
-        'reset_password/',
+        "reset_password/",
         auth_views.PasswordResetView.as_view(template_name="users/reset_password.html"),
-        name="reset_password"
-        ),
-
+        name="reset_password",
+    ),
     path(
-        'reset_password_sent/',
-        auth_views.PasswordResetDoneView.as_view(template_name="users/reset_password_sent.html"),
-        name="password_reset_done"
+        "reset_password_sent/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="users/reset_password_sent.html"
         ),
-
+        name="password_reset_done",
+    ),
     path(
-        'reset/<uidb64>/<token>/',
+        "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(template_name="users/reset.html"),
-        name="password_reset_confirm"
-        ),
-
+        name="password_reset_confirm",
+    ),
     path(
-        'reset_password_complete/',
-        auth_views.PasswordResetCompleteView.as_view(template_name="users/reset_password_complete.html"),
-        name="password_reset_complete"
+        "reset_password_complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="users/reset_password_complete.html"
         ),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+        name="password_reset_complete",
+    ),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = "Pracownik MBP - Panel administracyjny"
+admin.site.site_title = "Pracownik MBP - Panel administracyjny"
+admin.site.index_title = "Panel administracyjny"

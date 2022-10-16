@@ -14,30 +14,30 @@ class HomePage(LoginRequiredMixin, TemplateView):
 
     template_name = "home/index.html"
     model = User
-    login_url = reverse_lazy('users_app:user-login')
+    login_url = reverse_lazy("users_app:user-login")
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         if self.request.user.working_hours < 1:
-            context['part'] = True
+            context["part"] = True
         if self.request.user.current_leave == 1:
-            context['onedayleft'] = True
+            context["onedayleft"] = True
         if self.request.user.role == "S":
-            context['show_director'] = True
+            context["show_director"] = True
         if self.request.user.role == "T" or self.request.user.role == "K":
-            context['show_manager'] = True
+            context["show_manager"] = True
         if "informatyk" in self.request.user.position:
-            context['informatyk'] = True
+            context["informatyk"] = True
         return context
 
 
 class UploadFileView(LoginRequiredMixin, CreateView):
 
     model = UploadFile
-    template_name = 'home/files.html'
+    template_name = "home/files.html"
     fields = ["file", "description", "category", "priority"]
     success_url = "."
-    login_url = reverse_lazy('users_app:user-login')
+    login_url = reverse_lazy("users_app:user-login")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -45,16 +45,18 @@ class UploadFileView(LoginRequiredMixin, CreateView):
         data = []
         cat_dict = {}
         for category in CATEGORY_CHOICES:
-            cat_files = UploadFile.objects.filter(
-                category=category[0]).order_by('priority')
+            cat_files = UploadFile.objects.filter(category=category[0]).order_by(
+                "priority"
+            )
             cat_dict[category[1]] = cat_files
             data.append(cat_dict[category[1]])
         context["categories"] = zip(titles, data)
         return context
 
-@login_required(login_url=reverse_lazy('users_app:user-login'))
+
+@login_required(login_url=reverse_lazy("users_app:user-login"))
 def delete_file(request, pk):
     """Deletes the file."""
     file_to_delete = UploadFile.objects.get(id=pk)
     file_to_delete.delete()
-    return HttpResponseRedirect(reverse('home_app:documents'))
+    return HttpResponseRedirect(reverse("home_app:documents"))

@@ -19,12 +19,12 @@ from .forms import SickleaveForm
 class SickleavesListView(TopManagerPermisoMixin, ListView):
     """Sick leaves listing page."""
 
-    context_object_name = 'sickleaves'
+    context_object_name = "sickleaves"
     template_name = "sickleaves/sickleaves.html"
-    login_url = reverse_lazy('users_app:user-login')
+    login_url = reverse_lazy("users_app:user-login")
 
     def get_queryset(self):
-        return Sickleave.objects.all().order_by('-issue_date')
+        return Sickleave.objects.all().order_by("-issue_date")
 
 
 class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
@@ -33,8 +33,8 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
     template_name = "sickleaves/add_sickleave.html"
     model = Sickleave
     form_class = SickleaveForm
-    success_url = reverse_lazy('sickleaves_app:sickleaves')
-    login_url = reverse_lazy('users_app:user-login')
+    success_url = reverse_lazy("sickleaves_app:sickleaves")
+    login_url = reverse_lazy("users_app:user-login")
 
     def form_valid(self, form):
         employee = form.cleaned_data["employee"]
@@ -67,21 +67,19 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
         if employee.manager:
             send_to_people = []
             if head:
-                person = User.objects.filter(
-                    Q(role='S')).first()
+                person = User.objects.filter(Q(role="S")).first()
                 send_to_people.append(person.work_email)
             if manager:
-                person = User.objects.filter(
-                    Q(id=employee.manager.id)).first()
+                person = User.objects.filter(Q(id=employee.manager.id)).first()
                 send_to_people.append(person.work_email)
             if instructor:
                 person = User.objects.filter(
-                    Q(position="starszy kustosz - instruktor")).first()
+                    Q(position="starszy kustosz - instruktor")
+                ).first()
                 send_to_people.append(person.work_email)
             # send_to_people = User.objects.filter(
             #     Q(role='S') | Q(id=employee.manager.id) | Q(position="starszy kustosz - instruktor")).distinct()
-            send_to_people_list = [p for p in set(
-                send_to_people)] + [EMAIL_HOST_USER]
+            send_to_people_list = [p for p in set(send_to_people)] + [EMAIL_HOST_USER]
 
             send_mail(
                 subject,
@@ -96,14 +94,15 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
 
 class SickleaveUpdateView(TopManagerPermisoMixin, UpdateView):
     """Registered sick leave update form."""
+
     model = Sickleave
     template_name = "sickleaves/update_sickleave.html"
     fields = "__all__"
-    success_url = reverse_lazy('sickleaves_app:sickleaves')
-    login_url = reverse_lazy('users_app:user-login')
+    success_url = reverse_lazy("sickleaves_app:sickleaves")
+    login_url = reverse_lazy("users_app:user-login")
 
 
 def delete_sickleave(request, pk):
     """Deletes sick leave."""
     sickleave_to_delete = Sickleave.objects.get(id=pk).delete()
-    return HttpResponseRedirect(reverse('sickleaves_app:sickleaves'))
+    return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))

@@ -11,4 +11,4 @@ __pycache__
 /applications/sickleaves/migrations/*
 /applications/home/migrations/*
 
-/media/documents/*
+/media/*

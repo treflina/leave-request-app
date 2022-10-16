@@ -139,8 +139,7 @@
                             Data złożenia
                         </th>
                         <th scope="col">Nazwisko i imię</th>
-                        <th class="content-center" scope="col">Od</th>
-                        <th class="content-center" scope="col">Do</th>
+                        <th class="content-center" scope="col">Na dzień</th>
                         <th class="content-center" scope="col">Rodzaj</th>
                         <th scope="col">Za pracę dnia</th>
                         <th scope="col">Zastępujący</th>
@@ -160,9 +159,6 @@
                         </td>
                         <td class="content-center" data-title="Od:">
                             {{request.start_date|date:"d.m.y"}}
-                        </td>
-                        <td class="content-center" data-title="Do:">
-                            {{request.end_date|date:"d.m.y"}}
                         </td>
                         <td class="content-center" data-title="Rodzaj:">
                             {{request.type}}
