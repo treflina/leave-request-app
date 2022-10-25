@@ -1,16 +1,17 @@
 from io import BytesIO
 from distutils.log import error
+from simple_history.utils import update_change_reason
 
 from django.core.exceptions import ValidationError
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, FileResponse
+from django.http import HttpResponseRedirect, FileResponse, HttpResponse
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, UpdateView
 
 from pdf_creator import create_pdf
 from wnioski.settings import get_secret
@@ -19,7 +20,7 @@ from applications.users.models import User
 from applications.sickleaves.models import Sickleave
 from applications.users.mixins import TopManagerPermisoMixin
 
-from .forms import RequestForm, ReportForm
+from .forms import RequestForm, ReportForm, UpdateRequestForm
 from .managers import RequestManager
 from .models import Request
 
@@ -61,7 +62,6 @@ class RequestFormView(LoginRequiredMixin, FormView):
         end_date = form.cleaned_data["end_date"]
         work_date = form.cleaned_data["work_date"]
         send_to_person = form.cleaned_data["send_to_person"]
-
         if (type == "WS" or type == "WN") and Request.objects.filter(
             Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
         ).exists():
@@ -111,6 +111,50 @@ class RequestFormView(LoginRequiredMixin, FormView):
         messages.success(self.request, "Wniosek został pomyślnie złożony.")
         return super(RequestFormView, self).form_valid(form)
 
+    def form_invalid(self, form):
+        print("sth went wrong")
+        for key, value in self.request.POST.items():
+            print('Key: %s' % (key) )
+    # print(f'Key: {key}') in Python >= 3.7
+            print('Value %s' % (value) )
+        return super(RequestFormView, self).form_invalid(form)
+
+
+class RequestChangeView(TopManagerPermisoMixin, UpdateView):
+    """Change request form for HR."""
+
+    model = Request
+    form_class = UpdateRequestForm
+    template_name = "requests/changerequest.html"
+    login_url = reverse_lazy("users_app:user-login")
+    success_url = reverse_lazy("requests_app:hrallrequests")
+
+    def get_context_data(self, **kwargs):
+        context = super(RequestChangeView, self).get_context_data(**kwargs)
+        context["form"].fields["send_to_person"].queryset = User.objects.filter(
+            (Q(id=self.request.user.manager_id) | Q(role="S") | Q(role="T"))
+            & Q(is_active=True)
+        ).order_by("role")
+
+        if self.object.author.working_hours < 1:
+            context["part"] = True
+
+        history_changereason = (
+            Request.history.filter(id=self.object.id).first().history_change_reason
+        )
+        if history_changereason in ["None", ""] or history_changereason is None:
+            context["history_changereason"] = "brak"
+        else:
+            context["history_changereason"] = history_changereason
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        req = self.get_object()
+        changeReason = form.cleaned_data.get("history_change_reason")
+        update_change_reason(req, changeReason)
+        return response
+
 
 class UserRequestsListView(LoginRequiredMixin, ListView):
     """Employee requests listing page."""
@@ -144,24 +188,32 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
             context["no_request"] = True
 
         if user.role == "T" or user.role == "S" or user.is_staff:
-            context["requests_holiday"] = Request.objects.requests_holiday_topmanager(user)[:30]
-            context["requests_other"] = Request.objects.requests_other_topmanager(user)[:30]
+            context["requests_holiday"] = Request.objects.requests_holiday_topmanager(
+                user
+            )[:30]
+            context["requests_other"] = Request.objects.requests_other_topmanager(user)[
+                :30
+            ]
 
             if len(context["requests_other"]) < len(
-                Request.objects.allrequests_other_topmanager(user).all()):
+                Request.objects.allrequests_other_topmanager(user).all()
+            ):
                 context["showall_other"] = True
             if len(context["requests_holiday"]) < len(
-                Request.objects.allrequests_holiday_topmanager(user).all()):
+                Request.objects.allrequests_holiday_topmanager(user).all()
+            ):
                 context["showall_holiday"] = True
 
         else:
             context["requests_holiday"] = Request.objects.requests_holiday(user)[:30]
             context["requests_other"] = Request.objects.requests_other(user)[:30]
             if len(context["requests_holiday"]) < len(
-                Request.objects.allrequests_holiday(user).all()):
+                Request.objects.allrequests_holiday(user).all()
+            ):
                 context["showall_holiday"] = True
             if len(context["requests_other"]) < len(
-                Request.objects.allrequests_other(user).all()):
+                Request.objects.allrequests_other(user).all()
+            ):
                 context["showall_other"] = True
 
         return context

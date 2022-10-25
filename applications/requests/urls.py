@@ -10,6 +10,11 @@ urlpatterns = [
         name="request",
     ),
     path(
+        "changerequest/<int:pk>/",
+        views.RequestChangeView.as_view(),
+        name="changerequest",
+    ),
+    path(
         "user-requests/",
         views.UserRequestsListView.as_view(),
         name="user_requests",

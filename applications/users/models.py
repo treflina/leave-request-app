@@ -16,7 +16,6 @@ class User(AbstractBaseUser):
         ("K", "Kierownik - przełożony"),
         ("T", "Instruktor, Zastępca Dyrektora"),
         ("S", "Dyrektor"),
-        ("I", "Informatyk"),
     )
 
     username = models.CharField("Nazwa użytkownika", max_length=15, unique=True)

@@ -47,6 +47,7 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     'crispy_forms',
     'simple_history',
+    'constrainedfilefield',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS

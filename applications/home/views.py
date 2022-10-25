@@ -26,8 +26,7 @@ class HomePage(LoginRequiredMixin, TemplateView):
             context["show_director"] = True
         if self.request.user.role == "T" or self.request.user.role == "K":
             context["show_manager"] = True
-        if "informatyk" in self.request.user.position:
-            context["informatyk"] = True
+
         return context
 
 
@@ -51,6 +50,9 @@ class UploadFileView(LoginRequiredMixin, CreateView):
             cat_dict[category[1]] = cat_files
             data.append(cat_dict[category[1]])
         context["categories"] = zip(titles, data)
+
+        if "informatyk" in self.request.user.position:
+            context["informatyk"] = True
         return context
 
 

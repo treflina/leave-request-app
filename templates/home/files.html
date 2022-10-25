@@ -13,7 +13,7 @@
         {% for file in documents %}
         <li class="ml-5">
             <a href="{{ file.file.url }}" class="file-link">{{ file.description}}</a>
-            {% if request.user.is_staff or request.user.role == "T" or informatyk %}
+            {% if user.is_staff or user.role == "T" or informatyk %}
             <button type="button" class="btn btn-light btn-sm ml-2 delete" data-toggle="modal"
                 data-target="#deleteModal{{file.id}}">✘</button>
             {% endif %}
@@ -47,7 +47,7 @@
     </ul>
     {%endfor%}
 </div>
-{%if request.user.is_staff or request.user.role == "T" or request.user.role == "I"%}
+{%if user.is_staff or user.role == "T" or informatyk%}
 <div class="container mt-5">
     <div>
         {% if form.file.errors %}
@@ -76,7 +76,7 @@
                 {{ form.priority|as_crispy_field }}
             </div>
             <div class="col-lg-1">
-                <button class="btn btn-md position-relative" style="top:30px;" type="submit">Wyślij</button>
+                <button class="btn btn-md btn-light position-relative" style="top:30px;" type="submit">Wyślij</button>
             </div>
         </div>
     </form>

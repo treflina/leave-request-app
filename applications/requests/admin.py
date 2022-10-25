@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django.utils.translation import gettext_lazy as _
 
 from simple_history.admin import SimpleHistoryAdmin
 from .models import Request
@@ -16,21 +15,34 @@ class RequestsAdmin(SimpleHistoryAdmin):
         "days",
         "status",
         "send_to_person",
+
     )
     search_fields = ("author__last_name", "author__first_name")
     list_filter = ("type",)
-    fields = (
-        "author",
-        "created",
-        "type",
-        "start_date",
-        "end_date",
-        "work_date",
-        "days",
-        "substitute",
-        "status",
-        "send_to_person",
-        "signed_by",
+
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "author",
+                    "created",
+                    "type",
+                    "start_date",
+                    "end_date",
+                    "work_date",
+                    "days",
+                    "substitute",
+                    "status",
+                    "send_to_person",
+                    "signed_by",
+                )
+            },
+        ),
+        (
+            "Uzasadnienie wprowadzonych zmian we wniosku",
+            {"fields": ("attachment",)},
+        ),
     )
     readonly_fields = (
         "author",

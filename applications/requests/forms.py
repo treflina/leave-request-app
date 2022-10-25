@@ -10,16 +10,19 @@ from .models import Request, User
 
 
 class RequestForm(forms.ModelForm):
+    history_change_reason = forms.CharField(label="Powód wprowadzanych zmian", max_length=255, required=False)
     class Meta:
         model = Request
         fields = (
-            "send_to_person",
             "type",
-            "work_date",
             "start_date",
             "end_date",
             "days",
+            "work_date",
             "substitute",
+            "send_to_person",
+            # "attachment",
+            # "status",
         )
         widgets = {
             "send_to_person": forms.Select(
@@ -29,20 +32,20 @@ class RequestForm(forms.ModelForm):
                 }
             ),
             "work_date": forms.DateInput(
-                format="%d.%m.%y",
+                format="%Y-%m-%d",
                 attrs={
                     "type": "date",
                 },
             ),
             "start_date": forms.DateInput(
-                format="%d.%m.%y",
+                format="%Y-%m-%d",
                 attrs={
                     "type": "date",
                     "required": "True",
                 },
             ),
             "end_date": forms.DateInput(
-                format="%d.%m.%y",
+                format="%Y-%m-%d",
                 attrs={
                     "type": "date",
                 },
@@ -57,6 +60,12 @@ class RequestForm(forms.ModelForm):
                     "type": "number",
                 }
             ),
+            # "attachment": forms.ClearableFileInput(
+            #      attrs={
+            #         "type": "file",
+            #         "required": False,
+            #     }
+            # )
         }
 
     def clean_start_date(self):
@@ -112,6 +121,65 @@ class RequestForm(forms.ModelForm):
 
         self.helper = FormHelper()
         self.helper.form_show_labels = False
+
+class UpdateRequestForm(RequestForm):
+    history_change_reason = forms.CharField(label="Powód wprowadzanych zmian", max_length=255, required=False)
+    class Meta:
+        model = Request
+        fields = (
+            "type",
+            "start_date",
+            "end_date",
+            "days",
+            "work_date",
+            "substitute",
+            "send_to_person",
+            "attachment",
+            "status",
+        )
+        widgets = {
+            "send_to_person": forms.Select(
+                attrs={
+                    "required": "True",
+                    "class": "custom-select",
+                }
+            ),
+            "work_date": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "type": "date",
+                },
+            ),
+            "start_date": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "type": "date",
+                    "required": "True",
+                },
+            ),
+            "end_date": forms.DateInput(
+                format="%Y-%m-%d",
+                attrs={
+                    "type": "date",
+                },
+            ),
+            "substitute": forms.TextInput(
+                attrs={
+                    "placeholder": "Proszę wpisać osobę (jeśli dotyczy)",
+                }
+            ),
+            "days": forms.NumberInput(
+                attrs={
+                    "type": "number",
+                }
+            ),
+            "attachment": forms.ClearableFileInput(
+                 attrs={
+                    "type": "file",
+                    "required": False,
+                }
+            )
+        }
 
 
 class ReportForm(forms.Form):

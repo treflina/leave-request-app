@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.conf import settings
 
@@ -32,7 +33,7 @@ class Request(TimeStampedModel):
     end_date = models.DateField("Do", null=True, blank=True)
     days = models.PositiveIntegerField("Ilość dni urlopu", null=True, blank=True)
     status = models.CharField(max_length=20, default="oczekujący")
-    substitute = models.CharField("Zastępuje", max_length=50, blank=True)
+    substitute = models.CharField("Zastępuje", max_length=40, blank=True)
     send_to_person = models.ForeignKey(
         User,
         verbose_name="wysłano do",
@@ -43,16 +44,21 @@ class Request(TimeStampedModel):
     )
     signed_by = models.CharField("Zaopiniowany przez", max_length=50, blank=True)
     history = HistoricalRecords(history_change_reason_field=models.TextField(null=True))
-    # change_reason = models.TextField("Powód wprowadzenia zmian", null=True, blank=True)
-    # validate_file = FileValidator(
-    #     max_size=1024 * 2000,
-    #     content_types=(
-    #         "application/pdf",
-    #         "image/jpeg",
-    #         "image/png",
-    #     ),
-    # )
-    # attachment = models.FileField("Załącznik", upload_to="attachments/", validators=[validate_file], null=True)
+    validate_file = FileValidator(
+        max_size=1024 * 5000,
+        content_types=(
+            "application/pdf",
+            "image/jpeg",
+            "image/png",
+        ),
+    )
+    attachment = models.FileField(
+        "Załącznik",
+        upload_to="attachments/",
+        validators=[validate_file],
+        null=True,
+        blank=True,
+    )
 
     objects = RequestManager()
 

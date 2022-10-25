@@ -25,7 +25,7 @@ CONTENT_TYPES = (
 class UploadFile(models.Model):
     """Upload files model."""
 
-    validate_file = FileValidator(max_size=1024 * 5000, content_types=CONTENT_TYPES)
+    validate_file = FileValidator(max_size=1024 * 10000, content_types=CONTENT_TYPES)
     file = models.FileField("Plik", upload_to="documents/", validators=[validate_file])
     description = models.CharField("Opis", max_length=100, default="")
     category = models.CharField(

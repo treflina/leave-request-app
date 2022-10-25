@@ -147,6 +147,14 @@ input.search2 {
     display: none;
 }
 
+td a.icon-hrlist:hover {
+    text-decoration: none;
+}
+
+.custom-file-input:lang(pl) ~ .custom-file-label::after {
+    content: "Szukaj" !important;
+}
+
 @media (max-width: 410px) {
     .palm {
         display: none;
