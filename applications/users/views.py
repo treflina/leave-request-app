@@ -184,7 +184,7 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
     def get_context_data(self, **kwargs):
 
         context = super(AdminEmployeesList, self).get_context_data(**kwargs)
-        employees = User.objects.order_by("-is_active", "last_name", "first_name").all()
+        employees = User.objects.filter(is_active=True).order_by("-is_active", "last_name", "first_name")
 
         for employee in employees:
             if employee.working_hours == 1.00:
@@ -197,6 +197,8 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
             employee.duvet_days_count = Request.objects.filter(author_id=employee.id, duvet_day=True).count()
 
         context["employees"] = employees
+        exemployees = User.objects.filter(is_active=False).order_by("-is_active", "last_name", "first_name")
+        context["exemployees"] = exemployees
         return context
 
 

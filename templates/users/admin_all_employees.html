@@ -110,5 +110,73 @@
         </div>
     </div>
 </section>
+<section class="page-section mt-5">
+    <div>
+        <h3 class="mb3">Lista byłych pracowników</h3>
+        <table class="js-serial">
+            <thead>
+                <tr>
+                    <th scope="col">Nazwisko i imię</th>
+                    <th scope="col">Stanowisko</th>
+                    <th scope="col" class="content-center ml-1 mr-1">Urlop</th>
+                    <th scope="col" class="content-center">Etat</th>
+                    <th scope="col" class="content-center">Miejsce pracy</th>
+                    <th scope="col" class="content-center">Umowa do:</th>
+                    <th scope="col" class="content-center">Uwagi</th>
+                    <th scope="col" class="content-center">Akcja</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for exemployee in exemployees %}
+                <tr>
+                    <td data-title="Nazwisko i imię:">{{ exemployee.last_name}} {{exemployee.first_name}}</td>
+                    <td data-title="Stanowisko:">{{ exemployee.position|truncatechars:30 }}</td>
+                    <td data-title="Urlop:" class="content-center">{{ exemployee.current_leave }}</td>
+                    <td data-title="Etat:" class="content-center">{{ exemployee.working_hours }}</td>
+                    <td data-title="Miejsce pracy:" class="content-center">{{ exemployee.workplace }}</td>
+                    <td data-title="Umowa do:" class="content-center">{{ exemployee.contract_end|date:"d.m.y"}}</td>
+                    <td data-title="Uwagi:" class="content-center">{{ exemployee.additional_info|truncatechars:30 }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{%url 'users_app:update_employee' exemployee.id%}" class="btn btn-sm btn-light" type="submit">Edytuj</a>
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                data-target="#deleteModal{{exemployee.id}}">Usuń</button>
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="deleteModal{{exemployee.id}}" tabindex="-1"
+                            aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Czy na pewno chcesz usunąć pracownika? <br>{{exemployee.first_name}}
+                                            {{exemployee.last_name}} <br> UWAGA! Zostaną usunięte z bazy również jego
+                                            wszystkie
+                                            wnioski oraz zwolnienia lekarskie. <br> Możliwe alternatywne rozwiązanie:
+                                            zmiana wartości ustawienia "Obecnie zatrudniony" w Edytuj. </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
+                                        <form method="POST" action="{% url 'users_app:delete_employee' exemployee.id %}">
+                                            {%csrf_token%}
+                                            <button type="submit" class="btn btn-info">Tak, usuń</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</section>
 
 {% endblock content %}
