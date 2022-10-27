@@ -12,12 +12,13 @@
                 <table class="js-serial" id="wnioski-table">
                     <thead>
                         <tr>
-                            <th scope="col">Data złożenia</th>
+                            <th scope="col">Złożony</th>
                             <th scope="col">Nazwisko i imię</th>
                             <th scope="col" class="content-center">Od</th>
                             <th scope="col" class="content-center">Do</th>
-                            <th scope="col">Liczba dni<span class="text-danger">*</span></th>
+                            <th scope="col">L. dni<span class="text-danger">*</span></th>
                             <th scope="col">Rodzaj<span class="text-danger">**</span></th>
+                            <th scope="col">NŻ<span class="text-danger">***</span></th>
                             <th scope="col">Za pracę dnia</th>
                             <th scope="col">Zastępuje</th>
                             <th scope="col"></th>
@@ -26,14 +27,15 @@
                     <tbody>
                         {% for request in requests_received %}
                         <tr>
-                            <td data-title="Data złożenia:" class="content-center">{{request.created|date:"d.m.y"}}</td>
+                            <td data-title="Złożony:" class="content-center">{{request.created|date:"d.m.y"}}</td>
                             <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
                                 {{request.author.position_addinfo}}</td>
                             <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
                             <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
-                            <td data-title="Liczba dni:" class="content-center">
+                            <td data-title="L. dni:" class="content-center">
                                 {%if request.type == 'W'%}{{request.days}}{%endif%}</td>
                             <td data-title="Rodzaj">{{request.type}}</td>
+                            <td data-title="Rodzaj">{% if request.duvet_day == 1 %}TAK{% endif %}</td>
                             <td data-title="Za pracę dnia:">{{request.work_date|date:"d.m.y"}}</td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
                             <td>
@@ -61,6 +63,8 @@
                 <br>
                 <span class="text-danger">**</span> W - urlop wypoczynkowy, WS/WN - wolne za pracę w sobotę/niedzielę,
                 DW - wolne za święto przypadające w sobotę
+                <br>
+                <span class="text-danger">***</span> urlop na żądanie
             </div>
         </div>
     </section>
@@ -78,11 +82,12 @@
                 <table class="js-serial">
                     <thead>
                         <tr>
-                            <th scope="col">Data złożenia</th>
+                            <th scope="col">Złożony</th>
                             <th scope="col">Nazwisko i imię</th>
                             <th class="content-center" scope="col">Od</th>
                             <th class="content-center" scope="col">Do</th>
-                            <th scope="col">Liczba dni<span class="text-danger">*</span></th>
+                            <th scope="col">L. dni<span class="text-danger">*</span></th>
+                            <th scope="col">NŻ<span class="text-danger">**</span></th>
                             <th scope="col">Zastępuje</th>
                             <th scope="col">Status</th>
                         </tr>
@@ -90,13 +95,14 @@
                     <tbody class="myTable" id="myTable">
                         {% for request in requests_holiday %}
                         <tr>
-                            <td data-title="Data złożenia:" class="content-center">{{request.created|date:"d.m.y"}}</td>
+                            <td data-title="Złożony:" class="content-center">{{request.created|date:"d.m.y"}}</td>
                             <td data-title="Nazwisko i imię:">{{request.author.last_name}}
                                 {{request.author.first_name}} {{request.author.position_addinfo}}
                             </td>
                             <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
                             <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
-                            <td data-title="Liczba dni:" class="content-center">{{request.days}}</td>
+                            <td data-title="L. dni:" class="content-center">{{request.days}}</td>
+                            <td data-title="NŻ:" class="content-center">{% if request.duvet_day == 1 %}TAK{% endif %}</td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
                             <td>
                                 {% if request.status == 'oczekujący'%}
@@ -123,6 +129,8 @@
             </div>
             <div><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                 czasu pracy.
+                <br>
+                <span class="text-danger">**</span> urlop na żądanie
             </div>
         </div>
     </section>
@@ -140,7 +148,7 @@
                 <table class="js-serial">
                     <thead>
                         <tr>
-                            <th scope="col">Data złożenia</th>
+                            <th scope="col">Złożony</th>
                             <th class="content-center" scope="col">Nazwisko i imię</th>
                             <th class="content-center" scope="col">Na dzień</th>
                             <th scope="col">Rodzaj</th>
@@ -152,7 +160,7 @@
                     <tbody class="myTable2" id="myTable2">
                         <tr>
                             {%for request in requests_other%}
-                            <td data-title="Data złożenia:" class="search content-center">
+                            <td data-title="Złożony:" class="search content-center">
                                 {{request.created|date:"d.m.y"}}
                             </td>
                             <td data-title="Nazwisko i imię:">{{request.author.last_name}}

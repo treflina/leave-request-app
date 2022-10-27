@@ -29,25 +29,25 @@
             </div>
             <div class="col">
                 <div class="form-check">
-                    <input class="form-check-input active" type="radio" name="type" id="id_type_0" value="W" checked>
+                    <input class="form-check-input active" type="radio" name="type" id="id_type_0" value="W" {% if request.type == 'W' %} checked {% endif %}>
                     <label class="form-check-label" for="id_type_0"> Urlop wypoczynkowy (W) </label>
                 </div>
                 <div class="form-check">
                     <div class="row">
                         <div class="col">
-                            <input class="form-check-input" type="radio" name="type" id="id_type_1" value="WS">
+                            <input class="form-check-input" type="radio" name="type" id="id_type_1" value="WS" {% if request.type == 'WS' %} checked {% endif %}>
                             <label class="form-check-label" for="id_type_1"> Wolne za pracę w wolną sobotę
                                 (WS)<span class="text-danger">*</span> </label>
                         </div>
                     </div>
                 </div>
                 <div class="form-check ">
-                    <input class="form-check-input" type="radio" name="type" id="id_type_2" value="WN">
+                    <input class="form-check-input" type="radio" name="type" id="id_type_2" value="WN" {% if request.type == 'WN' %} checked {% endif %}>
                     <label class="form-check-label" for="id_type_2"> Wolne za pracę w niedzielę/święto
                         (WN)<span class="text-danger">*</span> </label>
                 </div>
                 <div class="form-check ">
-                    <input class="form-check-input" type="radio" name="type" id="id_type_3" value="DW">
+                    <input class="form-check-input" type="radio" name="type" id="id_type_3" value="DW" {% if request.type == 'DW' %} checked {% endif %}>
                     <label class="form-check-label " for="id_type_3"> Wolne za święto przypadające w wolną sobotę
                         (DW) </label>
                 </div>
@@ -82,8 +82,11 @@
             <div class="col col-lg-6">
                 <p class="text-danger">Uwaga! W przypadku zmiany liczby dni (godzin) udzielonego urlopu pamiętaj o zmianie wymiaru bieżącego urlopu pracownika.</p>
             </div>
+            <label for="duvet-day" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na żądanie:</label>
+            <div class="col col-lg-2 col-md-2 col-sm-2">
+                {{form.duvet_day|as_crispy_field}}
+            </div>
         </div>
-
         <div class="form-group row">
             <label for="substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
             <div class="col">

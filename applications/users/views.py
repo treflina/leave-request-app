@@ -194,6 +194,8 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
             else:
                 employee.is_manager = "TAK"
 
+            employee.duvet_days_count = Request.objects.filter(author_id=employee.id, duvet_day=True).count()
+
         context["employees"] = employees
         return context
 

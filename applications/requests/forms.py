@@ -2,6 +2,7 @@ from datetime import datetime, date
 from crispy_forms.helper import FormHelper
 
 from django.db.models.fields import DateField
+
 from django.forms.fields import ChoiceField
 from django.forms.widgets import Select, SelectDateWidget
 from django import forms
@@ -10,7 +11,10 @@ from .models import Request, User
 
 
 class RequestForm(forms.ModelForm):
+
     history_change_reason = forms.CharField(label="Powód wprowadzanych zmian", max_length=255, required=False)
+
+
     class Meta:
         model = Request
         fields = (
@@ -21,8 +25,7 @@ class RequestForm(forms.ModelForm):
             "work_date",
             "substitute",
             "send_to_person",
-            # "attachment",
-            # "status",
+            "duvet_day",
         )
         widgets = {
             "send_to_person": forms.Select(
@@ -60,13 +63,8 @@ class RequestForm(forms.ModelForm):
                     "type": "number",
                 }
             ),
-            # "attachment": forms.ClearableFileInput(
-            #      attrs={
-            #         "type": "file",
-            #         "required": False,
-            #     }
-            # )
-        }
+            "duvet_day": forms.RadioSelect(choices=((False, "NIE"), (True, "TAK"),))
+             }
 
     def clean_start_date(self):
         start_date = self.cleaned_data.get("start_date")
@@ -136,6 +134,7 @@ class UpdateRequestForm(RequestForm):
             "send_to_person",
             "attachment",
             "status",
+            "duvet_day",
         )
         widgets = {
             "send_to_person": forms.Select(
@@ -178,8 +177,15 @@ class UpdateRequestForm(RequestForm):
                     "type": "file",
                     "required": False,
                 }
-            )
-        }
+            ),
+            "duvet_day": forms.RadioSelect(
+                choices=(
+                        (False, "NIE"),
+                        (True, "TAK"),
+                        (None, "Nie dotyczy")
+                        ))
+             }
+
 
 
 class ReportForm(forms.Form):

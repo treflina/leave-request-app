@@ -15,7 +15,7 @@
                 <table class="js-serial">
                     <thead>
                         <tr>
-                            <th scope="col">Data złożenia</th>
+                            <th scope="col">Złożony</th>
                             <th class="content-center" scope="col">Nazwisko i imię</th>
                             <th class="content-center" scope="col">Na dzień</th>
                             <th scope="col">Rodzaj</th>
@@ -27,7 +27,7 @@
                     <tbody class="myTable2" id="myTable2">
                         <tr>
                             {%for request in requests_other%}
-                            <td data-title="Data złożenia:" class="search content-center">
+                            <td data-title="Złożony:" class="search content-center">
                                 {{request.created|date:"d.m.y"}}
                             </td>
                             <td data-title="Nazwisko i imię:">{{request.author.last_name}}

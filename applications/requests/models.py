@@ -20,6 +20,7 @@ class Request(TimeStampedModel):
         ("DW", "Wolne za święto przypadające w wolną sobotę (DW)"),
     )
 
+
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="autor",
@@ -32,6 +33,7 @@ class Request(TimeStampedModel):
     start_date = models.DateField("Od", null=True, blank=True)
     end_date = models.DateField("Do", null=True, blank=True)
     days = models.PositiveIntegerField("Ilość dni urlopu", null=True, blank=True)
+    duvet_day = models.BooleanField("Na żądanie", default=False, null=True)
     status = models.CharField(max_length=20, default="oczekujący")
     substitute = models.CharField("Zastępuje", max_length=40, blank=True)
     send_to_person = models.ForeignKey(

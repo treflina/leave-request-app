@@ -32,6 +32,7 @@ class RequestsAdmin(SimpleHistoryAdmin):
                     "end_date",
                     "work_date",
                     "days",
+                    "duvet_day",
                     "substitute",
                     "status",
                     "send_to_person",

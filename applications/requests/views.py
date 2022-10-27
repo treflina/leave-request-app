@@ -58,9 +58,15 @@ class RequestFormView(LoginRequiredMixin, FormView):
                 days = 0
         if (type == "WS" or type == "WN" or type == "DW") and days == None:
             days = 0
+
         start_date = form.cleaned_data["start_date"]
         end_date = form.cleaned_data["end_date"]
         work_date = form.cleaned_data["work_date"]
+        duvet_day = bool(form.cleaned_data.get("duvet_day"))
+
+        if type != "W":
+            duvet_day = None
+
         send_to_person = form.cleaned_data["send_to_person"]
         if (type == "WS" or type == "WN") and Request.objects.filter(
             Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
@@ -78,6 +84,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
             start_date=start_date,
             end_date=end_date,
             days=days,
+            duvet_day=duvet_day,
             substitute=form.cleaned_data["substitute"],
             send_to_person=send_to_person,
         ).save()
@@ -105,6 +112,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
             settings.EMAIL_HOST_USER,
             [send_to_person.work_email],
             fail_silently=False,
+
         )
         user.current_leave -= days
         user.save(update_fields=["current_leave"])
@@ -113,9 +121,10 @@ class RequestFormView(LoginRequiredMixin, FormView):
 
     def form_invalid(self, form):
         print("sth went wrong")
+
         for key, value in self.request.POST.items():
             print('Key: %s' % (key) )
-    # print(f'Key: {key}') in Python >= 3.7
+
             print('Value %s' % (value) )
         return super(RequestFormView, self).form_invalid(form)
 
