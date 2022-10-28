@@ -46,7 +46,7 @@
                                 {{request.status}}
                                 {%endif%}
                             </td>
-                            <td><a class="icon-hrlist" href="{%url 'requests_app:changerequest' request.id%}">&#128295</a> {%if request.attachment %}&#128449{%endif%} </td>
+                            <td><a class="icon-hrlist" href="{%url 'requests_app:changerequest' request.id%}"><span class="edit-icon">&#9998;</span></a> {%if request.attachment %}&#128449{%endif%} </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -103,7 +103,7 @@
                                 {{request.status}}
                                 {%endif%}
                             </td>
-                            <td><a class="icon-hrlist" href="{%url 'requests_app:changerequest' request.id%}">&#128736</a> {%if request.attachment %}&#128449{%endif%} </td>
+                            <td><a class="icon-hrlist" href="{%url 'requests_app:changerequest' request.id%}"><span class="edit-icon">&#9998;</span></a> {%if request.attachment %}&#128449{%endif%} </td>
                         </tr>
                         {% endfor %}
                     </tbody>

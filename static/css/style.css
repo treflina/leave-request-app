@@ -155,6 +155,11 @@ td a.icon-hrlist:hover {
     content: "Szukaj" !important;
 }
 
+.edit-icon {
+    display: inline-block;
+    transform: rotateZ(90deg);
+  }
+
 @media (max-width: 410px) {
     .palm {
         display: none;
