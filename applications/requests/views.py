@@ -1,28 +1,24 @@
 from io import BytesIO
-from distutils.log import error
 from simple_history.utils import update_change_reason
 
-from django.core.exceptions import ValidationError
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, FileResponse, HttpResponse
+from django.http import HttpResponseRedirect, FileResponse
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView, ListView, UpdateView
-
-from pdf_creator import create_pdf
-from wnioski.settings import get_secret
 
 from applications.users.models import User
 from applications.sickleaves.models import Sickleave
 from applications.users.mixins import TopManagerPermisoMixin
 
-from .forms import RequestForm, ReportForm, UpdateRequestForm
-from .managers import RequestManager
 from .models import Request
+from .forms import RequestForm, ReportForm, UpdateRequestForm
+from .utils import RequestEmailNotification
+from pdf_creator import create_pdf
+
+import logging
+logger = logging.getLogger('django')
 
 
 class RequestFormView(LoginRequiredMixin, FormView):
@@ -34,7 +30,6 @@ class RequestFormView(LoginRequiredMixin, FormView):
     login_url = reverse_lazy("users_app:user-login")
 
     def get_context_data(self, **kwargs):
-
         context = super(RequestFormView, self).get_context_data(**kwargs)
         context["form"].fields["send_to_person"].queryset = (
             User.objects.filter(
@@ -48,26 +43,25 @@ class RequestFormView(LoginRequiredMixin, FormView):
             context["part"] = True
         return context
 
-    def form_valid(self, form):
 
+    def form_valid(self, form):
         user = self.request.user
         type = form.cleaned_data["type"]
+
         days = form.cleaned_data["days"]
-        if (type == "WS" or type == "WN" or type == "DW") and days != None:
-            if days > 0:
-                days = 0
-        if (type == "WS" or type == "WN" or type == "DW") and days == None:
+        if (type == "WS" or type == "WN" or type == "DW"):
             days = 0
 
         start_date = form.cleaned_data["start_date"]
         end_date = form.cleaned_data["end_date"]
         work_date = form.cleaned_data["work_date"]
-        duvet_day = bool(form.cleaned_data.get("duvet_day"))
 
+        duvet_day = bool(form.cleaned_data.get("duvet_day"))
         if type != "W":
             duvet_day = None
 
         send_to_person = form.cleaned_data["send_to_person"]
+
         if (type == "WS" or type == "WN") and Request.objects.filter(
             Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
         ).exists():
@@ -88,45 +82,18 @@ class RequestFormView(LoginRequiredMixin, FormView):
             substitute=form.cleaned_data["substitute"],
             send_to_person=send_to_person,
         ).save()
-        start_date = start_date.strftime("%d.%m.%y")
-        end_date = end_date.strftime("%d.%m.%y")
-        if work_date:
-            work_date = work_date.strftime("%d.%m.%y")
-        if type == "W" and start_date == end_date:
-            text_msg = f"urlop wypoczynkowy w dniu {start_date}"
-        elif type == "W":
-            text_msg = f"urlop wypoczynkowy w okresie {start_date} - {end_date}"
-        elif type == "WS" or type == "WN":
-            text_msg = f"dzień wolny ({type}) {start_date} za pracę {work_date}"
-        elif type == "DW":
-            text_msg = f"dzień wolny {start_date} za święto przypadające w sobotę"
-        else:
-            text_msg = f"wolne ({type}) w okresie {start_date} - {end_date}"
 
-        subject = f"{user} prosi o akceptację wniosku ({start_date}-{end_date})"
-        message = f"{user} prosi o akceptację wniosku o {text_msg}.\r\n \r\nZaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/. \r\n \r\nWiadomość wygenerowana automatycznie."
-        EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
-        send_mail(
-            subject,
-            message,
-            settings.EMAIL_HOST_USER,
-            [send_to_person.work_email],
-            fail_silently=False,
-
-        )
         user.current_leave -= days
         user.save(update_fields=["current_leave"])
         messages.success(self.request, "Wniosek został pomyślnie złożony.")
+
+        try:
+            notification = RequestEmailNotification(user, type, start_date, end_date, work_date, duvet_day, send_to_person)
+            notification.send_notification()
+        except Exception:
+            logger.error("Email request notification not sent", exc_info=True)
+
         return super(RequestFormView, self).form_valid(form)
-
-    def form_invalid(self, form):
-        print("sth went wrong")
-
-        for key, value in self.request.POST.items():
-            print('Key: %s' % (key) )
-
-            print('Value %s' % (value) )
-        return super(RequestFormView, self).form_invalid(form)
 
 
 class RequestChangeView(TopManagerPermisoMixin, UpdateView):
@@ -151,7 +118,7 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
         history_changereason = (
             Request.history.filter(id=self.object.id).first().history_change_reason
         )
-        if history_changereason in ["None", ""] or history_changereason is None:
+        if history_changereason in ["None", "", None]:
             context["history_changereason"] = "brak"
         else:
             context["history_changereason"] = history_changereason
@@ -166,7 +133,7 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
 
 
 class UserRequestsListView(LoginRequiredMixin, ListView):
-    """Employee requests listing page."""
+    """Authenticated user requests listing page."""
 
     template_name = "requests/user_requests.html"
     model = Request
@@ -182,7 +149,8 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
 
 
 class RequestsListView(TopManagerPermisoMixin, ListView):
-    """All employees 30 latest requests (except those sent by current user themselves) sent from the beginning of the year and for the next 3 weeks."""
+    """List view that contains 30 last requests from subordinates
+    since the beginning of the year and up to the following 3 weeks."""
 
     model = Request
     template_name = "requests/allrequests.html"

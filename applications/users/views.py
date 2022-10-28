@@ -1,39 +1,27 @@
-from datetime import date, datetime
+from datetime import date
 from django.shortcuts import render
-from django.core.mail import send_mail
-from django.conf import settings
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django import forms
-
 from django.views.generic import (
     View,
-    TemplateView,
-    CreateView,
     ListView,
     UpdateView,
 )
-
 from django.views.generic.edit import (
     FormView,
 )
 
 from applications.users.mixins import TopManagerPermisoMixin
-
 from .forms import (
     UserRegisterForm,
     LoginForm,
     UpdatePasswordForm,
 )
-
-#
 from .models import User
-
 from applications.requests.models import Request
 from applications.sickleaves.models import Sickleave
 
@@ -47,7 +35,6 @@ class UserRegisterView(TopManagerPermisoMixin, FormView):
     login_url = reverse_lazy("users_app:user-login")
 
     def form_valid(self, form):
-        # employee = form.save()
         User.objects.create_user(
             form.cleaned_data["username"],
             form.cleaned_data["password1"],
@@ -82,7 +69,6 @@ class LoginUser(FormView):
             username=form.cleaned_data["username"],
             password=form.cleaned_data["password"],
         )
-
         login(self.request, user)
         return super(LoginUser, self).form_valid(form)
 
@@ -184,7 +170,9 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
     def get_context_data(self, **kwargs):
 
         context = super(AdminEmployeesList, self).get_context_data(**kwargs)
-        employees = User.objects.filter(is_active=True).order_by("-is_active", "last_name", "first_name")
+        employees = User.objects.filter(is_active=True).order_by(
+            "-is_active", "last_name", "first_name"
+        )
         current_year = date.today().year
 
         for employee in employees:
@@ -195,10 +183,17 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
             else:
                 employee.is_manager = "TAK"
 
-            employee.duvet_days_count = Request.objects.filter(author_id=employee.id, duvet_day=True, start_date__gte=date(current_year, 1, 1), start_date__lte=date(current_year, 12, 31)).count()
+            employee.duvet_days_count = Request.objects.filter(
+                author_id=employee.id,
+                duvet_day=True,
+                start_date__gte=date(current_year, 1, 1),
+                start_date__lte=date(current_year, 12, 31),
+            ).count()
         context["employees"] = employees
 
-        exemployees = User.objects.filter(is_active=False).order_by("-is_active", "last_name", "first_name")
+        exemployees = User.objects.filter(is_active=False).order_by(
+            "-is_active", "last_name", "first_name"
+        )
         context["exemployees"] = exemployees
         return context
 
@@ -245,6 +240,7 @@ def delete_employee(request, pk):
     employee_to_delete = User.objects.get(id=pk).delete()
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
 
+
 @login_required(login_url="users_app:user-login")
 def add_annual_leave(request):
     """Adds all employees annual leave entitlement to their current leave entitlement."""
@@ -252,8 +248,3 @@ def add_annual_leave(request):
         employee.current_leave += employee.annual_leave
         employee.save()
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
-
-
-
-
-

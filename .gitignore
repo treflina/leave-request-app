@@ -5,6 +5,7 @@ desktop.ini
 __pycache__
 
 /secret.json
+/wnioski.log
 
 /applications/users/migrations/*
 /applications/requests/migrations/*
