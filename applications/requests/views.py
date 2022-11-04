@@ -108,7 +108,7 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(RequestChangeView, self).get_context_data(**kwargs)
         context["form"].fields["send_to_person"].queryset = User.objects.filter(
-            (Q(id=self.request.user.manager_id) | Q(role="S") | Q(role="T"))
+            (Q(role="K") | Q(role="S") | Q(role="T"))
             & Q(is_active=True)
         ).order_by("role")
 
