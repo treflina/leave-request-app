@@ -1,15 +1,10 @@
-from datetime import date
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
-from django.db.models.fields import EmailField, DecimalField
-from django.db.models import Q
-
 from .managers import UserManager
 
 
 class User(AbstractBaseUser):
-    """User table model"""
+    """Users in the system."""
 
     ROLE_CHOICES = (
         ("P", "Nie"),
