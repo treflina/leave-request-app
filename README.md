@@ -40,7 +40,7 @@ source bin/activate
 
 cd wnioski
 pip3 install -r requirements.txt
-apt-get install libmagic1
+sudo apt-get install libmagic1
 ```
 
 In case there's a problem with installing Pillow:
