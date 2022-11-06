@@ -8,6 +8,7 @@ Other main functions:
 - e-mail notifications to a manager that a request's been sent
 - pdf report generator about days off, sick leaves
 - sick leaves registration page
+- possibility to download documents (like regulations, private insurance contract rules etc.) for employees
 
 Written in Python with Django 3.2. Responsive (including tables).
 

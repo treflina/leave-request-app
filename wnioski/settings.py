@@ -169,7 +169,7 @@ LOGGING = {
 
 AUTH_USER_MODEL = "users.User"
 
-LANGUAGE_CODE = "pl"
+LANGUAGE_CODE = "pl-PL"
 
 TIME_ZONE = "Europe/Warsaw"
 

@@ -36,9 +36,13 @@ msgstr "Uprawnienia"
 msgid "no"
 msgstr "Nie"
 
-#: .\models.py:13 .\models.py:37
+#: .\models.py:13
 msgid "manager"
 msgstr "Kierownik-przełożony"
+
+.\models.py:37
+msgid "manager"
+msgstr "Przełożony"
 
 #: .\models.py:14
 msgid "vice-director, instructor"
