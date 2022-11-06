@@ -1,30 +1,32 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.utils.translation import gettext_lazy as _
+
 from .managers import UserManager
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     """Users in the system."""
 
     ROLE_CHOICES = (
-        ("P", "Nie"),
-        ("K", "Kierownik - przełożony"),
-        ("T", "Instruktor, Zastępca Dyrektora"),
-        ("S", "Dyrektor"),
+        ("P", _("no")),
+        ("K", _("manager")),
+        ("T", _("vice-director, instructor")),
+        ("S", _("director")),
     )
 
-    username = models.CharField("Nazwa użytkownika", max_length=15, unique=True)
-    email = models.EmailField("Email", null=True, blank=True)
-    work_email = models.EmailField("Email służbowy", null=True, blank=True)
-    first_name = models.CharField("Imię", max_length=30)
-    last_name = models.CharField("Nazwisko", max_length=50)
-    position = models.CharField("Stanowisko", max_length=50)
+    username = models.CharField(_("user name"), max_length=15, unique=True)
+    email = models.EmailField("email", null=True, blank=True)
+    work_email = models.EmailField(_("work email"), null=True, blank=True)
+    first_name = models.CharField(_("first name"), max_length=30)
+    last_name = models.CharField(_("last name"), max_length=50)
+    position = models.CharField(_("position"), max_length=50)
     position_addinfo = models.CharField(
-        'Dopisek "sprz." w przypadku dwóch umów', max_length=50, blank=True
+        _("annotation in case of two contracts"), max_length=50, blank=True
     )
-    workplace = models.CharField("Dział/Filia", max_length=50, blank=True)
+    workplace = models.CharField(_("department"), max_length=50, blank=True)
     role = models.CharField(
-        "Stanowisko kierownicze", null=True, max_length=10, choices=ROLE_CHOICES
+        _("management role"), null=True, max_length=10, choices=ROLE_CHOICES
     )
     manager = models.ForeignKey(
         "self",
@@ -32,19 +34,19 @@ class User(AbstractBaseUser):
         blank=True,
         related_name="user",
         on_delete=models.SET_NULL,
-        verbose_name="przełożony",
+        verbose_name=_("manager"),
     )
     working_hours = models.DecimalField(
-        "Wymiar etatu", max_digits=3, decimal_places=2, default=1
+        _("working hours"), max_digits=3, decimal_places=2, default=1
     )
-    annual_leave = models.IntegerField("Roczny wymiar urlopu", default=26)
-    current_leave = models.IntegerField("Urlop (pozostało)", default=0)
-    contract_end = models.DateField("Umowa do:", null=True, blank=True)
-    is_staff = models.BooleanField("Dostęp do zakładki admin", default=False)
-    is_active = models.BooleanField("Obecnie zatrudniony", default=True)
-    is_superuser = models.BooleanField("Uprawnienia administratora", default=False)
+    annual_leave = models.IntegerField(_("annual leave entitlement"), default=26)
+    current_leave = models.IntegerField(_("current leave"), default=0)
+    contract_end = models.DateField(_("contract end:"), null=True, blank=True)
+    is_staff = models.BooleanField(_("access to admin bookmark"), default=False)
+    is_active = models.BooleanField(_("currently employed"), default=True)
+    is_superuser = models.BooleanField(_("superuser permissions"), default=False)
     additional_info = models.CharField(
-        "Dodatkowe informacje", blank=True, max_length=100
+        _("additional information"), blank=True, max_length=100
     )
 
     USERNAME_FIELD = "username"
@@ -52,15 +54,15 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     class Meta:
-        verbose_name = "Pracownik"
-        verbose_name_plural = "Pracownicy"
+        verbose_name = _("employee")
+        verbose_name_plural = _("employees")
         ordering = ["last_name", "first_name"]
 
-    def has_perm(self, perm, obj=None):
-        return self.is_superuser
+    # def has_perm(self, perm, obj=None):
+    #     return self.is_superuser
 
-    def has_module_perms(self, app_label):
-        return self.is_superuser
+    # def has_module_perms(self, app_label):
+    #     return self.is_superuser
 
     def get_full_name(self):
         return self.first_name + " " + self.last_name

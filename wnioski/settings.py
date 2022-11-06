@@ -57,6 +57,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -168,7 +169,7 @@ LOGGING = {
 
 AUTH_USER_MODEL = "users.User"
 
-LANGUAGE_CODE = "pl-PL"
+LANGUAGE_CODE = "pl"
 
 TIME_ZONE = "Europe/Warsaw"
 

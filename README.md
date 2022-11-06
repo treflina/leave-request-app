@@ -40,6 +40,7 @@ source bin/activate
 
 cd wnioski
 pip3 install -r requirements.txt
+sudo apt-get install gettext
 sudo apt-get install libmagic1
 ```
 

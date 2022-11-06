@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-11-06 10:44+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: .\admin.py:34
+msgid "Basic Information"
+msgstr "Podstawowe informacje"
+
+#: .\admin.py:54
+msgid "Leave"
+msgstr "Urlop"
+
+#: .\admin.py:58
+msgid "Permissions"
+msgstr "Uprawnienia"
+
+#: .\models.py:12
+msgid "no"
+msgstr "Nie"
+
+#: .\models.py:13 .\models.py:37
+msgid "manager"
+msgstr "Kierownik-przełożony"
+
+#: .\models.py:14
+msgid "vice-director, instructor"
+msgstr "Zatępca dyrektora, instruktor"
+
+#: .\models.py:15
+msgid "director"
+msgstr "Dyrektor"
+
+#: .\models.py:18
+msgid "user name"
+msgstr "Nazwa użytkownika"
+
+#: .\models.py:20
+msgid "work email"
+msgstr "Email służbowy"
+
+#: .\models.py:21
+msgid "first name"
+msgstr "Imię"
+
+#: .\models.py:22
+msgid "last name"
+msgstr "Nazwisko"
+
+#: .\models.py:23
+msgid "position"
+msgstr "Stanowisko"
+
+#: .\models.py:25
+msgid "annotation in case of two contracts"
+msgstr "Dopisek 'sprz' w przypadku dwóch umów"
+
+#: .\models.py:27
+msgid "department"
+msgstr "Dział/filia"
+
+#: .\models.py:29
+msgid "management role"
+msgstr "Stanowisko kierownicze"
+
+#: .\models.py:40
+msgid "working hours"
+msgstr "Wymiar etatu"
+
+#: .\models.py:42
+msgid "annual leave entitlement"
+msgstr "Roczny wymiar urlopu"
+
+#: .\models.py:43
+msgid "current leave"
+msgstr "Urlop (pozostało)"
+
+#: .\models.py:44
+msgid "contract end:"
+msgstr "Umowa do:"
+
+#: .\models.py:45
+msgid "access to admin bookmark"
+msgstr "Dostęp do zakładki admin"
+
+#: .\models.py:46
+msgid "currently employed"
+msgstr "Obecnie zatrudniony"
+
+#: .\models.py:47
+msgid "superuser permissions"
+msgstr "Uprawnienia administratora"
+
+#: .\models.py:49
+msgid "additional information"
+msgstr "Dodatkowe informacje"
+
+#: .\models.py:57
+msgid "employee"
+msgstr "pracownik"
+
+#: .\models.py:58
+msgid "employees"
+msgstr "pracownicy"
+
+#~ msgid "No"
+#~ msgstr "Nie"
