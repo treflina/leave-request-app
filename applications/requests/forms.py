@@ -2,9 +2,6 @@ from datetime import datetime, date
 from crispy_forms.helper import FormHelper
 
 from django.db.models.fields import DateField
-
-from django.forms.fields import ChoiceField
-from django.forms.widgets import Select, SelectDateWidget
 from django import forms
 
 from .models import Request, User

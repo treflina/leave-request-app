@@ -126,3 +126,6 @@ msgstr "pracownicy"
 
 #~ msgid "No"
 #~ msgstr "Nie"
+
+msgid "January"
+msgstr "Styczeń"
