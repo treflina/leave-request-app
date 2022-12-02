@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
+
 class ModelTest(TestCase):
     """Test models."""
 
@@ -9,25 +10,23 @@ class ModelTest(TestCase):
         username = "test"
         password = "testpassword"
         user = get_user_model().objects.create_user(
-            username=username,
-            password=password
+            username=username, password=password
         )
         self.assertEqual(user.username, username)
         self.assertTrue(user.check_password(password))
         self.assertFalse(user.is_superuser)
         self.assertFalse(user.is_staff)
 
-
     def test_new_user_without_username_raises_error(self):
         """Test that creating a user without setting a username raises a ValueError."""
         with self.assertRaises(ValueError):
-            get_user_model().objects.create_user('', 'test123')
+            get_user_model().objects.create_user("", "test123")
 
     def test_create_superuser(self):
         """Test creating a superuser."""
         user = get_user_model().objects.create_superuser(
-            'testuser',
-            'testpassword',
+            "testuser",
+            "testpassword",
         )
 
         self.assertTrue(user.is_superuser)

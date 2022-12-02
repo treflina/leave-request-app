@@ -15,7 +15,6 @@ from django.views.generic.edit import (
     FormView,
 )
 
-from applications.users.mixins import TopManagerPermisoMixin
 from .forms import (
     UserRegisterForm,
     LoginForm,
@@ -24,6 +23,7 @@ from .forms import (
 from .models import User
 from applications.requests.models import Request
 from applications.sickleaves.models import Sickleave
+from applications.users.mixins import TopManagerPermisoMixin
 
 
 class UserRegisterView(TopManagerPermisoMixin, FormView):

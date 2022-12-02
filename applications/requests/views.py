@@ -1,7 +1,6 @@
-from io import BytesIO
 from simple_history.utils import update_change_reason
 
-from django.http import HttpResponseRedirect, FileResponse
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib import messages
@@ -9,16 +8,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView, ListView, UpdateView
 
 from applications.users.models import User
-from applications.sickleaves.models import Sickleave
 from applications.users.mixins import TopManagerPermisoMixin
 
 from .models import Request
-from .forms import RequestForm, ReportForm, UpdateRequestForm
+from .forms import RequestForm, UpdateRequestForm
 from .utils import RequestEmailNotification
-from pdf_creator import create_pdf
 
 import logging
-logger = logging.getLogger('django')
+logger = logging.getLogger("django")
 
 
 class RequestFormView(LoginRequiredMixin, FormView):
@@ -43,13 +40,12 @@ class RequestFormView(LoginRequiredMixin, FormView):
             context["part"] = True
         return context
 
-
     def form_valid(self, form):
         user = self.request.user
         type = form.cleaned_data["type"]
 
         days = form.cleaned_data["days"]
-        if (type == "WS" or type == "WN" or type == "DW"):
+        if type == "WS" or type == "WN" or type == "DW":
             days = 0
 
         start_date = form.cleaned_data["start_date"]
@@ -88,7 +84,9 @@ class RequestFormView(LoginRequiredMixin, FormView):
         messages.success(self.request, "Wniosek został pomyślnie złożony.")
 
         try:
-            notification = RequestEmailNotification(user, type, start_date, end_date, work_date, duvet_day, send_to_person)
+            notification = RequestEmailNotification(
+                user, type, start_date, end_date, work_date, duvet_day, send_to_person
+            )
             notification.send_notification()
         except Exception:
             logger.error("Email request notification not sent", exc_info=True)
@@ -108,9 +106,8 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(RequestChangeView, self).get_context_data(**kwargs)
         context["form"].fields["send_to_person"].queryset = User.objects.filter(
-            (Q(role="K") | Q(role="S") | Q(role="T"))
-            & Q(is_active=True)
-        ).order_by("role")
+            (Q(role="K") | Q(role="S") | Q(role="T")) & Q(is_active=True)
+        ).order_by("last_name")
 
         if self.object.author.working_hours < 1:
             context["part"] = True
@@ -277,232 +274,3 @@ def delete_request(request, pk):
         user.save(update_fields=["current_leave"])
     request_to_delete.delete()
     return HttpResponseRedirect(reverse("requests_app:user_requests"))
-
-
-class ReportView(TopManagerPermisoMixin, FormView):
-    """Creates pdf report about requests and sickleaves for a chosen time period."""
-
-    form_class = ReportForm
-    template_name = "requests/report.html"
-    success_url = "."
-    login_url = reverse_lazy("users_app:user-login")
-
-    def form_valid(self, form):
-
-        person = form.cleaned_data["person"]
-        type = form.cleaned_data["type"]
-        start_date = form.cleaned_data["start_date"]
-        end_date = form.cleaned_data["end_date"]
-        pdf_buffer = BytesIO()
-
-        urlop_data = [
-            [
-                "Lp.",
-                "Data złożenia",
-                "Nazwisko i imię",
-                "Od",
-                "Do",
-                "Dni/godz.",
-                "Status",
-                "Podpisany przez:",
-            ]
-        ]
-        other_data = [
-            [
-                "Lp.",
-                "Data złożenia",
-                "Nazwisko i imię",
-                "W dniu",
-                "Rodzaj",
-                "Za pracę dnia",
-                "Status",
-                "Podpisany przez:",
-            ]
-        ]
-        c_data = [
-            [
-                "Lp.",
-                "Data wystawienia",
-                "Nr dokumentu",
-                "Nazwisko i imię",
-                "Rodzaj",
-                "Od",
-                "Do",
-                "Inne",
-            ]
-        ]
-
-        if type == "W":
-            x = 1
-            if person == "all_employees":
-                requests_data = (
-                    Request.objects.filter(
-                        Q(type="W")
-                        & Q(start_date__gte=start_date)
-                        & Q(start_date__lte=end_date)
-                    )
-                    .order_by("author")
-                    .all()
-                )
-                name = ""
-                position = ""
-                employee = "- wszyscy pracownicy"
-            else:
-                employee = User.objects.get(id=person)
-                name = employee.last_name + " " + employee.first_name
-                position = employee.position
-                requests_data = (
-                    Request.objects.filter(
-                        Q(type="W")
-                        & Q(author__id=employee.id)
-                        & Q(start_date__gte=start_date)
-                        & Q(start_date__lte=end_date)
-                        & ~Q(status="oczekujący")
-                    )
-                    .order_by("created")
-                    .all()
-                )
-            for item in requests_data:
-                created_newformat = str(item.created).split()[0]
-                employee_repr = (
-                    item.author.last_name
-                    + " "
-                    + item.author.first_name
-                    + " "
-                    + item.author.position_addinfo
-                )
-                data = [
-                    x,
-                    created_newformat,
-                    employee_repr,
-                    item.start_date,
-                    item.end_date,
-                    item.days,
-                    item.status,
-                    item.signed_by,
-                ]
-                urlop_data.append(data)
-                x += 1
-            title = "Wnioski urlopowe"
-            create_pdf(
-                urlop_data, pdf_buffer, title, start_date, end_date, name, position
-            )
-            pdf_buffer.seek(0)
-            return FileResponse(
-                pdf_buffer, as_attachment=True, filename=f"wykaz urlopów {employee}.pdf"
-            )
-        elif type == "WS":
-            x = 1
-            if person == "all_employees":
-                requests_data = (
-                    Request.objects.filter(
-                        ~Q(type="W")
-                        & Q(start_date__gte=start_date)
-                        & Q(start_date__lte=end_date)
-                    )
-                    .order_by("author")
-                    .all()
-                )
-                name = ""
-                position = ""
-                employee = "- wszyscy pracownicy"
-            else:
-                employee = User.objects.get(id=person)
-                name = employee.last_name + " " + employee.first_name
-                position = employee.position
-                requests_data = (
-                    Request.objects.filter(
-                        ~Q(type="W")
-                        & Q(author__id=employee.id)
-                        & Q(start_date__gte=start_date)
-                        & Q(start_date__lte=end_date)
-                        & ~Q(status="oczekujący")
-                    )
-                    .order_by("created")
-                    .all()
-                )
-
-            for item in requests_data:
-                created_newformat = str(item.created).split()[0]
-                employee_repr = (
-                    item.author.last_name
-                    + " "
-                    + item.author.first_name
-                    + " "
-                    + item.author.position_addinfo
-                )
-                data1 = [
-                    x,
-                    created_newformat,
-                    employee_repr,
-                    item.start_date,
-                    item.type,
-                    item.work_date,
-                    item.status,
-                    item.signed_by,
-                ]
-                other_data.append(data1)
-                x += 1
-
-            title = "Wnioski o dni wolne za pracujące soboty (niedziele, święta)"
-            create_pdf(
-                other_data, pdf_buffer, title, start_date, end_date, name, position
-            )
-            pdf_buffer.seek(0)
-            return FileResponse(
-                pdf_buffer,
-                as_attachment=True,
-                filename=f"wykaz dni wolne {employee}.pdf",
-            )
-        if type == "C":
-            x = 1
-            if person == "all_employees":
-                sickleaves_data = (
-                    Sickleave.objects.filter(
-                        Q(start_date__gte=start_date) & Q(start_date__lte=end_date)
-                    )
-                    .order_by("employee__last_name", "start_date")
-                    .all()
-                )
-                name = ""
-                position = ""
-                employee = "- wszyscy pracownicy"
-            else:
-                employee = User.objects.get(id=person)
-                name = employee.last_name + " " + employee.first_name
-                position = employee.position
-                sickleaves_data = (
-                    Sickleave.objects.filter(
-                        Q(employee__id=employee.id)
-                        & Q(start_date__gte=start_date)
-                        & Q(start_date__lte=end_date)
-                    )
-                    .order_by("start_date")
-                    .all()
-                )
-            for item in sickleaves_data:
-                employee_repr = (
-                    item.employee.last_name
-                    + " "
-                    + item.employee.first_name
-                    + " "
-                    + item.employee.position_addinfo
-                )
-                data2 = [
-                    x,
-                    item.issue_date,
-                    item.doc_number,
-                    employee_repr,
-                    item.type,
-                    item.start_date,
-                    item.end_date,
-                    item.additional_info,
-                ]
-                c_data.append(data2)
-                x += 1
-            title = "Zwolnienia lekarskie"
-            create_pdf(c_data, pdf_buffer, title, start_date, end_date, name, position)
-            pdf_buffer.seek(0)
-            return FileResponse(
-                pdf_buffer, as_attachment=True, filename=f"chorobowe {employee}.pdf"
-            )

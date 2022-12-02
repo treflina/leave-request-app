@@ -12,7 +12,7 @@ class UserManager(BaseUserManager, models.Manager):
         self, username, password, is_staff, is_active, is_superuser, **extra_fields
     ):
         if not username:
-            raise ValueError('User must have a username.')
+            raise ValueError("User must have a username.")
         user = self.model(
             username=username,
             is_staff=is_staff,

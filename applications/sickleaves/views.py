@@ -9,7 +9,8 @@ from .forms import SickleaveForm
 from .utils import SickleaveNotification
 
 import logging
-logger = logging.getLogger('django')
+
+logger = logging.getLogger("django")
 
 
 class SickleavesListView(TopManagerPermisoMixin, ListView):
@@ -37,7 +38,9 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
             notification = SickleaveNotification(form)
             notification.send_notification()
         except Exception:
-            logger.error("Email notification about sickleave was not sent", exc_info=True)
+            logger.error(
+                "Email notification about sickleave was not sent", exc_info=True
+            )
         return super(SickleaveCreateView, self).form_valid(form)
 
 

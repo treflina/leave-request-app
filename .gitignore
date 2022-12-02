@@ -13,3 +13,5 @@ __pycache__
 /applications/home/migrations/*
 
 /media/*
+
+/data.json

@@ -12,8 +12,9 @@ class RequestManager(models.Manager):
 
     # manager for listing employees requests
     def requests_to_accept(self, user):
-        result = self.filter(Q(send_to_person=user) & Q(status="oczekujący")
-        ).order_by("-created")
+        result = self.filter(Q(send_to_person=user) & Q(status="oczekujący")).order_by(
+            "-created"
+        )
         return result
 
     def requests_holiday_topmanager(self, user):
@@ -47,17 +48,13 @@ class RequestManager(models.Manager):
 
     def allrequests_holiday(self, user):
         result = self.filter(
-            Q(author__manager=user)
-            & Q(type="W")
-            & Q(end_date__gte=self.mindate)
+            Q(author__manager=user) & Q(type="W") & Q(end_date__gte=self.mindate)
         ).order_by("-end_date")
         return result
 
     def hrallrequests_holiday(self):
         mindate = f"{date.today().year-1}-12-01"
-        return self.filter(Q(type="W") & Q(end_date__gte=mindate)).order_by(
-            "-end_date"
-        )
+        return self.filter(Q(type="W") & Q(end_date__gte=mindate)).order_by("-end_date")
 
     def requests_other_topmanager(self, user):
         result = (
@@ -93,8 +90,7 @@ class RequestManager(models.Manager):
     def hrallrequests_other(self):
         mindate = f"{date.today().year-1}-12-01"
         result = self.filter(
-            Q(end_date__gte=mindate)
-            & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+            Q(end_date__gte=mindate) & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
         ).order_by("-end_date")
         return result
 

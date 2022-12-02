@@ -21,7 +21,7 @@ urlpatterns = [
         views.EmployeeUpdateView.as_view(),
         name="update_employee",
     ),
-     path(
+    path(
         "add-annual-leave/",
         views.add_annual_leave,
         name="add_annual_leave",

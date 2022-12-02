@@ -20,7 +20,6 @@ class Request(TimeStampedModel):
         ("DW", "Wolne za święto przypadające w wolną sobotę (DW)"),
     )
 
-
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="autor",

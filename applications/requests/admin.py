@@ -15,7 +15,6 @@ class RequestsAdmin(SimpleHistoryAdmin):
         "days",
         "status",
         "send_to_person",
-
     )
     search_fields = ("author__last_name", "author__first_name")
     list_filter = ("type",)

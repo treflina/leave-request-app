@@ -9,8 +9,9 @@ from .models import Request, User
 
 class RequestForm(forms.ModelForm):
 
-    history_change_reason = forms.CharField(label="Powód wprowadzanych zmian", max_length=255, required=False)
-
+    history_change_reason = forms.CharField(
+        label="Powód wprowadzanych zmian", max_length=255, required=False
+    )
 
     class Meta:
         model = Request
@@ -60,8 +61,13 @@ class RequestForm(forms.ModelForm):
                     "type": "number",
                 }
             ),
-            "duvet_day": forms.RadioSelect(choices=((False, "NIE"), (True, "TAK"),))
-             }
+            "duvet_day": forms.RadioSelect(
+                choices=(
+                    (False, "NIE"),
+                    (True, "TAK"),
+                )
+            ),
+        }
 
     def clean_start_date(self):
         start_date = self.cleaned_data.get("start_date")
@@ -117,8 +123,12 @@ class RequestForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_show_labels = False
 
+
 class UpdateRequestForm(RequestForm):
-    history_change_reason = forms.CharField(label="Powód wprowadzanych zmian", max_length=255, required=False)
+    history_change_reason = forms.CharField(
+        label="Powód wprowadzanych zmian", max_length=255, required=False
+    )
+
     class Meta:
         model = Request
         fields = (
@@ -170,64 +180,12 @@ class UpdateRequestForm(RequestForm):
                 }
             ),
             "attachment": forms.ClearableFileInput(
-                 attrs={
+                attrs={
                     "type": "file",
                     "required": False,
                 }
             ),
             "duvet_day": forms.RadioSelect(
-                choices=(
-                        (False, "NIE"),
-                        (True, "TAK"),
-                        (None, "Nie dotyczy")
-                        ))
-             }
-
-
-
-class ReportForm(forms.Form):
-
-    now = datetime.now()
-
-    CHOICES = (
-        ("W", "urlop wypoczynkowy"),
-        ("WS", "dni wolne za pracujące soboty oraz inne (WS, WN, DW)"),
-        ("C", "zwolnienia lekarskie"),
-    )
-
-    person = forms.ChoiceField(
-        label="Wybierz osobę",
-        widget=forms.Select(attrs={"class": "selector"}),
-        choices=(),
-    )
-    type = forms.ChoiceField(label="Rodzaj", choices=CHOICES)
-
-    start_date = forms.DateField(
-        label="Od",
-        widget=forms.SelectDateWidget(
-            attrs={"style": "width: 33%; display: inline-block;"},
-            years=range(2021, 2035),
-        ),
-        initial=now.strftime("%Y") + "-01-01",
-    )
-    end_date = forms.DateField(
-        label="Do",
-        widget=forms.SelectDateWidget(
-            attrs={"style": "width: 33%; display: inline-block;"},
-            years=range(2022, 2035),
-        ),
-        initial=now.date()
-        #
-    )
-
-    def __init__(self, *args, **kwargs):
-        super(ReportForm, self).__init__(*args, **kwargs)
-        EXTRA_CHOICES = [
-            ("all_employees", "Wszyscy pracownicy"),
-        ]
-        choices = [
-            (user.id, user)
-            for user in User.objects.all().order_by("last_name", "first_name")
-        ]
-        choices.extend(EXTRA_CHOICES)
-        self.fields["person"].choices = choices
+                choices=((False, "NIE"), (True, "TAK"), (None, "Nie dotyczy"))
+            ),
+        }

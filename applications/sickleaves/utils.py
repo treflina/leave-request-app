@@ -6,8 +6,8 @@ from wnioski.settings import get_secret
 
 User = get_user_model()
 
-class SickleaveNotification:
 
+class SickleaveNotification:
     def __init__(self, form):
         self.form = form
         self.employee = self.form.cleaned_data["employee"]
@@ -46,7 +46,9 @@ class SickleaveNotification:
                 person = User.objects.filter(Q(id=self.employee.manager.id)).first()
                 send_to_people.append(person.work_email)
             if self.instructor:
-                person = User.objects.filter(Q(role="T") & Q(position__icontains="instruktor")).first()
+                person = User.objects.filter(
+                    Q(role="T") & Q(position__icontains="instruktor")
+                ).first()
                 send_to_people.append(person.work_email)
 
             send_to_people_list = [p for p in set(send_to_people)] + [EMAIL_HOST_USER]

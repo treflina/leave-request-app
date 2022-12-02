@@ -1,13 +1,16 @@
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, CreateView
+from django.views.generic import TemplateView, CreateView, FormView
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
 from applications.users.models import User
+from applications.users.mixins import TopManagerPermisoMixin
 from .models import UploadFile, CATEGORY_CHOICES
+from .forms import ReportForm
+from pdf_creator import create_pdf_report
 
 
 class HomePage(LoginRequiredMixin, TemplateView):
@@ -28,6 +31,23 @@ class HomePage(LoginRequiredMixin, TemplateView):
             context["show_manager"] = True
 
         return context
+
+
+class ReportView(TopManagerPermisoMixin, FormView):
+    """Creates pdf report about leave requests and sickleaves for a chosen time period."""
+
+    form_class = ReportForm
+    template_name = "requests/report.html"
+    success_url = "."
+    login_url = reverse_lazy("users_app:user-login")
+
+    def form_valid(self, form):
+        person = form.cleaned_data["person"]
+        leave_type = form.cleaned_data["leave_type"]
+        start = form.cleaned_data["start_date"]
+        end = form.cleaned_data["end_date"]
+
+        return create_pdf_report(person=person, leave_type=leave_type, start_date=start, end_date=end)
 
 
 class UploadFileView(LoginRequiredMixin, CreateView):

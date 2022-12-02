@@ -54,9 +54,4 @@ urlpatterns = [
         views.delete_request,
         name="delete_request",
     ),
-    path(
-        "report/",
-        views.ReportView.as_view(),
-        name="report",
-    ),
 ]
