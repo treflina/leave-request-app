@@ -13,25 +13,25 @@ class SickleaveNotification:
         self.employee = self.form.cleaned_data["employee"]
         self.start_date = self.form.cleaned_data["start_date"].strftime("%d.%m.%y")
         self.end_date = self.form.cleaned_data["end_date"].strftime("%d.%m.%y")
-        self.type = self.form.cleaned_data["type"]
+        self.leave_type = self.form.cleaned_data["leave_type"]
         self.head = self.form.cleaned_data["head"]
         self.manager = self.form.cleaned_data["manager"]
         self.instructor = self.form.cleaned_data["instructor"]
         self.text_info = ""
 
     def send_notification(self):
-        if self.type == "O":
+        if self.leave_type == "O":
             text = "na opiece nad chorym członkiem rodziny"
             text_subj = f"opieka"
-        elif self.type == "K":
+        elif self.leave_type == "K":
             text = "na kwarantannie"
             text_subj = f"kwarantanna"
             self.text_info = f"Podane daty mogą ulec zmianie."
-        elif self.type == "I":
+        elif self.leave_type == "I":
             text = "na izolacji"
             text_subj = f"izolacja"
         else:
-            text = f"na zwolnieniu lekarskim ({self.type})"
+            text = f"na zwolnieniu lekarskim ({self.leave_type})"
             text_subj = f"chorobowe"
 
         subject = f"{text_subj} {self.employee.first_name} {self.employee.last_name} ({self.start_date} - {self.end_date})"

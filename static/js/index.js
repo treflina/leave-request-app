@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const w = document.querySelector("#id_type_0");
-    const ws = document.querySelector("#id_type_1");
-    const wn = document.querySelector("#id_type_2");
-    const dw = document.querySelector("#id_type_3");
+    const w = document.querySelector("#id_leave_type_0");
+    const ws = document.querySelector("#id_leave_type_1");
+    const wn = document.querySelector("#id_leave_type_2");
+    const dw = document.querySelector("#id_leave_type_3");
     const box_w = document.querySelector(".box_w");
     const box_ws = document.querySelector(".box_ws");
 
@@ -124,5 +124,3 @@ function search2() {
         }
     }
 }
-
-

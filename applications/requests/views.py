@@ -15,6 +15,7 @@ from .forms import RequestForm, UpdateRequestForm
 from .utils import RequestEmailNotification
 
 import logging
+
 logger = logging.getLogger("django")
 
 
@@ -42,10 +43,10 @@ class RequestFormView(LoginRequiredMixin, FormView):
 
     def form_valid(self, form):
         user = self.request.user
-        type = form.cleaned_data["type"]
+        leave_type = form.cleaned_data["leave_type"]
 
         days = form.cleaned_data["days"]
-        if type == "WS" or type == "WN" or type == "DW":
+        if leave_type == "WS" or leave_type == "WN" or leave_type == "DW":
             days = 0
 
         start_date = form.cleaned_data["start_date"]
@@ -53,12 +54,12 @@ class RequestFormView(LoginRequiredMixin, FormView):
         work_date = form.cleaned_data["work_date"]
 
         duvet_day = bool(form.cleaned_data.get("duvet_day"))
-        if type != "W":
+        if leave_type != "W":
             duvet_day = None
 
         send_to_person = form.cleaned_data["send_to_person"]
 
-        if (type == "WS" or type == "WN") and Request.objects.filter(
+        if (leave_type == "WS" or leave_type == "WN") and Request.objects.filter(
             Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
         ).exists():
             messages.error(
@@ -69,7 +70,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
 
         request = Request(
             author=user,
-            type=type,
+            leave_type=leave_type,
             work_date=work_date,
             start_date=start_date,
             end_date=end_date,
@@ -85,7 +86,13 @@ class RequestFormView(LoginRequiredMixin, FormView):
 
         try:
             notification = RequestEmailNotification(
-                user, type, start_date, end_date, work_date, duvet_day, send_to_person
+                user,
+                leave_type,
+                start_date,
+                end_date,
+                work_date,
+                duvet_day,
+                send_to_person,
             )
             notification.send_notification()
         except Exception:
@@ -254,7 +261,7 @@ def reject_request(request, pk):
     """Rejects the employee request."""
     user = request.user
     request_to_reject = Request.objects.get(id=pk)
-    if request_to_reject.type == "W":
+    if request_to_reject.leave_type == "W":
         employee_to_update = User.objects.get(id=request_to_reject.author.id)
         employee_to_update.current_leave += request_to_reject.days
         employee_to_update.save(update_fields=["current_leave"])
@@ -269,7 +276,7 @@ def delete_request(request, pk):
     """Withdraws the request."""
     user = request.user
     request_to_delete = Request.objects.get(id=pk)
-    if request_to_delete.type == "W":
+    if request_to_delete.leave_type == "W":
         user.current_leave += request_to_delete.days
         user.save(update_fields=["current_leave"])
     request_to_delete.delete()

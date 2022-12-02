@@ -13,7 +13,7 @@ from .managers import RequestManager
 class Request(TimeStampedModel):
     """Request table model."""
 
-    TYPE_CHOICES = (
+    LEAVE_TYPE_CHOICES = (
         ("W", "Urlop wypoczynkowy (W)"),
         ("WS", "Wolne za pracującą sobotę (WS)"),
         ("WN", "Wolne za pracę w niedzielę/święto (WN)"),
@@ -27,7 +27,9 @@ class Request(TimeStampedModel):
         related_name="request_user",
         default="",
     )
-    type = models.CharField("Rodzaj", max_length=30, choices=TYPE_CHOICES, default="")
+    leave_type = models.CharField(
+        "Rodzaj", max_length=30, choices=LEAVE_TYPE_CHOICES, default=""
+    )
     work_date = models.DateField("Data pracującej sob./nd/św.", null=True, blank=True)
     start_date = models.DateField("Od", null=True, blank=True)
     end_date = models.DateField("Do", null=True, blank=True)
@@ -64,10 +66,12 @@ class Request(TimeStampedModel):
     objects = RequestManager()
 
     def __str__(self):
-        if self.type == "W":
-            return f"Wniosek ({self.type} od {self.start_date} do {self.end_date})"
+        if self.leave_type == "W":
+            return (
+                f"Wniosek ({self.leave_type} od {self.start_date} do {self.end_date})"
+            )
         else:
-            return f"Wniosek ({self.type}) {self.start_date}"
+            return f"Wniosek ({self.leave_type}) {self.start_date}"
 
     class Meta:
         verbose_name = "Wnioski"

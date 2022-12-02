@@ -4,11 +4,10 @@ from django.conf import settings
 from .managers import SickleavesSearchManager
 
 
-# Create your models here.
 class Sickleave(models.Model):
-    """Sickleave table model."""
+    """Sickleave model."""
 
-    TYPE_CHOICES = (
+    LEAVE_TYPE_CHOICES = (
         ("C", "Chorobowe"),
         ("O", "Opieka"),
         ("K", "Kwarantanna"),
@@ -22,7 +21,9 @@ class Sickleave(models.Model):
         related_name="sickemployee",
         default="",
     )
-    type = models.CharField("Rodzaj", max_length=10, choices=TYPE_CHOICES, default="C")
+    leave_type = models.CharField(
+        "Rodzaj", max_length=10, choices=LEAVE_TYPE_CHOICES, default="C"
+    )
     issue_date = models.DateField("Data wystawienia", null=True, blank=True)
     doc_number = models.CharField("Nr dokumentu", max_length=20, null=True, blank=True)
     start_date = models.DateField("Od", null=True)
@@ -39,12 +40,4 @@ class Sickleave(models.Model):
         ordering = ["issue_date"]
 
     def __str__(self):
-        return (
-            self.employee.last_name
-            + " "
-            + self.employee.first_name
-            + " od "
-            + str(self.start_date)
-            + " do "
-            + str(self.end_date)
-        )
+        return f"{self.employee.last_name} {self.employee.first_name} od {str(self.start_date)} do {str(self.end_date)}"

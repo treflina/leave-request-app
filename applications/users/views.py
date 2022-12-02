@@ -136,16 +136,16 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
             )
 
             if len(today_sick) > 0:
-                if today_sick[0].type == "O":
+                if today_sick[0].leave_type == "O":
                     employee.today_note = "O"
-                elif today_sick[0].type == "K":
+                elif today_sick[0].leave_type == "K":
                     employee.today_note = "K"
-                elif today_sick[0].type == "I":
+                elif today_sick[0].leave_type == "I":
                     employee.today_note = "I"
                 else:
                     employee.today_note = "C"
             elif len(today_requests) != 0:
-                list_req = [tr.type for tr in today_requests]
+                list_req = [tr.leave_type for tr in today_requests]
                 employee.today_note = list_req[0]
             else:
                 employee.today_note = "✓"

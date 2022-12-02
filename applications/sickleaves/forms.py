@@ -20,7 +20,7 @@ class SickleaveForm(forms.ModelForm):
         model = Sickleave
         fields = (
             "employee",
-            "type",
+            "leave_type",
             "issue_date",
             "doc_number",
             "start_date",

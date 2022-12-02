@@ -17,7 +17,7 @@ class RequestsAdmin(SimpleHistoryAdmin):
         "send_to_person",
     )
     search_fields = ("author__last_name", "author__first_name")
-    list_filter = ("type",)
+    list_filter = ("leave_type",)
 
     fieldsets = (
         (
@@ -26,7 +26,7 @@ class RequestsAdmin(SimpleHistoryAdmin):
                 "fields": (
                     "author",
                     "created",
-                    "type",
+                    "leave_type",
                     "start_date",
                     "end_date",
                     "work_date",

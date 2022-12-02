@@ -20,7 +20,7 @@ class RequestManager(models.Manager):
     def requests_holiday_topmanager(self, user):
         result = (
             self.filter(
-                Q(type="W")
+                Q(leave_type="W")
                 & Q(end_date__gte=self.mindate)
                 & Q(start_date__lte=self.maxdate)
             )
@@ -31,7 +31,7 @@ class RequestManager(models.Manager):
 
     def allrequests_holiday_topmanager(self, user):
         result = (
-            self.filter(Q(type="W") & Q(end_date__gte=self.mindate))
+            self.filter(Q(leave_type="W") & Q(end_date__gte=self.mindate))
             .exclude(author=user)
             .order_by("-end_date")
         )
@@ -40,7 +40,7 @@ class RequestManager(models.Manager):
     def requests_holiday(self, user):
         result = self.filter(
             Q(author__manager=user)
-            & Q(type="W")
+            & Q(leave_type="W")
             & Q(end_date__gte=self.mindate)
             & Q(start_date__lte=self.maxdate)
         ).order_by("-end_date")
@@ -48,18 +48,20 @@ class RequestManager(models.Manager):
 
     def allrequests_holiday(self, user):
         result = self.filter(
-            Q(author__manager=user) & Q(type="W") & Q(end_date__gte=self.mindate)
+            Q(author__manager=user) & Q(leave_type="W") & Q(end_date__gte=self.mindate)
         ).order_by("-end_date")
         return result
 
     def hrallrequests_holiday(self):
         mindate = f"{date.today().year-1}-12-01"
-        return self.filter(Q(type="W") & Q(end_date__gte=mindate)).order_by("-end_date")
+        return self.filter(Q(leave_type="W") & Q(end_date__gte=mindate)).order_by(
+            "-end_date"
+        )
 
     def requests_other_topmanager(self, user):
         result = (
             self.filter(
-                (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+                (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
                 & Q(start_date__gte=self.mindate)
                 & Q(start_date__lte=self.maxdate)
             )
@@ -72,7 +74,7 @@ class RequestManager(models.Manager):
         result = (
             self.filter(
                 Q(start_date__gte=self.mindate)
-                & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+                & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
             )
             .exclude(author=user)
             .order_by("-end_date")
@@ -83,21 +85,22 @@ class RequestManager(models.Manager):
         result = self.filter(
             Q(author__manager=user)
             & Q(start_date__gte=self.mindate)
-            & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+            & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
         ).order_by("-end_date")
         return result
 
     def hrallrequests_other(self):
         mindate = f"{date.today().year-1}-12-01"
         result = self.filter(
-            Q(end_date__gte=mindate) & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+            Q(end_date__gte=mindate)
+            & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
         ).order_by("-end_date")
         return result
 
     def requests_other(self, user):
         result = self.filter(
             Q(author__manager=user)
-            & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+            & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
             & Q(start_date__gte=self.mindate)
             & Q(start_date__lte=self.maxdate)
         ).order_by("-end_date")
@@ -107,7 +110,7 @@ class RequestManager(models.Manager):
 
     def user_requests_holiday(self, user):
         result = self.filter(
-            Q(author__id=user.id) & Q(type="W") & Q(start_date__gte=self.mindate)
+            Q(author__id=user.id) & Q(leave_type="W") & Q(start_date__gte=self.mindate)
         ).order_by("-created")
         return result
 
@@ -115,7 +118,7 @@ class RequestManager(models.Manager):
         result = self.filter(
             Q(author__id=user.id)
             & Q(start_date__gte=self.mindate)
-            & (Q(type="WS") | Q(type="WN") | Q(type="DW"))
+            & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
         ).order_by("-created")
         return result
 

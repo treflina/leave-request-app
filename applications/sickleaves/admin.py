@@ -7,7 +7,7 @@ class SickleavesAdmin(admin.ModelAdmin):
 
     list_display = (
         "employee",
-        "type",
+        "leave_type",
         "issue_date",
         "doc_number",
         "start_date",

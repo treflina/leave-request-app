@@ -1,5 +1,4 @@
 from datetime import datetime
-# from django.db.models.fields import DateField
 from django import forms
 from applications.users.models import User
 

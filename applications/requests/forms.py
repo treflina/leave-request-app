@@ -16,7 +16,7 @@ class RequestForm(forms.ModelForm):
     class Meta:
         model = Request
         fields = (
-            "type",
+            "leave_type",
             "start_date",
             "end_date",
             "days",
@@ -78,14 +78,14 @@ class RequestForm(forms.ModelForm):
     def clean_end_date(self):
         start_date = self.cleaned_data["start_date"]
         end_date = self.cleaned_data["end_date"]
-        type = self.cleaned_data["type"]
+        leave_type = self.cleaned_data["leave_type"]
         if not end_date:
             end_date = start_date
         if not end_date >= start_date:
             raise forms.ValidationError(
                 "Data końcowa nie może być wcześniejsza od daty początkowej."
             )
-        if (end_date != start_date) and (type == "WS" or type == "WN"):
+        if (end_date != start_date) and (leave_type == "WS" or leave_type == "WN"):
             raise forms.ValidationError(
                 "Data końcowa nie powinna się różnić od daty początkowej w przypadku wolnego za pracującą sobotę lub niedzielę."
             )
@@ -101,8 +101,8 @@ class RequestForm(forms.ModelForm):
 
     def clean_work_date(self):
         work_date = self.cleaned_data.get("work_date")
-        type = self.cleaned_data["type"]
-        if work_date == None and (type == "WN" or type == "WS"):
+        leave_type = self.cleaned_data["leave_type"]
+        if work_date == None and (leave_type == "WN" or leave_type == "WS"):
             raise forms.ValidationError(
                 "Proszę podać datę pracującej soboty, niedzieli lub święta."
             )
@@ -110,8 +110,8 @@ class RequestForm(forms.ModelForm):
 
     def clean_days(self):
         days = self.cleaned_data.get("days")
-        type = self.cleaned_data["type"]
-        if days == None and type == "W":
+        leave_type = self.cleaned_data["leave_type"]
+        if days == None and leave_type == "W":
             raise forms.ValidationError(
                 "Proszę podać ilość dni (pełny etat) lub godzin (niepełny etat) urlopu."
             )
@@ -132,7 +132,7 @@ class UpdateRequestForm(RequestForm):
     class Meta:
         model = Request
         fields = (
-            "type",
+            "leave_type",
             "start_date",
             "end_date",
             "days",

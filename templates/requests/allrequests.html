@@ -33,8 +33,8 @@
                             <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
                             <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
                             <td data-title="L. dni:" class="content-center">
-                                {%if request.type == 'W'%}{{request.days}}{%endif%}</td>
-                            <td data-title="Rodzaj">{{request.type}}</td>
+                                {%if request.leave_type == 'W'%}{{request.days}}{%endif%}</td>
+                            <td data-title="Rodzaj">{{request.leave_type}}</td>
                             <td data-title="Rodzaj">{% if request.duvet_day == 1 %}TAK{% endif %}</td>
                             <td data-title="Za pracę dnia:">{{request.work_date|date:"d.m.y"}}</td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
@@ -167,7 +167,7 @@
                                 {{request.author.first_name}} {{request.author.position_addinfo}}
                             </td>
                             <td data-title="Od:" class="search">{{request.start_date|date:"d.m.y"}}</td>
-                            <td data-title="Do:" class="content-center">{{request.type}}</td>
+                            <td data-title="Do:" class="content-center">{{request.leave_type}}</td>
                             <td data-title="Za pracę dnia:" class="content-center">{{request.work_date|date:"d.m.y"}}
                             </td>
                             <td data-title="Zastępuje:">{{request.substitute}}</td>
