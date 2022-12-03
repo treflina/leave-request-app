@@ -1,10 +1,33 @@
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib import messages
 from django.db.models.query_utils import Q
 from wnioski.settings import get_secret
 
 User = get_user_model()
+from applications.requests.models import Request
+
+
+class SickAndAnnulalLeaveOverlappedAlertMixin:
+    """Mixin that displays a warning message when an employee has submitted a leave request
+    for the same day as registered sick leave."""
+    
+    def form_valid(self, form):
+        start = form.cleaned_data.get("start_date")
+        end = form.cleaned_data.get("end_date")
+        employee = form.cleaned_data.get("employee")
+        employee_leave_requests = Request.objects.filter(
+            Q(author=employee)
+            & ~Q(status="odrzucony")
+            & (Q(start_date__range=[start, end]) | Q(end_date__range=[start, end]))
+        )
+        if employee_leave_requests.exists():
+            messages.warning(
+                self.request,
+                f"{employee.first_name} {employee.last_name} złożył/a wniosek o urlop wypoczynkowy w podanym okresie zwolnienia lekarskiego ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')}). Pamiętaj o anulowaniu tego wniosku i zaktualizowaniu przysługujego pracownikowi wymiaru urlopu.",
+            )
+        return super().form_valid(form)
 
 
 class SickleaveNotification:
@@ -52,7 +75,6 @@ class SickleaveNotification:
                 send_to_people.append(person.work_email)
 
             send_to_people_list = [p for p in set(send_to_people)] + [EMAIL_HOST_USER]
-            print(send_to_people_list)
 
             send_mail(
                 subject,

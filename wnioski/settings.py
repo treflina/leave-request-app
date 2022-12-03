@@ -57,7 +57,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -136,6 +136,7 @@ MEDIA_ROOT = BASE_DIR.child("media")
 MESSAGE_TAGS = {
     messages.SUCCESS: "alert-success",
     messages.ERROR: "alert-danger",
+    messages.WARNING: "alert-warning"
 }
 
 LOGGING = {

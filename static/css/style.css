@@ -125,7 +125,7 @@ input.search2 {
 .navbar {
     background-color: #787a91;
     padding: 1% 3%;
-    z-index: 1;
+    z-index: 10;
 }
 
 .navbar-brand {
@@ -158,7 +158,7 @@ td a.icon-hrlist:hover {
 .edit-icon {
     display: inline-block;
     transform: rotateZ(90deg);
-  }
+}
 
 @media (max-width: 410px) {
     .palm {

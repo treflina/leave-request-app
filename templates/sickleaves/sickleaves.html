@@ -4,7 +4,16 @@
 {% block content %}
 {%include 'includes/navbar.html'%}
 
-
+<div class="container">
+    {% for message in messages %}
+    <div class="alert {{ message.tags }} m-5" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+</div>
 <section class="page-section mt-5">
     <div>
         <div>
@@ -19,6 +28,7 @@
 
             </form>
         </div>
+
         <table class="js-serial" id="present">
             <thead>
                 <tr>

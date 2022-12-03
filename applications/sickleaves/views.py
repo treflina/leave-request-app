@@ -1,12 +1,16 @@
+from datetime import datetime
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import HttpResponseRedirect
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from applications.users.mixins import TopManagerPermisoMixin
+from applications.requests.models import Request
 from .models import Sickleave
 from .forms import SickleaveForm
-from .utils import SickleaveNotification
+from .utils import SickleaveNotification, SickAndAnnulalLeaveOverlappedAlertMixin
 
 import logging
 
@@ -24,7 +28,7 @@ class SickleavesListView(TopManagerPermisoMixin, ListView):
         return Sickleave.objects.all().order_by("-issue_date")
 
 
-class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
+class SickleaveCreateView(TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, CreateView):
     """Sick leave registration form."""
 
     template_name = "sickleaves/add_sickleave.html"
@@ -44,8 +48,8 @@ class SickleaveCreateView(TopManagerPermisoMixin, CreateView):
         return super(SickleaveCreateView, self).form_valid(form)
 
 
-class SickleaveUpdateView(TopManagerPermisoMixin, UpdateView):
-    """Registered sick leave update form."""
+class SickleaveUpdateView(TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, UpdateView):
+    """Sickleave update form."""
 
     model = Sickleave
     template_name = "sickleaves/update_sickleave.html"

@@ -125,6 +125,7 @@ class RequestForm(forms.ModelForm):
 
 
 class UpdateRequestForm(RequestForm):
+
     history_change_reason = forms.CharField(
         label="Powód wprowadzanych zmian", max_length=255, required=False
     )
@@ -189,3 +190,10 @@ class UpdateRequestForm(RequestForm):
                 choices=((False, "NIE"), (True, "TAK"), (None, "Nie dotyczy"))
             ),
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['attachment'].widget.clear_checkbox_label = 'Usuń'
+        self.fields['attachment'].widget.initial_text = "Załączono"
+        self.fields['attachment'].widget.input_text = "Zmień"
+
