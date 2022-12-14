@@ -37,7 +37,7 @@ class ReportView(TopManagerPermisoMixin, FormView):
     """Creates pdf report about leave requests and sickleaves for a chosen time period."""
 
     form_class = ReportForm
-    template_name = "requests/report.html"
+    template_name = "home/report.html"
     success_url = "."
     login_url = reverse_lazy("users_app:user-login")
 
@@ -46,8 +46,9 @@ class ReportView(TopManagerPermisoMixin, FormView):
         leave_type = form.cleaned_data["leave_type"]
         start = form.cleaned_data["start_date"]
         end = form.cleaned_data["end_date"]
+        attachment = form.cleaned_data["attachment"]
 
-        return create_pdf_report(person=person, leave_type=leave_type, start_date=start, end_date=end)
+        return create_pdf_report(person=person, leave_type=leave_type, start_date=start, end_date=end, attachment=attachment)
 
 
 class UploadFileView(LoginRequiredMixin, CreateView):

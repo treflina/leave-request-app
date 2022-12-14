@@ -6,10 +6,15 @@ class ReportForm(forms.Form):
 
     now = datetime.now()
 
-    CHOICES = (
+    TYPE_CHOICES = (
         ("W", "urlop wypoczynkowy"),
         ("WS", "dni wolne za pracujące soboty oraz inne (WS, WN, DW)"),
         ("C", "zwolnienia lekarskie"),
+    )
+
+    ATTACHMENT_CHOICES = (
+        (True, "Pobierz"),
+        (False, "Wyświetl")
     )
 
     person = forms.ChoiceField(
@@ -17,7 +22,7 @@ class ReportForm(forms.Form):
         widget=forms.Select(attrs={"class": "selector"}),
         choices=(),
     )
-    leave_type = forms.ChoiceField(label="Rodzaj", choices=CHOICES)
+    leave_type = forms.ChoiceField(label="Rodzaj", choices=TYPE_CHOICES)
 
     start_date = forms.DateField(
         label="Od",
@@ -35,6 +40,8 @@ class ReportForm(forms.Form):
         ),
         initial=now.date()
     )
+
+    attachment = forms.BooleanField(label="", required=False, widget = forms.RadioSelect(choices=ATTACHMENT_CHOICES), initial=True)
 
     def __init__(self, *args, **kwargs):
         super(ReportForm, self).__init__(*args, **kwargs)
