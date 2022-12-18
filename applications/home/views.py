@@ -48,7 +48,13 @@ class ReportView(TopManagerPermisoMixin, FormView):
         end = form.cleaned_data["end_date"]
         attachment = form.cleaned_data["attachment"]
 
-        return create_pdf_report(person=person, leave_type=leave_type, start_date=start, end_date=end, attachment=attachment)
+        return create_pdf_report(
+            person=person,
+            leave_type=leave_type,
+            start_date=start,
+            end_date=end,
+            attachment=attachment,
+        )
 
 
 class UploadFileView(LoginRequiredMixin, CreateView):

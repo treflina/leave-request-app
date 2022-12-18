@@ -6,7 +6,7 @@
 
 <section class="page-section mt-5" id="to_accept">
     <div class="container">
-        <h3 class="report-title">Wykaz dni wolnych/zwolnień lekarskich</h3>
+        <h3 class="report-title">Zestawienie dni wolnych, urlopów wypoczynkowych, zwolnień lekarskich</h3>
         <form method="POST">{%csrf_token%}
             <div class="form-group">
                 {{form.person|as_crispy_field}}

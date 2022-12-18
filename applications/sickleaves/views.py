@@ -28,7 +28,9 @@ class SickleavesListView(TopManagerPermisoMixin, ListView):
         return Sickleave.objects.all().order_by("-issue_date")
 
 
-class SickleaveCreateView(TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, CreateView):
+class SickleaveCreateView(
+    TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, CreateView
+):
     """Sick leave registration form."""
 
     template_name = "sickleaves/add_sickleave.html"
@@ -48,7 +50,9 @@ class SickleaveCreateView(TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedA
         return super(SickleaveCreateView, self).form_valid(form)
 
 
-class SickleaveUpdateView(TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, UpdateView):
+class SickleaveUpdateView(
+    TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, UpdateView
+):
     """Sickleave update form."""
 
     model = Sickleave

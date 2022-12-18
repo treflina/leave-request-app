@@ -12,7 +12,7 @@ from applications.requests.models import Request
 class SickAndAnnulalLeaveOverlappedAlertMixin:
     """Mixin that displays a warning message when an employee has submitted a leave request
     for the same day as registered sick leave."""
-    
+
     def form_valid(self, form):
         start = form.cleaned_data.get("start_date")
         end = form.cleaned_data.get("end_date")
@@ -25,7 +25,9 @@ class SickAndAnnulalLeaveOverlappedAlertMixin:
         if employee_leave_requests.exists():
             messages.warning(
                 self.request,
-                f"{employee.first_name} {employee.last_name} złożył/a wniosek o urlop wypoczynkowy w podanym okresie zwolnienia lekarskiego ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')}). Pamiętaj o anulowaniu tego wniosku i zaktualizowaniu przysługujego pracownikowi wymiaru urlopu.",
+                f"""{employee.first_name} {employee.last_name} złożył/a wniosek o urlop wypoczynkowy w podanym okresie zwolnienia lekarskiego
+                ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')}). Pamiętaj o anulowaniu tego wniosku i zaktualizowaniu
+                przysługujego pracownikowi wymiaru urlopu."""
             )
         return super().form_valid(form)
 
@@ -58,7 +60,8 @@ class SickleaveNotification:
             text_subj = f"chorobowe"
 
         subject = f"{text_subj} {self.employee.first_name} {self.employee.last_name} ({self.start_date} - {self.end_date})"
-        message = f"Dzień dobry,\r\n{self.employee.first_name} {self.employee.last_name} przebywa {text} w dniach {self.start_date} do {self.end_date}. {self.text_info}\r\n \r\nWiadomość wygenerowana automatycznie."
+        message = f"""Dzień dobry,\r\n{self.employee.first_name} {self.employee.last_name} przebywa {text} w dniach {self.start_date} do {self.end_date}.
+                    {self.text_info}\r\n \r\nWiadomość wygenerowana automatycznie."""
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
         if self.employee.manager:
             send_to_people = []

@@ -190,10 +190,9 @@ class UpdateRequestForm(RequestForm):
                 choices=((False, "NIE"), (True, "TAK"), (None, "Nie dotyczy"))
             ),
         }
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['attachment'].widget.clear_checkbox_label = 'Usuń'
-        self.fields['attachment'].widget.initial_text = "Załączono"
-        self.fields['attachment'].widget.input_text = "Zmień"
-
+        self.fields["attachment"].widget.clear_checkbox_label = "Usuń"
+        self.fields["attachment"].widget.initial_text = "Załączono"
+        self.fields["attachment"].widget.input_text = "Zmień"
