@@ -60,7 +60,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
         send_to_person = form.cleaned_data["send_to_person"]
 
         if (leave_type == "WS" or leave_type == "WN") and Request.objects.filter(
-            Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
+            Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony") & ~Q(status="anulowany")
         ).exists():
             messages.error(
                 self.request,
