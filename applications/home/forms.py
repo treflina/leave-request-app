@@ -36,7 +36,7 @@ class ReportForm(forms.Form):
             attrs={"style": "width: 33%; display: inline-block;"},
             years=range(2022, 2035),
         ),
-        initial=now.date(),
+        initial=datetime.now().date(),
     )
 
     attachment = forms.BooleanField(

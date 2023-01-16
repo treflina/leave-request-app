@@ -7,9 +7,6 @@ from django.db.models import Q
 class RequestManager(models.Manager):
     """Managers for Request Model"""
 
-    mindate = f"{date.today().year}-01-01"
-    maxdate = date.today() + timedelta(days=21)
-
     # manager for listing employees requests
     def requests_to_accept(self, user):
         result = self.filter(Q(send_to_person=user) & Q(status="oczekujący")).order_by(
@@ -21,8 +18,8 @@ class RequestManager(models.Manager):
         result = (
             self.filter(
                 Q(leave_type="W")
-                & Q(end_date__gte=self.mindate)
-                & Q(start_date__lte=self.maxdate)
+                & Q(end_date__gte=f"{date.today().year}-01-01")
+                & Q(start_date__lte=date.today() + timedelta(days=21))
             )
             .exclude(author=user)
             .order_by("-end_date")
@@ -31,7 +28,9 @@ class RequestManager(models.Manager):
 
     def allrequests_holiday_topmanager(self, user):
         result = (
-            self.filter(Q(leave_type="W") & Q(end_date__gte=self.mindate))
+            self.filter(
+                Q(leave_type="W") & Q(end_date__gte=f"{date.today().year}-01-01")
+            )
             .exclude(author=user)
             .order_by("-end_date")
         )
@@ -41,14 +40,16 @@ class RequestManager(models.Manager):
         result = self.filter(
             Q(author__manager=user)
             & Q(leave_type="W")
-            & Q(end_date__gte=self.mindate)
-            & Q(start_date__lte=self.maxdate)
+            & Q(end_date__gte=f"{date.today().year}-01-01")
+            & Q(start_date__lte=date.today() + timedelta(days=21))
         ).order_by("-end_date")
         return result
 
     def allrequests_holiday(self, user):
         result = self.filter(
-            Q(author__manager=user) & Q(leave_type="W") & Q(end_date__gte=self.mindate)
+            Q(author__manager=user)
+            & Q(leave_type="W")
+            & Q(end_date__gte=f"{date.today().year}-01-01")
         ).order_by("-end_date")
         return result
 
@@ -62,8 +63,8 @@ class RequestManager(models.Manager):
         result = (
             self.filter(
                 (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
-                & Q(start_date__gte=self.mindate)
-                & Q(start_date__lte=self.maxdate)
+                & Q(start_date__gte=f"{date.today().year}-01-01")
+                & Q(start_date__lte=date.today() + timedelta(days=21))
             )
             .exclude(author=user)
             .order_by("-end_date")
@@ -73,7 +74,7 @@ class RequestManager(models.Manager):
     def allrequests_other_topmanager(self, user):
         result = (
             self.filter(
-                Q(start_date__gte=self.mindate)
+                Q(start_date__gte=f"{date.today().year}-01-01")
                 & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
             )
             .exclude(author=user)
@@ -84,7 +85,7 @@ class RequestManager(models.Manager):
     def allrequests_other(self, user):
         result = self.filter(
             Q(author__manager=user)
-            & Q(start_date__gte=self.mindate)
+            & Q(start_date__gte=f"{date.today().year}-01-01")
             & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
         ).order_by("-end_date")
         return result
@@ -101,8 +102,8 @@ class RequestManager(models.Manager):
         result = self.filter(
             Q(author__manager=user)
             & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
-            & Q(start_date__gte=self.mindate)
-            & Q(start_date__lte=self.maxdate)
+            & Q(start_date__gte=f"{date.today().year}-01-01")
+            & Q(start_date__lte=date.today() + timedelta(days=21))
         ).order_by("-end_date")
         return result
 
@@ -110,14 +111,16 @@ class RequestManager(models.Manager):
 
     def user_requests_holiday(self, user):
         result = self.filter(
-            Q(author__id=user.id) & Q(leave_type="W") & Q(start_date__gte=self.mindate)
+            Q(author__id=user.id)
+            & Q(leave_type="W")
+            & Q(start_date__gte=f"{date.today().year}-01-01")
         ).order_by("-created")
         return result
 
     def user_requests_other(self, user):
         result = self.filter(
             Q(author__id=user.id)
-            & Q(start_date__gte=self.mindate)
+            & Q(start_date__gte=f"{date.today().year}-01-01")
             & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
         ).order_by("-created")
         return result

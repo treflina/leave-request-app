@@ -27,7 +27,7 @@ class SickAndAnnulalLeaveOverlappedAlertMixin:
                 self.request,
                 f"""{employee.first_name} {employee.last_name} złożył/a wniosek o urlop wypoczynkowy w podanym okresie zwolnienia lekarskiego
                 ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')}). Pamiętaj o anulowaniu tego wniosku i zaktualizowaniu
-                przysługujego pracownikowi wymiaru urlopu."""
+                przysługującego pracownikowi wymiaru urlopu."""
             )
         return super().form_valid(form)
 

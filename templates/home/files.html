@@ -47,7 +47,7 @@
     </ul>
     {%endfor%}
 </div>
-{%if user.is_staff or user.role == "T" or informatyk%}
+{%if user.is_staff or user.role == "T" or user.role == "S" or informatyk%}
 <div class="container mt-5">
     <div>
         {% if form.file.errors %}
