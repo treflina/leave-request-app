@@ -3,7 +3,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, CreateView, FormView
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.urls import reverse
 
 from applications.users.models import User
@@ -34,7 +33,8 @@ class HomePage(LoginRequiredMixin, TemplateView):
 
 
 class ReportView(TopManagerPermisoMixin, FormView):
-    """Creates pdf report about leave requests and sickleaves for a chosen time period."""
+    """Creates pdf report about leave requests and sickleaves for a chosen
+    time period."""
 
     form_class = ReportForm
     template_name = "home/report.html"

@@ -1,14 +1,9 @@
 from django.urls import reverse_lazy, reverse
-from django.contrib.auth import authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 
 
-from .models import User
-
-
-def check_ocupation_user(user, role):
-
+def check_occupation_user(user, role):
     if role == "S" or role == "T" or role == "K":
         return True
     elif user.is_staff:
@@ -25,6 +20,6 @@ class TopManagerPermisoMixin(LoginRequiredMixin):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
 
-        if not check_ocupation_user(request.user, request.user.role):
+        if not check_occupation_user(request.user, request.user.role):
             return HttpResponseRedirect(reverse("users_app:user-login"))
         return super().dispatch(request, *args, **kwargs)

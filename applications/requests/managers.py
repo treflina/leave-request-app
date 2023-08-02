@@ -1,4 +1,4 @@
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 
 from django.db import models
 from django.db.models import Q
@@ -108,7 +108,6 @@ class RequestManager(models.Manager):
         return result
 
     # managers for listing user requests
-
     def user_requests_holiday(self, user):
         result = self.filter(
             Q(author__id=user.id)

@@ -1,9 +1,10 @@
 from django.core.mail import send_mail
 from django.conf import settings
-from wnioski.settings import get_secret
 
 
 class RequestEmailNotification:
+    """Handles sending email to manager about a new leave request made by employee."""
+
     def __init__(
         self,
         author,
@@ -39,8 +40,12 @@ class RequestEmailNotification:
             text_msg = f"wolne ({self.leave_type}) w okresie {self.start_date} - {self.end_date}"
 
         subject = f"{self.author} prosi o akceptację wniosku ({self.start_date}-{self.end_date})"
-        message = f"{self.author} prosi o akceptację wniosku o {text_msg}.\r\n \r\nZaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/ \r\n \r\nWiadomość wygenerowana automatycznie."
-        EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
+        message = (
+            f"{self.author} prosi o akceptację wniosku o {text_msg}.\r\n \r\n"
+            f"Zaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/ \r\n \r\n"
+            f"Wiadomość wygenerowana automatycznie."
+        )
+
         send_mail(
             subject,
             message,

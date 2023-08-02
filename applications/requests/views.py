@@ -60,15 +60,17 @@ class RequestFormView(LoginRequiredMixin, FormView):
         send_to_person = form.cleaned_data["send_to_person"]
 
         if (leave_type == "WS" or leave_type == "WN") and Request.objects.filter(
-            Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony") & ~Q(status="anulowany")
+            Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
+            & ~Q(status="anulowany")
         ).exists():
             messages.error(
                 self.request,
-                "Błąd. Wniosek o odebranie dnia wolnego za wskazaną pracującą sobotę/niedzielę już został złożony.",
+                """Błąd. Wniosek o odebranie dnia wolnego za wskazaną pracującą
+                sobotę/niedzielę został już złożony.""",
             )
             return self.form_invalid(form)
 
-        request = Request(
+        Request(
             author=user,
             leave_type=leave_type,
             work_date=work_date,
@@ -201,7 +203,8 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
 
 
 class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
-    """All employees requests listing page for HR department. It contains all requests except those sent by current user themselves."""
+    """All employees requests listing page for HR department. It contains all requests
+    except those sent by current user themselves."""
 
     model = Request
     template_name = "requests/hrallrequests.html"
@@ -216,7 +219,8 @@ class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
 
 
 class AllHolidayRequestsListView(TopManagerPermisoMixin, ListView):
-    """All holiday employees requests listing page. It contains all requests except those sent by current user themselves."""
+    """All holiday employees requests listing page. It contains all requests except
+    those sent by current user themselves."""
 
     model = Request
     template_name = "requests/holiday-allrequests.html"
@@ -232,7 +236,8 @@ class AllHolidayRequestsListView(TopManagerPermisoMixin, ListView):
 
 
 class AllOtherRequestsListView(TopManagerPermisoMixin, ListView):
-    """All other employees requests listing page. It contains all requests except those sent by current user themselves."""
+    """All other employees requests listing page. It contains all requests except
+    those sent by current user themselves."""
 
     model = Request
     template_name = "requests/other-allrequests.html"

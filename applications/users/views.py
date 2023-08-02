@@ -237,13 +237,14 @@ class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
 
 @login_required(login_url="users_app:user-login")
 def delete_employee(request, pk):
-    employee_to_delete = User.objects.get(id=pk).delete()
+    User.objects.get(id=pk).delete()
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
 
 
 @login_required(login_url="users_app:user-login")
 def add_annual_leave(request):
-    """Adds all employees annual leave entitlement to their current leave entitlement."""
+    """Adds all employees annual leave entitlement to their current leave
+    entitlement."""
     for employee in User.objects.filter(is_active=True):
         employee.current_leave += employee.annual_leave
         employee.save()
