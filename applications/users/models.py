@@ -57,7 +57,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _("employee")
         verbose_name_plural = _("employees")
         ordering = ["last_name", "first_name"]
-        
+
     def get_full_name(self):
         return self.first_name + " " + self.last_name
 

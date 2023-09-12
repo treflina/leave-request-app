@@ -1,5 +1,4 @@
 from django import forms
-from django.db.models import query
 
 from .models import Sickleave
 from applications.users.models import User

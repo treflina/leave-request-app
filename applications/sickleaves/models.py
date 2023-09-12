@@ -40,4 +40,5 @@ class Sickleave(models.Model):
         ordering = ["issue_date"]
 
     def __str__(self):
-        return f"{self.employee.last_name} {self.employee.first_name} od {str(self.start_date)} do {str(self.end_date)}"
+        return f"""{self.employee.last_name} {self.employee.first_name}
+            od {str(self.start_date)} do {str(self.end_date)}"""

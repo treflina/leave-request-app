@@ -17,6 +17,18 @@ h3 {
     text-align: center;
 }
 
+
+.sr-only {
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+  margin: -1px;
+}
+
 .welcome {
     position: absolute;
     top: 50%;
@@ -36,6 +48,9 @@ h3 {
     justify-content: center;
     padding-bottom: 5rem;
     scroll-padding-top: 200px;
+    max-width: 1350px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .listing {
@@ -106,9 +121,11 @@ input.search2 {
     left: 50%;
     -webkit-transform: translateX(-50%);
     transform: translateX(-50%);
-    width: 35%;
-    margin-bottom: 16px;
+    max-width: 400px;
+    margin-bottom: 1rem;
 }
+
+
 
 .page-footer {
     background-color: #fff;
@@ -123,13 +140,14 @@ input.search2 {
 
 /* Navigation */
 .navbar {
-    background-color: #787a91;
-    padding: 1% 3%;
+    background-color: #545460;
     z-index: 10;
 }
 
-.navbar-brand {
-    font-size: 1.5rem;
+.logo-img {
+    height: 50px;
+    width: auto;
+    padding-right: 15px;
 }
 
 .info {
@@ -160,15 +178,19 @@ td a.icon-hrlist:hover {
     transform: rotateZ(90deg);
 }
 
-@media (max-width: 410px) {
-    .palm {
-        display: none;
-    }
+.add-btn {
+    font-weight: bold;
 }
 
 @media (min-width: 360px) {
     .page-section {
         scroll-padding-top: 160px;
+    }
+}
+
+@media (max-width: 410px) {
+    .palm {
+        display: none;
     }
 }
 
@@ -217,6 +239,10 @@ td {
 }
 
 @media only screen and (max-width: 760px) {
+
+    .form-search {
+        min-width: 90%;
+    }
     /* Force table to not be like tables anymore */
     table,
     thead,
