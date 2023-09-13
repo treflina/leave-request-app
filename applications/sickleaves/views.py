@@ -85,7 +85,7 @@ class SickleavesListView(FilteredListView):
     context_object_name = "sickleaves"
     template_name = "sickleaves/sickleaves.html"
     login_url = reverse_lazy("users_app:user-login")
-    paginate_by = 10
+    paginate_by = 20
 
 
 class SickleaveCreateView(

@@ -56,7 +56,7 @@ class RequestManager(models.Manager):
     def hrallrequests_holiday(self):
         mindate = f"{date.today().year-1}-12-01"
         return self.filter(Q(leave_type="W") & Q(end_date__gte=mindate)).order_by(
-            "-end_date"
+            "-start_date"
         )
 
     def requests_other_topmanager(self, user):
@@ -95,7 +95,7 @@ class RequestManager(models.Manager):
         result = self.filter(
             Q(end_date__gte=mindate)
             & (Q(leave_type="WS") | Q(leave_type="WN") | Q(leave_type="DW"))
-        ).order_by("-end_date")
+        ).order_by("-start_date")
         return result
 
     def requests_other(self, user):
