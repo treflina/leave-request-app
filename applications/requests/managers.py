@@ -126,33 +126,12 @@ class RequestManager(models.Manager):
 
     def requests_received_counter(self, user):
         """Manager that counts received requests with status 'to accept'."""
-        employees_requests_received = self.filter(
+        employees_requests_received_count = self.filter(
             Q(send_to_person=user) & Q(status="oczekujący")
-        )
-        result_list = employees_requests_received.all()
-        if len(result_list) == 0:
-            result = ""
-        elif len(result_list) == 1:
-            result = "➊"
-        elif len(result_list) == 2:
-            result = "➋"
-        elif len(result_list) == 3:
-            result = "➌"
-        elif len(result_list) == 4:
-            result = "➍"
-        elif len(result_list) == 5:
-            result = "➎"
-        elif len(result_list) == 6:
-            result = "➏"
-        elif len(result_list) == 7:
-            result = "➐"
-        elif len(result_list) == 8:
-            result = "➑"
-        elif len(result_list) == 9:
-            result = "➒"
-        elif len(result_list) == 10:
-            result = "➓"
-        elif len(result_list) > 10:
-            result = "➓+"
+        ).count()
 
-        return result
+        symbols = ["", "➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒",  "➓", "➓+"]
+
+        if employees_requests_received_count > 10:
+            return "➓+"
+        return symbols[employees_requests_received_count]
