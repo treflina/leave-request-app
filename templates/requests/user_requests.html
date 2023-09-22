@@ -1,125 +1,59 @@
-{% extends "base.html" %} {% load static %} {% block content %}
+{% extends "base.html" %}
+{% load static filter_tags %}
+{% block content %}
 {% include 'includes/navbar.html'%}
 <main>
-    <section class="page-section">
-        <div class="listing all_employees_list mt-5">
-            <h4 class="table-title">Twoje wnioski urlopowe</h4>
-            <table class="js-serial">
+    <section class="page-section page-scroll-fix" id="user-leave-requests-holiday">
+        <a href="#user-leave-requests-other" class="circle-link circle-link--1">
+            <i class="bi bi-arrow-down-circle" title="Przejdź do pozostałych wniosków"></i></a>
+            <table class="table">
+                <caption class="table-caption mt-5">Twoje wnioski urlopowe</caption>
                 <thead>
                     <tr>
-                        <th scope="col">Złożony</th>
+                        <th class="content-center" scope="col">Lp.</th>
+                        <th class="content-center" scope="col">Z dnia</th>
                         <th scope="col">Nazwisko i imię</th>
-                        <th class="content-center" scope="col">Od</th>
-                        <th class="content-center" scope="col">Do</th>
+                        <th class="content-center" scope="col">Okres</th>
                         <th scope="col" class="content-center">
-                            L. {% if user.working_hours < 1 %}godzin
-                            {%else%}dni {%endif%}
-                        </th>
-                        <th scope="col">NŻ<span class="text-danger">*</span></th>
-                        <th scope="col">Zastępujący</th>
+                            L. {% if user.working_hours < 1 %}godzin {%else%}dni {%endif%} </th>
+                        {% if request.user.role == "K" or request.user.role == "S" %}<th scope="col">Zastępuje</th>{% endif %}
                         <th scope="col">Status</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for request in user_requests_holiday %}
+                    {% for leave_request in user_requests_holiday %}
                     <tr>
+                        <td class="content-center" data-title="Lp.">
+                            {{ forloop.counter0|add:user_requests_holiday.start_index }}.
+                        </td>
                         <td class="content-center" data-title="Złożony:">
-                            {{request.created|date:"d.m.y"}}
+                            {{leave_request.created|date:"d.m.y"}}
                         </td>
                         <td data-title="Nazwisko i imię:">
-                            {{request.author.first_name}}
-                            {{request.author.last_name}}
+                            {{leave_request.author.first_name}}
+                            {{leave_request.author.last_name}}
                         </td>
 
-                        <td class="content-center" data-title="Od:">
-                            {{request.start_date|date:"d.m.y"}}
-                        </td>
-                        <td class="content-center" data-title="Do:">
-                            {{request.end_date|date:"d.m.y"}}
+                        <td class="content-center" data-title="Okres">
+                            {{leave_request.start_date|date:"d.m.y"}}{% if leave_request.start_date != leave_request.end_date %}- {{leave_request.end_date|date:"d.m.y"}}{% endif %}
+                            {% if leave_request.duvet_day == 1 %}(nż<span class="text-danger">*</span>){% endif %}
                         </td>
                         <td data-title="L. dni:" class="content-center">
-                            {{ request.days}}
+                            {{ leave_request.days}}
                         </td>
-                        <td data-title="NŻ:" class="content-center">{% if request.duvet_day == 1 %}TAK{% endif %}</td>
-                        <td data-title="Zastępuje:">{{request.substitute}}</td>
-                        <td data-title="Status:">{{request.status}}</td>
-                        {% if request.status == "oczekujący" %}
+                        {% if request.user.role == "K" or request.user.role == "S" %}<td data-title="Zastępuje:">{{leave_request.substitute}}</td>{% endif %}
+                        <td data-title="Status:">{{leave_request.status}}</td>
+                        {% if leave_request.status == "oczekujący" %}
                         <td>
-                            <button
-                                type="button"
-                                class="btn btn-warning btn-sm"
-                                data-toggle="modal"
-                                data-target="#deleteModal{{request.id}}"
-                            >
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                data-target="#deleteModal{{leave_request.id}}">
                                 Wycofaj
                             </button>
-
-                            <!-- Modal -->
-                            <div
-                                class="modal fade"
-                                id="deleteModal{{request.id}}"
-                                tabindex="-1"
-                                aria-labelledby="deleteModalLabel"
-                                aria-hidden="true"
-                            >
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5
-                                                class="modal-title"
-                                                id="exampleModalLabel"
-                                            >
-                                                Ostrzeżenie
-                                            </h5>
-                                            <button
-                                                type="button"
-                                                class="close"
-                                                data-dismiss="modal"
-                                                aria-label="Close"
-                                            >
-                                                <span aria-hidden="true"
-                                                    >&times;</span
-                                                >
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>
-                                                Czy na pewno chcesz wycofać
-                                                wniosek <br />
-                                                od
-                                                {{request.start_date|date:"d.m.y"}}
-                                                do
-                                                {{request.end_date|date:"d.m.y"}}?
-                                            </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button
-                                                type="button"
-                                                class="btn btn-light"
-                                                data-dismiss="modal"
-                                            >
-                                                Wróć
-                                            </button>
-                                            <form
-                                                method="POST"
-                                                action="{% url 'requests_app:delete_request' request.id %}"
-                                            >
-                                                {%csrf_token%}
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-info"
-                                                >
-                                                    Tak, wycofuję.
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {% include 'includes/delete_modal.html' %}
                         </td>
-                        {% elif request.status == "zaakceptowany" or request.status == "odrzucony" %}
-                        <td>przez {{request.signed_by}}</td>
+                        {% elif leave_request.status == "zaakceptowany" or leave_request.status == "odrzucony" %}
+                        <td class="table-last-row">przez {{leave_request.signed_by}}</td>
                         {% else %}
                         <td></td>
                         {% endif %}
@@ -128,127 +62,68 @@
                 </tbody>
             </table>
             <div>
-                <span class="text-danger">*</span> urlop na żądanie
+                <p><span class="text-danger">*</span> urlop na żądanie</p>
             </div>
-        </div>
-
+        {% if user_requests_holiday %}
+            {% include 'includes/pagination.html' with page_obj=user_requests_holiday %}
+        {% endif %}
     </section>
-    <section class="page-section">
-        <div class="listing all_employees_list mt-3">
-            <h4 class="table-title">
-                Twoje wnioski o dni wolne za pracę w soboty/niedziele/święta
-            </h4>
-            <table class="js-serial">
+    <section class="page-section page-scroll-fix mt-lg-3 mt-md-1" id="user-leave-requests-other">
+        <a href="#user-leave-requests-holiday" class="circle-link circle-link--2">
+            <i class="bi bi-arrow-up-circle" title="Przejdź do pozostałych wniosków"></i></a>
+            <table class="table">
+                <caption class="table-caption">Twoje wnioski o dni wolne za pracę w soboty/niedziele/święta</caption>
                 <thead>
                     <tr>
                         <th class="content-center" scope="col">
-                            Złożony
+                            Lp.
+                        </th>
+                        <th class="content-center" scope="col">
+                            Z dnia
                         </th>
                         <th scope="col">Nazwisko i imię</th>
-                        <th class="content-center" scope="col">Na dzień</th>
+                        <th class="content-center" scope="col">Okres</th>
                         <th class="content-center" scope="col">Rodzaj</th>
-                        <th scope="col">Za pracę dnia</th>
-                        <th scope="col">Zastępujący</th>
+                        <th class="content-center" scope="col">Za pracę dnia</th>
+                        {% if request.user.role == "K" or request.user.role == "S" %}<th scope="col">Zastępujący</th>{% endif %}
                         <th scope="col">Status</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for request in user_requests_other %}
+                    {% for leave_request in user_requests_other %}
                     <tr>
-                        <td class="content-center" data-title="Złożony:">
-                            {{request.created|date:"d.m.y"}}
+                        <td class="content-center" data-title="Lp.">
+                            {{ forloop.counter0|add:user_requests_other.start_index }}.
+                        </td>
+                        <td class="content-center" data-title="Z dnia:">
+                            {{leave_request.created|date:"d.m.y"}}
                         </td>
                         <td data-title="Nazwisko i imię:">
-                            {{request.author.first_name}}
-                            {{request.author.last_name}}
+                            {{leave_request.author.first_name}}
+                            {{leave_request.author.last_name}}
                         </td>
-                        <td class="content-center" data-title="Od:">
-                            {{request.start_date|date:"d.m.y"}}
+                        <td class="content-center" data-title="Okres:">
+                            {{leave_request.start_date|date:"d.m.y"}}
                         </td>
                         <td class="content-center" data-title="Rodzaj:">
-                            {{request.leave_type}}
+                            {{leave_request.leave_type}}
                         </td>
                         <td class="content-center" data-title="Za pracę dnia:">
-                            {{request.work_date|date:"d.m.y"}}
+                            {{leave_request.work_date|date:"d.m.y"}}
                         </td>
-                        <td data-title="Zastępuje:">{{request.substitute}}</td>
-                        <td data-title="Status:">{{request.status}}</td>
-                        {% if request.status == "oczekujący" %}
+                        {% if request.user.role == "K" or request.user.role == "S" %}<td data-title="Zastępuje:">{{leave_request.substitute}}</td>{% endif %}
+                        <td data-title="Status:">{{leave_request.status}}</td>
+                        {% if leave_request.status == "oczekujący" %}
                         <td>
-                            <button
-                                type="button"
-                                class="btn btn-warning btn-sm"
-                                data-toggle="modal"
-                                data-target="#deleteModal{{request.id}}"
-                            >
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="modal"
+                                data-target="#deleteModal{{leave_request.id}}">
                                 Wycofaj
                             </button>
-                            <!-- Modal -->
-                            <div
-                                class="modal fade"
-                                id="deleteModal{{request.id}}"
-                                tabindex="-1"
-                                aria-labelledby="deleteModalLabel"
-                                aria-hidden="true"
-                            >
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5
-                                                class="modal-title"
-                                                id="exampleModalLabel"
-                                            >
-                                                Ostrzeżenie
-                                            </h5>
-                                            <button
-                                                type="button"
-                                                class="close"
-                                                data-dismiss="modal"
-                                                aria-label="Close"
-                                            >
-                                                <span aria-hidden="true"
-                                                    >&times;</span
-                                                >
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>
-                                                Czy na pewno chcesz wycofać
-                                                wniosek <br />
-                                                od
-                                                {{request.start_date|date:"d.m.y"}}
-                                                do
-                                                {{request.end_date|date:"d.m.y"}}?
-                                            </p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button
-                                                type="button"
-                                                class="btn btn-light"
-                                                data-dismiss="modal"
-                                            >
-                                                Wróć
-                                            </button>
-                                            <form
-                                                method="POST"
-                                                action="{% url 'requests_app:delete_request' request.id %}"
-                                            >
-                                                {%csrf_token%}
-                                                <button
-                                                    type="submit"
-                                                    class="btn btn-info"
-                                                >
-                                                    Tak, wycofuję.
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {% include 'includes/delete_modal.html' %}
                         </td>
-                        {% elif request.status == "zaakceptowany" or request.status == "odrzucony" %}
-                        <td>przez {{request.signed_by}}</td>
+                        {% elif leave_request.status == "zaakceptowany" or leave_request.status == "odrzucony" %}
+                        <td class="table-last-row">przez {{leave_request.signed_by}}</td>
                         {% else %}
                         <td></td>
                         {% endif %}
@@ -256,7 +131,9 @@
                     {%endfor%}
                 </tbody>
             </table>
-        </div>
+        {% if user_requests_other %}
+            {% include 'includes/pagination2.html' with page_obj2=user_requests_other %}
+        {% endif %}
     </section>
 </main>
 {% endblock content %}

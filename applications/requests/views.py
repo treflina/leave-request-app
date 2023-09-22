@@ -6,6 +6,9 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView, ListView, UpdateView
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 from applications.users.models import User
 from applications.users.mixins import TopManagerPermisoMixin
@@ -144,13 +147,39 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
     template_name = "requests/user_requests.html"
     model = Request
     login_url = reverse_lazy("users_app:user-login")
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
-
         context = super(UserRequestsListView, self).get_context_data(**kwargs)
         user = self.request.user
-        context["user_requests_holiday"] = Request.objects.user_requests_holiday(user)
-        context["user_requests_other"] = Request.objects.user_requests_other(user)
+        user_requests_holiday = Request.objects.user_requests_holiday(user)
+        paginator = Paginator(user_requests_holiday, self.paginate_by)
+
+        page = self.request.GET.get('page')
+
+        try:
+            user_requests_holiday = paginator.page(page)
+        except PageNotAnInteger:
+            user_requests_holiday = paginator.page(1)
+        except EmptyPage:
+            user_requests_holiday = paginator.page(paginator.num_pages)
+
+        context['user_requests_holiday'] = user_requests_holiday
+
+        user_requests_other = Request.objects.user_requests_other(user)
+        paginator = Paginator(user_requests_other, self.paginate_by)
+
+        page = self.request.GET.get('page2')
+
+        try:
+            user_requests_other = paginator.page(page)
+        except PageNotAnInteger:
+            user_requests_other = paginator.page(1)
+        except EmptyPage:
+            user_requests_other = paginator.page(paginator.num_pages)
+
+        context['user_requests_other'] = user_requests_other
+
         return context
 
 

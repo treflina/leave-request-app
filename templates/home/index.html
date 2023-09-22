@@ -1,28 +1,23 @@
 {% extends "base.html" %}
-{% load  static %}
-
+{% load static %}
 {% block content %}
 {%include 'includes/navbar.html'%}
 
-
-<div class="container welcome">
-
-    <h2>Witaj {{user.first_name}} {{user.last_name}}!</h2>
-    <h5>({{user.position}})</h5>
-    <div class="mt-4">
-        <h1>{%if onedayleft%}Został Ci{%else%}Zostało Ci{%endif%}
-            <span style="font-weight: bold; color:green;  margin: 0 10px;">{{user.current_leave}} </span>
-            {%if part%}godzin urlopu{%else%}{%if onedayleft%}dzień{%else%}dni{%endif%}
-            urlopu{%endif%}<span class="palm">🌴</span> </h1>
-    </div>
-
+<div class="container welcome pt-5 mt-lg-5">
+    <h1 class="welcome__text-name">Witaj {{user.first_name}} {{user.last_name}}!</h1>
+    <p class="welcome__text-position">({{user.position}})</p>
+    <p class="welcome__text-info mt-4">{%if onedayleft%}Został Ci{%else%}Zostało Ci{%endif%}
+        <span>{{user.current_leave}}</span>
+        {%if part%}godzin urlopu{%else%}{%if onedayleft%}dzień{%else%}dni{%endif%}
+        urlopu{%endif%}<span class="palm">🌴</span>
+    </p>
     {% if show_director %}
-    <div class="index-btns mt-5">
+    <div class="welcome__btns my-2">
         <a href="{%url 'users_app:all-employees'%}" role="button" class="btn btn-success mr-1">Lista pracowników</a>
         <a href="{%url 'sickleaves_app:sickleaves'%}" role="button" class="btn btn-danger">Zwolnienia lekarskie</a>
     </div>
     {% else %}
-    <div class="index-btns mt-5">
+    <div class="welcome__btns my-2">
         <a href="{% url 'requests_app:user_requests'%}" role="button" class="btn btn-secondary mr-1">Twoje wnioski</a>
         {%if show_manager %}
         <a href="{% url 'requests_app:allrequests'%}" role="button" class="btn btn-warning mr-1">Zaopiniuj wnioski</a>
@@ -30,10 +25,10 @@
         <a href="{% url 'requests_app:request'%}" role="button" class="btn btn-success">Złóż wniosek</a>
     </div>
     {% endif %}
-    <a class="text-dark" href="{% url 'home_app:documents'%}">
-        <div class="documents-link position-absolute mt-3">
-            <img class="doc-img" src="{%static 'img/doc-img.png'%}" alt="segregatory z dokumentami">
-            <p style="font-size: 0.6em;">Niezbędnik</p>
+    <a class="d-block position-relative mt-5 text-dark text-left mr-lg-auto mr-md-auto" href="{% url 'home_app:documents'%}">
+        <div class="welcome__doclink">
+            <img class="welcome__doclink-img" src="{%static 'img/doc-img.png'%}" alt="segregatory z dokumentami">
+            <p class="welcome__doclink-title text-center">Niezbędnik</p>
         </div>
     </a>
 </div>

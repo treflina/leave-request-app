@@ -14,7 +14,7 @@
     </div>
     {% endfor %}
 </div>
-<section class="page-section mt-5 flex-column">
+<section class="page-section flex-column mt-5">
             <h3 class="table-title mb-4">Zwolnienia lekarskie</h3>
             <div class="d-flex justify-content-center align-items-center flex-wrap w-100 mt-4 mb-2 py-1" style="background-color: #efefef;">
                 <form class="form-search filter-year-form d-flex justify-content-center align-items-center" method="get" >{%csrf_token%}
@@ -31,7 +31,7 @@
                 <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn mx-2 my-1 btn-warning"><span class="add-btn">+</span> Dodaj zwolnienie</a>
             </div>
         <div class="table-wrapper px-2" style="overflow-x: auto; max-width: 98vw; ">
-        <table class="no-js-serial" id="present">
+        <table id="present">
             <thead>
                 <tr>
                     <th scope="col">Lp.</th>

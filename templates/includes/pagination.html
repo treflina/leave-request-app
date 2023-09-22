@@ -1,26 +1,28 @@
 {% load filter_tags %}
-
 {% if is_paginated %}
-
 <nav aria-label="Paginacja" class="my-4">
     <ul class="pagination justify-content-center">
-            {% if page_obj.has_previous %}
-            <li class="page-item">
-                <a class="page-link text-dark" href="?{% param_replace page=page_obj.previous_page_number %}">Poprzednia</a>
-            </li>
-            {% else %}
-            <li class="page-item disabled">
-                <a class="page-link" href="#">Poprzednia</a>
-            </li>
-            {% endif %}
         {% if page_obj.has_previous %}
-        <li class="page-item"><a class="page-link text-dark" href="?{% param_replace page=page_obj.previous_page_number %}">{{page_obj.previous_page_number}}</a></li>
+        <li class="page-item">
+            <a class="page-link text-dark" href="?{% param_replace page=page_obj.previous_page_number %}">Poprzednia</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#">Poprzednia</a>
+        </li>
+        {% endif %}
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link text-dark" href="?{% param_replace page=page_obj.previous_page_number %}">{{page_obj.previous_page_number}}</a>
+        </li>
         {% endif %}
         <li class="page-item active" aria-current="page">
             <span class="page-link bg-secondary" style="border-color: #6c757d;">{{page_obj.number}}</span>
         </li>
         {% if page_obj.has_next %}
-        <li class="page-item"><a class="page-link text-dark" href="?{% param_replace page=page_obj.next_page_number %}">{{page_obj.next_page_number}}</a></li>
+        <li class="page-item">
+            <a class="page-link text-dark" href="?{% param_replace page=page_obj.next_page_number %}">{{page_obj.next_page_number}}</a>
+        </li>
         {% endif %}
         {% if page_obj.has_next %}
         <li class="page-item">
