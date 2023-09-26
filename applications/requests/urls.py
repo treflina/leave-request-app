@@ -30,16 +30,6 @@ urlpatterns = [
         name="hrallrequests",
     ),
     path(
-        "allholidayrequests/",
-        views.AllHolidayRequestsListView.as_view(),
-        name="allholidayrequests",
-    ),
-    path(
-        "allotherrequests/",
-        views.AllOtherRequestsListView.as_view(),
-        name="allotherrequests",
-    ),
-    path(
         "request-reject/<int:pk>/",
         views.reject_request,
         name="reject_request",

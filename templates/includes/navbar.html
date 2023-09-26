@@ -18,14 +18,9 @@
         </li>
         {%endif%}
         {%if user.role != 'P'%}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="{% url 'requests_app:allrequests'%}" id="navbardrop" data-toggle="dropdown">Wnioski pracowników<span style='color:orange;'>{{requests_list}}</span>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'requests_app:allrequests'%}">Wnioski pracowników<span style='color:orange;'>{{requests_list}}</span>
               </a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item link-hide js-scroll-trigger" href="{% anchor 'requests_app:allrequests' 'to_accept'%}">Do zaopiniowania</a>
-            <a class="dropdown-item link-hide js-scroll-trigger" href="{% anchor 'requests_app:allrequests' 'holiday'%}">Wnioski urlopowe</a>
-            <a class="dropdown-item link-hide js-scroll-trigger" href="{% anchor 'requests_app:allrequests' 'saturday'%}">Wolne za soboty</a>
-          </div>
         </li>
         {%endif%}
         {% if user.role == "S" %}

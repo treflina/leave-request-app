@@ -3,28 +3,23 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">
+                <p class="modal-title">
                     Ostrzeżenie
-                </h5>
+                </p>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true"
-                                            >&times;</span>
+                    <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <p>
-                    Czy na pewno chcesz wycofać
-                    wniosek <br />
-                    od
-                    {{leave_request.start_date|date:"d.m.y"}}
-                    do
-                    {{leave_request.end_date|date:"d.m.y"}}?
+                    Czy na pewno chcesz wycofać wniosek <br />
+                    od {{leave_request.start_date|date:"d.m.y"}}
+                    do {{leave_request.end_date|date:"d.m.y"}}?
                 </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-dismiss="modal">
-                    Wróć
-                </button>
+                    Wróć</button>
                 <form method="POST" action="{% url 'requests_app:delete_request' leave_request.id %}">
                     {%csrf_token%}
                     <button type="submit" class="btn btn-info">

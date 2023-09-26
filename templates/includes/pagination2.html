@@ -4,7 +4,7 @@
     <ul class="pagination justify-content-center">
             {% if page_obj2.has_previous %}
             <li class="page-item">
-                <a class="page-link text-dark" href="?{% param_replace page2=page_obj2.previous_page_number %}">Poprzednia</a>
+                <a class="page-link text-dark" href="?{% param_replace page2=page_obj2.previous_page_number %}#{{id}}">Poprzednia</a>
             </li>
             {% else %}
             <li class="page-item disabled">
@@ -12,18 +12,18 @@
             </li>
             {% endif %}
         {% if page_obj2.has_previous %}
-        <li class="page-item"><a class="page-link text-dark" href="?{% param_replace page2=page_obj2.previous_page_number %}">{{page_obj2.previous_page_number}}</a></li>
+        <li class="page-item"><a class="page-link text-dark" href="?{% param_replace page2=page_obj2.previous_page_number %}#{{id}}">{{page_obj2.previous_page_number}}</a></li>
         {% endif %}
         <li class="page-item active" aria-current="page">
             <span class="page-link bg-secondary" style="border-color: #6c757d;">{{page_obj2.number}}</span>
         </li>
         {% if page_obj2.has_next %}
-        <li class="page-item"><a class="page-link text-dark" href="?{% param_replace page2=page_obj2.next_page_number %}">{{page_obj2.next_page_number}}</a></li>
+        <li class="page-item"><a class="page-link text-dark" href="?{% param_replace page2=page_obj2.next_page_number %}#{{id}}">{{page_obj2.next_page_number}}</a></li>
         {% endif %}
 
         {% if page_obj2.has_next %}
         <li class="page-item">
-            <a class="page-link text-dark" href="?{% param_replace page2=page_obj2.next_page_number %}">Następna</a>
+            <a class="page-link text-dark" href="?{% param_replace page2=page_obj2.next_page_number %}#{{id}}">Następna</a>
         </li>
         {% else %}
         <li class="page-item disabled">

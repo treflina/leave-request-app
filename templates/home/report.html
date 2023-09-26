@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% load  static %}
+{% load static %}
 {% block content %}
 {% include 'includes/navbar.html'%}
 {% load crispy_forms_tags %}
 
-<section class="page-section mt-5" id="to_accept">
+<section class="pagesection my-5">
     <div class="container">
-        <h3 class="report-title">Zestawienie dni wolnych, urlopów wypoczynkowych, zwolnień lekarskich</h3>
+        <h1 class="page-heading mb-5">Zestawienie dni wolnych, urlopów wypoczynkowych, zwolnień lekarskich</h1>
         <form method="POST">{%csrf_token%}
             <div class="form-group">
                 {{form.person|as_crispy_field}}
@@ -25,11 +25,13 @@
                 </div>
                 <div class="row mt-3">
                     <div class="col-lg-3 col-md-5 col-sm-6 ml-2">
-                    {{form.attachment|as_crispy_field}}
+                        {{form.attachment|as_crispy_field}}
                     </div>
                     <div>
-                    <button class="btn btn-info mt-2 ml-3" type="submit">Generuj raport PDF</button>
+                        <button class="btn btn-info mt-2 ml-3" type="submit">Generuj raport PDF</button>
                     </div>
                 </div>
-            </form>
+        </form>
+    </div>
+</section>
 {% endblock content%}

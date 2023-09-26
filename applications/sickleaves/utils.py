@@ -4,31 +4,43 @@ from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.db.models.query_utils import Q
 from wnioski.settings import get_secret
+from applications.requests.models import Request
 
 User = get_user_model()
-from applications.requests.models import Request
 
 
 class SickAndAnnulalLeaveOverlappedAlertMixin:
-    """Mixin that displays a warning message when an employee has submitted a leave request
-    for the same day as registered sick leave."""
+    """Mixin that displays a warning message when an employee has submitted
+    a leave request for the same day as registered sick leave."""
 
     def form_valid(self, form):
         start = form.cleaned_data.get("start_date")
         end = form.cleaned_data.get("end_date")
+        leave_type = form.cleaned_data.get("leave_type")
         employee = form.cleaned_data.get("employee")
         employee_leave_requests = Request.objects.filter(
             Q(author=employee)
             & ~Q(status="odrzucony")
             & (Q(start_date__range=[start, end]) | Q(end_date__range=[start, end]))
         )
-        if employee_leave_requests.exists():
+        if employee_leave_requests.exists() and leave_type != "O":
             messages.warning(
                 self.request,
-                f"""{employee.first_name} {employee.last_name} złożył/a wniosek o urlop wypoczynkowy w podanym okresie zwolnienia lekarskiego
-                ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')}). Pamiętaj o anulowaniu tego wniosku i zaktualizowaniu
-                przysługującego pracownikowi wymiaru urlopu."""
+                f"""{employee.first_name} {employee.last_name} złożył/a wniosek o urlop
+                wypoczynkowy w podanym okresie zwolnienia lekarskiego
+                ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')}).
+                Pamiętaj o anulowaniu tego wniosku i zaktualizowaniu
+                przysługującego pracownikowi wymiaru urlopu.""",
             )
+        elif employee_leave_requests.exists() and leave_type == "O":
+            messages.warning(
+                self.request,
+                f"""Zwolnienie zostało poprawnie zapisane, ale {employee.first_name}
+                {employee.last_name} złożył/a wniosek o urlop wypoczynkowy w podanym
+                okresie ({(start.strftime('%d.%m.%y'))}-{end.strftime('%d.%m.%y')})
+                sprawowania opieki nad chorym członkiem rodziny.""",
+            )
+
         return super().form_valid(form)
 
 
@@ -47,20 +59,23 @@ class SickleaveNotification:
     def send_notification(self):
         if self.leave_type == "O":
             text = "na opiece nad chorym członkiem rodziny"
-            text_subj = f"opieka"
+            text_subj = "opieka"
         elif self.leave_type == "K":
             text = "na kwarantannie"
-            text_subj = f"kwarantanna"
-            self.text_info = f"Podane daty mogą ulec zmianie."
+            text_subj = "kwarantanna"
+            self.text_info = "Podane daty mogą ulec zmianie."
         elif self.leave_type == "I":
             text = "na izolacji"
-            text_subj = f"izolacja"
+            text_subj = "izolacja"
         else:
             text = f"na zwolnieniu lekarskim ({self.leave_type})"
-            text_subj = f"chorobowe"
+            text_subj = "chorobowe"
 
-        subject = f"{text_subj} {self.employee.first_name} {self.employee.last_name} ({self.start_date} - {self.end_date})"
-        message = f"""Dzień dobry,\r\n{self.employee.first_name} {self.employee.last_name} przebywa {text} w dniach {self.start_date} do {self.end_date}.
+        subject = f"""{text_subj} {self.employee.first_name} {self.employee.last_name}
+                    ({self.start_date} - {self.end_date})"""
+        message = f"""Dzień dobry,\r\n{self.employee.first_name}
+                    {self.employee.last_name} przebywa {text}
+                    w dniach {self.start_date} do {self.end_date}.
                     {self.text_info}\r\n \r\nWiadomość wygenerowana automatycznie."""
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
         if self.employee.manager:

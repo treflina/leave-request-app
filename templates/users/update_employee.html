@@ -4,11 +4,8 @@
 {% block content %}
 {% include 'includes/navbar.html'%}
 {% load crispy_forms_tags %}
-
 <div class="container mt-5">
-
-    <h3 class="mb-5 text-left">Edytuj dane pracownika</h3>
-
+    <h1 class="page-heading mb-5 text-left">Edytuj dane pracownika</h1>
     <form method="POST">{% csrf_token%}
         <div class="row">
             <div class="col-lg-6">
@@ -79,12 +76,9 @@
                 {{ form.is_staff|as_crispy_field }}
             </div>
         </div>
-
         <div class="form-group">
             <button class="btn btn-secondary" type="submit">Zmień</button>
         </div>
     </form>
 </div>
-
-
-{% endblock content%}
+{% endblock content %}

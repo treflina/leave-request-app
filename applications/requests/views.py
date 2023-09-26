@@ -1,3 +1,8 @@
+import logging
+import operator
+import django_filters
+
+from functools import reduce
 from simple_history.utils import update_change_reason
 
 from django.http import HttpResponseRedirect
@@ -6,9 +11,7 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView, ListView, UpdateView
-from django.core.paginator import Paginator
-from django.core.paginator import EmptyPage
-from django.core.paginator import PageNotAnInteger
+from django.forms.widgets import Select, TextInput, DateInput
 
 from applications.users.models import User
 from applications.users.mixins import TopManagerPermisoMixin
@@ -16,8 +19,8 @@ from applications.users.mixins import TopManagerPermisoMixin
 from .models import Request
 from .forms import RequestForm, UpdateRequestForm
 from .utils import RequestEmailNotification
+from paginator import PaginationMixin
 
-import logging
 
 logger = logging.getLogger("django")
 
@@ -63,7 +66,9 @@ class RequestFormView(LoginRequiredMixin, FormView):
         send_to_person = form.cleaned_data["send_to_person"]
 
         if (leave_type == "WS" or leave_type == "WN") and Request.objects.filter(
-            Q(author=user) & Q(work_date=work_date) & ~Q(status="odrzucony")
+            Q(author=user)
+            & Q(work_date=work_date)
+            & ~Q(status="odrzucony")
             & ~Q(status="anulowany")
         ).exists():
             messages.error(
@@ -141,8 +146,8 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
         return response
 
 
-class UserRequestsListView(LoginRequiredMixin, ListView):
-    """Authenticated user requests listing page."""
+class UserRequestsListView(LoginRequiredMixin, PaginationMixin, ListView):
+    """Authenticated user leave requests listing view."""
 
     template_name = "requests/user_requests.html"
     model = Request
@@ -153,136 +158,159 @@ class UserRequestsListView(LoginRequiredMixin, ListView):
         context = super(UserRequestsListView, self).get_context_data(**kwargs)
         user = self.request.user
         user_requests_holiday = Request.objects.user_requests_holiday(user)
-        paginator = Paginator(user_requests_holiday, self.paginate_by)
-
-        page = self.request.GET.get('page')
-
-        try:
-            user_requests_holiday = paginator.page(page)
-        except PageNotAnInteger:
-            user_requests_holiday = paginator.page(1)
-        except EmptyPage:
-            user_requests_holiday = paginator.page(paginator.num_pages)
-
-        context['user_requests_holiday'] = user_requests_holiday
-
         user_requests_other = Request.objects.user_requests_other(user)
-        paginator = Paginator(user_requests_other, self.paginate_by)
 
-        page = self.request.GET.get('page2')
-
-        try:
-            user_requests_other = paginator.page(page)
-        except PageNotAnInteger:
-            user_requests_other = paginator.page(1)
-        except EmptyPage:
-            user_requests_other = paginator.page(paginator.num_pages)
-
-        context['user_requests_other'] = user_requests_other
+        context["user_requests_holiday"] = self.paginate(user_requests_holiday, "page")
+        context["user_requests_other"] = self.paginate(user_requests_other, "page2")
 
         return context
 
 
-class RequestsListView(TopManagerPermisoMixin, ListView):
-    """List view that contains 30 last requests from subordinates
-    since the beginning of the year and up to the following 3 weeks."""
+class RequestsFilteredListView(ListView):
+    filterset_class = None
 
-    model = Request
-    template_name = "requests/allrequests.html"
-    login_url = reverse_lazy("users_app:user-login")
+    def get_queryset(self):
+        queryset = Request.objects.all().order_by("-start_date")
+        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        return self.filterset.qs.distinct()
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["filterset"] = self.filterset
+        return context
 
-        context = super(RequestsListView, self).get_context_data(**kwargs)
+
+class RequestsFilter(django_filters.FilterSet):
+    """Filter for listing leave requests views."""
+
+    LEAVE_TYPE_CHOICES = [("W", "W"), ("WS", "WS"), ("WN", "WN"), ("DW", "DW")]
+
+    dropdown_field = django_filters.ChoiceFilter(
+        field_name="leave_type",
+        lookup_expr="exact",
+        choices=LEAVE_TYPE_CHOICES,
+        label="Wybierz rodzaj wolnego",
+        empty_label="Rodzaj",
+        widget=Select(attrs={"class": "form-control"}),
+    )
+    start_date = django_filters.DateFilter(
+        field_name="start_date",
+        lookup_expr="gte",
+        label="Od:",
+        widget=DateInput(
+            format="%d.%m.%y",
+            attrs={
+                "class": "form-control",
+                "type": "date",
+            },
+        ),
+    )
+    end_date = django_filters.DateFilter(
+        field_name="end_date",
+        lookup_expr="lte",
+        label="Do:",
+        widget=DateInput(
+            format="%d.%m.%y",
+            attrs={
+                "class": "form-control",
+                "type": "date",
+            },
+        ),
+    )
+
+    other_fields = django_filters.CharFilter(
+        method="filter_other_fields",
+        label="Wyszukaj",
+        widget=TextInput(attrs={"class": "form-control", "placeholder": "Wyszukaj..."}),
+    )
+
+    class Meta:
+        model = Request
+        fields = [
+            "dropdown_field",
+            "start_date",
+            "end_date",
+            "other_fields",
+        ]
+
+    @staticmethod
+    def filter_other_fields(qs, name, value):
+        query_words = value.split()
+        return qs.filter(
+            reduce(
+                operator.and_,
+                (
+                    Q(author__first_name__icontains=word) |
+                    Q(author__last_name__icontains=word)
+                    for word in query_words
+                ),
+            ) |
+            Q(start_date__icontains=value)
+            | Q(end_date__icontains=value)
+            | Q(work_date__icontains=value)
+            | Q(status__icontains=value)
+        )
+
+    @staticmethod
+    def filter_year(qs, name, value):
+        return qs.filter(Q(start_date__year=value) | Q(end_date__year=value))
+
+
+class RequestsListView(TopManagerPermisoMixin, ListView):
+    """Leave requests listing view for managers where they can accept or reject
+    reuests they have received.
+    Topmanagers can view requests sent from all employees."""
+
+    context_object_name = "requests_holiday"
+    template_name = "requests/allrequests.html"
+    login_url = reverse_lazy("users_app:user-login")
+    paginate_by = 20
+
+    def get_queryset(self):
         user = self.request.user
-        context["requests_received"] = Request.objects.requests_to_accept(user)
-        if len(context["requests_received"]) == 0:
-            context["no_request"] = True
-
         if user.role == "T" or user.role == "S" or user.is_staff:
-            context["requests_holiday"] = Request.objects.requests_holiday_topmanager(
-                user
-            )[:30]
-            context["requests_other"] = Request.objects.requests_other_topmanager(user)[
-                :30
-            ]
-
-            if len(context["requests_other"]) < len(
-                Request.objects.allrequests_other_topmanager(user).all()
-            ):
-                context["showall_other"] = True
-            if len(context["requests_holiday"]) < len(
-                Request.objects.allrequests_holiday_topmanager(user).all()
-            ):
-                context["showall_holiday"] = True
-
+            queryset = Request.objects.all().order_by("-start_date")
+        elif user.role == "K":
+            queryset = Request.objects.filter(author__manager=user)
         else:
-            context["requests_holiday"] = Request.objects.requests_holiday(user)[:30]
-            context["requests_other"] = Request.objects.requests_other(user)[:30]
-            if len(context["requests_holiday"]) < len(
-                Request.objects.allrequests_holiday(user).all()
-            ):
-                context["showall_holiday"] = True
-            if len(context["requests_other"]) < len(
-                Request.objects.allrequests_other(user).all()
-            ):
-                context["showall_other"] = True
+            queryset = None
+        filter = RequestsFilter(self.request.GET, queryset)
+        return filter.qs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        filter = RequestsFilter(self.request.GET, queryset)
+        context["filterset"] = filter
+        context["requests_received"] = Request.objects.requests_to_accept(
+            self.request.user
+        )
         return context
 
 
 class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
-    """All employees requests listing page for HR department. It contains all requests
-    except those sent by current user themselves."""
+    """All employees requests listing page for HR department."""
 
-    model = Request
+    context_object_name = "requests_holiday"
     template_name = "requests/hrallrequests.html"
     login_url = reverse_lazy("users_app:user-login")
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = Request.objects.all().order_by("-start_date")
+        filter = RequestsFilter(self.request.GET, queryset)
+        return filter.qs
 
     def get_context_data(self, **kwargs):
-
-        context = super(HRAllRequestsListView, self).get_context_data(**kwargs)
-        context["requests_holiday"] = Request.objects.hrallrequests_holiday()
-        context["requests_other"] = Request.objects.hrallrequests_other()
+        context = super().get_context_data(**kwargs)
+        queryset = self.get_queryset()
+        filter = RequestsFilter(self.request.GET, queryset)
+        context["filterset"] = filter
         return context
 
 
-class AllHolidayRequestsListView(TopManagerPermisoMixin, ListView):
-    """All holiday employees requests listing page. It contains all requests except
-    those sent by current user themselves."""
-
-    model = Request
-    template_name = "requests/holiday-allrequests.html"
-    login_url = reverse_lazy("users_app:user-login")
-    context_object_name = "requests_holiday"
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == "T" or user.role == "S" or user.is_staff:
-            return Request.objects.allrequests_holiday_topmanager(user)
-        else:
-            return Request.objects.allrequests_holiday(user)
-
-
-class AllOtherRequestsListView(TopManagerPermisoMixin, ListView):
-    """All other employees requests listing page. It contains all requests except
-    those sent by current user themselves."""
-
-    model = Request
-    template_name = "requests/other-allrequests.html"
-    login_url = reverse_lazy("users_app:user-login")
-    context_object_name = "requests_other"
-
-    def get_queryset(self):
-        user = self.request.user
-        if user.role == "T" or user.role == "S" or user.is_staff:
-            return Request.objects.allrequests_other_topmanager(user)
-        else:
-            return Request.objects.allrequests_other(user)
-
-
 def accept_request(request, pk):
-    """Accepts the employee request."""
+    """Accept the employee request."""
     user = request.user
     request_to_accept = Request.objects.get(id=pk)
     request_to_accept.status = "zaakceptowany"
@@ -292,7 +320,7 @@ def accept_request(request, pk):
 
 
 def reject_request(request, pk):
-    """Rejects the employee request."""
+    """Reject the employee request."""
     user = request.user
     request_to_reject = Request.objects.get(id=pk)
     if request_to_reject.leave_type == "W":
@@ -307,7 +335,7 @@ def reject_request(request, pk):
 
 
 def delete_request(request, pk):
-    """Withdraws the request."""
+    """Withdraw the request."""
     user = request.user
     request_to_delete = Request.objects.get(id=pk)
     if request_to_delete.leave_type == "W":

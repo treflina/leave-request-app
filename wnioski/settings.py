@@ -119,6 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 DEFAULT_FROM_EMAIL = get_secret("DEFAULT_FROM_EMAIL")
+# DEFAULT_FROM_EMAIL = get_secret("EMAIL_HOST_USER")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True

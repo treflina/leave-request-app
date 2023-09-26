@@ -22,7 +22,7 @@
         </button>
     </div>
     {% endfor %}
-    <h3 class="mt-3 mb-5"> Wniosek o udzielenie urlopu / dnia wolnego</h3>
+    <h1 class="page-heading mt-3 mb-5"> Wniosek o udzielenie urlopu / dnia wolnego</h1>
     <form id="send-request-form" action="" method="POST" autocomplete="off">{%csrf_token%}
         <div class="form-group row">
             <label for="person" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Imię i nazwisko:</label>
@@ -65,9 +65,7 @@
                     <label class="form-check-label " for="id_leave_type_3"> Wolne za święto przypadające w wolną sobotę
                         (DW) </label>
                 </div>
-
                 <div class="form-group row box_ws hide">
-
                     <label class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
                     <div class="col-lg-6">
                         {{form.work_date|as_crispy_field}}
@@ -75,15 +73,12 @@
                 </div>
             </div>
         </div>
-
         <div class="form-group row mt-2">
-
             <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">W okresie:</label>
             <div class="input-group col-lg-6 col-md-9" id="d">
                 {{form.start_date|as_crispy_field}}
                 <span class="input-group-addon ml-2 mr-2">do</span>
                 {{form.end_date|as_crispy_field}}</div>
-
         </div>
         <div class="form-group row box_w">
             <label for="number_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W wymiarze:</label>
@@ -98,19 +93,16 @@
                 {{form.duvet_day|as_crispy_field}}
             </div>
         </div>
-
         <div class="form-group row">
             <label for="substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
             <div class="col">
                 {{form.substitute|as_crispy_field}}
             </div>
         </div>
-
         <div class="form-group row">
             <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wyślij do:</label>
             <div class="col">
                 {{form.send_to_person|as_crispy_field}}
-
             </div>
         </div>
         <div class="form-group row">
@@ -121,3 +113,6 @@
     </form>
 </div>
 {% endblock content %}
+{% block extra_js %}
+    <script src="{% static 'js/fillin-request.js' %}"></script>
+{% endblock extra_js %}

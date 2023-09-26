@@ -1,5 +1,5 @@
 from io import BytesIO
-from datetime import datetime, date
+from datetime import date
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
@@ -11,10 +11,9 @@ from reportlab.platypus import (
     Paragraph,
     PageBreak,
 )
-from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT, TA_CENTER, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfgen import canvas
 from reportlab.lib.styles import ParagraphStyle
 
 from django.db.models import Q
@@ -36,7 +35,6 @@ pdfmetrics.registerFontFamily(
 
 
 def create_pdf_sheet(data, fileName, title, start_date, end_date):
-
     if title == "Wykaz zwolnień lekarskich":
         pagesize = A4
         table_font_size = 10

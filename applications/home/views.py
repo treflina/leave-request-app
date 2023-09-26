@@ -58,6 +58,8 @@ class ReportView(TopManagerPermisoMixin, FormView):
 
 
 class UploadFileView(LoginRequiredMixin, CreateView):
+    """Uploaded documents listing view. HR, topmanagers and users who are employed
+    as informaticians can upload and delete files."""
 
     model = UploadFile
     template_name = "home/files.html"
@@ -67,16 +69,13 @@ class UploadFileView(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        titles = [category[1] for category in CATEGORY_CHOICES]
         data = []
-        cat_dict = {}
-        for category in CATEGORY_CHOICES:
-            cat_files = UploadFile.objects.filter(category=category[0]).order_by(
+        for cat, title in CATEGORY_CHOICES:
+            cat_files = UploadFile.objects.filter(category=cat).order_by(
                 "priority"
             )
-            cat_dict[category[1]] = cat_files
-            data.append(cat_dict[category[1]])
-        context["categories"] = zip(titles, data)
+            data.append((title, cat_files))
+        context["categories"] = data
 
         if "informatyk" in self.request.user.position:
             context["informatyk"] = True

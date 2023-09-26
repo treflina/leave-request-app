@@ -17,11 +17,9 @@
     <script src="https://kit.fontawesome.com/455e063248.js" crossorigin="anonymous"></script>
 </head>
 <body>
-
-   
     <main>
         <div class ="container reset">
-            <h4>Wprowadź nowe hasło</h4>
+            <p style="font-size: 1.5rem;">Wprowadź nowe hasło</p>
             <div class="form-group">
                 <form class="reset-form" method="POST"> {%csrf_token%}
                     {{form|crispy}}

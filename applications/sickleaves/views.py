@@ -1,3 +1,6 @@
+import logging
+import operator
+from functools import reduce
 import django_filters
 from datetime import date
 from django.urls import reverse_lazy, reverse
@@ -12,16 +15,12 @@ from .models import Sickleave
 from .forms import SickleaveForm
 from .utils import SickleaveNotification, SickAndAnnulalLeaveOverlappedAlertMixin
 
-import logging
 
 logger = logging.getLogger("django")
 
 
 class FilteredListView(ListView):
     filterset_class = None
-    context_object_name = "sickleaves"
-    template_name = "sickleaves/sickleaves.html"
-    login_url = reverse_lazy("users_app:user-login")
 
     def get_queryset(self):
         queryset = Sickleave.objects.all().order_by("-issue_date")
@@ -34,7 +33,7 @@ class FilteredListView(ListView):
         return context
 
 
-class YearFilter(django_filters.FilterSet):
+class SickleavesFilter(django_filters.FilterSet):
     def get_years_choices():
         current_year = date.today().year
         years_choices = tuple(
@@ -44,16 +43,15 @@ class YearFilter(django_filters.FilterSet):
 
     YEARS_CHOICES = get_years_choices()
 
-    issue_year = django_filters.ChoiceFilter(
-        field_name="issue_date",
-        lookup_expr="year",
+    dropdown_field = django_filters.ChoiceFilter(
+        method="filter_year",
         choices=YEARS_CHOICES,
         label="Wybierz rok",
         empty_label="Rok",
         widget=Select(attrs={"class": "form-control"}),
     )
     other_fields = django_filters.CharFilter(
-        method="custom_filter",
+        method="filter_other_fields",
         label="Wyszukaj",
         widget=TextInput(attrs={"class": "form-control", "placeholder": "Wyszukaj..."})
         )
@@ -62,25 +60,39 @@ class YearFilter(django_filters.FilterSet):
         model = Sickleave
         fields = [
             "other_fields",
-            "issue_year"
+            "dropdown_field"
         ]
 
     @staticmethod
-    def custom_filter(qs, name, value):
+    def filter_other_fields(qs, name, value):
+        query_words = value.split()
         return qs.filter(
-            Q(employee__last_name__icontains=value) |
-            Q(employee__first_name__icontains=value) |
+            reduce(
+                operator.and_,
+                (
+                    Q(employee__first_name__icontains=word) |
+                    Q(employee__last_name__icontains=word)
+                    for word in query_words
+                ),
+            ) |
             Q(start_date__icontains=value) |
             Q(end_date__icontains=value) |
             Q(issue_date__icontains=value) |
             Q(additional_info__icontains=value)
         )
 
+    @staticmethod
+    def filter_year(qs, name, value):
+        return qs.filter(
+            Q(start_date__year=value) |
+            Q(end_date__year=value)
+        )
+
 
 class SickleavesListView(FilteredListView):
     """Sick leaves listing page."""
 
-    filterset_class = YearFilter
+    filterset_class = SickleavesFilter
 
     context_object_name = "sickleaves"
     template_name = "sickleaves/sickleaves.html"

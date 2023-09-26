@@ -4,26 +4,25 @@
 
 {% block content %}
 {% include 'includes/navbar.html'%}
-
-
 <div class="container documents mt-5">
     {% for category, documents in categories %}
-    <ul class="mt-5">
-        <h5>{{category}}</h5>
+    <ul class="documents__list mt-5">
+        <p class="documents__heading">{{category}}</p>
         {% for file in documents %}
-        <li class="ml-5">
-            <a href="{{ file.file.url }}" class="file-link">{{ file.description}}</a>
+        <li class="documents__list-item ml-5">
+            <a href="{{ file.file.url }}" class="documents__list-link file-link">{{ file.description}}</a>
             {% if user.is_staff or user.role == "T" or informatyk %}
             <button type="button" class="btn btn-light btn-sm ml-2 delete" data-toggle="modal"
                 data-target="#deleteModal{{file.id}}">✘</button>
             {% endif %}
-        </li> <!-- Modal -->
-        <div class="modal fade" id="deleteModal{{file.id}}" tabindex="-1" aria-labelledby="deleteModalLabel"
+        </li>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal{{file.id}}" tabindex="-1"
             aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Ostrzeżenie</h5>
+                        <p class="modal-title">Ostrzeżenie</p>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -59,10 +58,9 @@
         </div>
         {% endif %}
     </div>
-
     <form method="post" , enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="row">
+        <div class="form-group row">
             <div class="col-lg-3">
                 {{ form.file|as_crispy_field }}
             </div>

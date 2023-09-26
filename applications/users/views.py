@@ -1,3 +1,6 @@
+import django_filters
+import operator
+from functools import reduce
 from datetime import date
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
@@ -14,6 +17,7 @@ from django.views.generic import (
 from django.views.generic.edit import (
     FormView,
 )
+from django.forms.widgets import TextInput
 
 from .forms import (
     UserRegisterForm,
@@ -103,20 +107,56 @@ def update_password(request):
     return render(request, "users/update_password.html", {"form": form})
 
 
+class UsersFilter(django_filters.FilterSet):
+    """Filter used to search data in employees listing views."""
+
+    lookup_fields = django_filters.CharFilter(
+        method="filter_fields",
+        label="Wyszukaj",
+        widget=TextInput(attrs={"class": "form-control", "placeholder": "Wyszukaj..."}),
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "lookup_fields",
+        ]
+
+    @staticmethod
+    def filter_fields(qs, name, value):
+        query_words = value.split()
+        return qs.filter(
+            reduce(
+                operator.and_,
+                (
+                    Q(first_name__icontains=word) | Q(last_name__icontains=word)
+                    for word in query_words
+                ),
+            )
+            | Q(position__icontains=value)
+            | Q(workplace__icontains=value)
+            | Q(additional_info__icontains=value)
+        )
+
+
 class AllEmployeesList(TopManagerPermisoMixin, ListView):
-    """Employees listing page for head/manager"""
+    """Employees listing view for head/manager with notification
+    if an employee should be present at work today."""
 
     template_name = "users/all_employees.html"
     model = User
-    context_object_name = "employees"
+    context_object_name = "all_employees"
     login_url = reverse_lazy("users_app:user-login")
 
+    def get_queryset(self, **kwargs):
+        queryset = User.objects.filter(is_active=True).exclude(username="admin")
+        filter = UsersFilter(self.request.GET, queryset)
+        return filter.qs
+
     def get_context_data(self, **kwargs):
-
-        context = super(AllEmployeesList, self).get_context_data(**kwargs)
-        all_employees = User.objects.filter(is_active=True).exclude(username="admin")
+        context = super().get_context_data(**kwargs)
+        all_employees = self.get_queryset()
         today = date.today()
-
         for employee in all_employees:
             if employee.working_hours == 1.00:
                 employee.working_hours = 1
@@ -124,43 +164,43 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
                 Q(start_date__lte=today)
                 & Q(end_date__gte=today)
                 & Q(employee__id=employee.id)
-            ).all()
-            today_requests = (
-                Request.objects.filter(
-                    Q(start_date__lte=today)
-                    & Q(end_date__gte=today)
-                    & Q(author__id=employee.id)
-                )
-                .exclude(status="odrzucony")
-                .all()
-            )
-
-            if len(today_sick) > 0:
-                if today_sick[0].leave_type == "O":
-                    employee.today_note = "O"
-                elif today_sick[0].leave_type == "K":
-                    employee.today_note = "K"
-                elif today_sick[0].leave_type == "I":
-                    employee.today_note = "I"
-                else:
-                    employee.today_note = "C"
-            elif len(today_requests) != 0:
-                list_req = [tr.leave_type for tr in today_requests]
-                employee.today_note = list_req[0]
+            ).last()
+            today_request = Request.objects.filter(
+                Q(start_date__lte=today)
+                & Q(end_date__gte=today)
+                & Q(author__id=employee.id)
+                & Q(status="zaakceptowany")
+            ).last()
+            if today_sick:
+                employee.today_note = today_sick.leave_type
+            elif today_request:
+                employee.today_note = today_request.leave_type
             else:
                 employee.today_note = "✓"
 
-            add_infolist = ["wych", "rodz", "mac", "rehab", "urlop", "bezpł"]
-            for info in add_infolist:
+            long_absence_list_keywords = [
+                "wych",
+                "rodz",
+                "mac",
+                "rehab",
+                "urlop",
+                "bezpł",
+            ]
+            for info in long_absence_list_keywords:
                 if info in employee.additional_info:
                     employee.today_note = ""
 
         context["all_employees"] = all_employees
+
+        filterset = UsersFilter(self.request.GET, all_employees)
+        context["filterset"] = filterset
         return context
 
 
 class AdminEmployeesList(TopManagerPermisoMixin, ListView):
-    """Employees listing page for admin"""
+    """Employees listing view for HR with information about how many days off they are
+    entitled to, how many duvet days have been taken in the current year.
+    This view contains also a list of ex-employees"""
 
     template_name = "users/admin_all_employees.html"
     model = User
@@ -168,7 +208,6 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
     login_url = reverse_lazy("users_app:user-login")
 
     def get_context_data(self, **kwargs):
-
         context = super(AdminEmployeesList, self).get_context_data(**kwargs)
         employees = User.objects.filter(is_active=True).order_by(
             "-is_active", "last_name", "first_name"
@@ -192,7 +231,7 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
         context["employees"] = employees
 
         exemployees = User.objects.filter(is_active=False).order_by(
-            "-is_active", "last_name", "first_name"
+            "last_name", "first_name"
         )
         context["exemployees"] = exemployees
         return context
@@ -243,8 +282,8 @@ def delete_employee(request, pk):
 
 @login_required(login_url="users_app:user-login")
 def add_annual_leave(request):
-    """Adds all employees annual leave entitlement to their current leave
-    entitlement."""
+    """Tool to add at the beginning of the year all employees annual leave entitlement
+    to their current leave entitlement."""
     for employee in User.objects.filter(is_active=True):
         employee.current_leave += employee.annual_leave
         employee.save()

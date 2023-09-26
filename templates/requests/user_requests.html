@@ -3,18 +3,18 @@
 {% block content %}
 {% include 'includes/navbar.html'%}
 <main>
-    <section class="page-section page-scroll-fix" id="user-leave-requests-holiday">
-        <a href="#user-leave-requests-other" class="circle-link circle-link--1">
+    <section class="pagesection page-scroll-fix" id="user-requests-holiday">
+        <a href="#user-requests-other" class="circle-link circle-link--1">
             <i class="bi bi-arrow-down-circle" title="Przejdź do pozostałych wniosków"></i></a>
             <table class="table">
                 <caption class="table-caption mt-5">Twoje wnioski urlopowe</caption>
                 <thead>
                     <tr>
-                        <th class="content-center" scope="col">Lp.</th>
-                        <th class="content-center" scope="col">Z dnia</th>
+                        <th scope="col">Lp.</th>
+                        <th scope="col">Z dnia</th>
                         <th scope="col">Nazwisko i imię</th>
-                        <th class="content-center" scope="col">Okres</th>
-                        <th scope="col" class="content-center">
+                        <th scope="col">Okres</th>
+                        <th scope="col">
                             L. {% if user.working_hours < 1 %}godzin {%else%}dni {%endif%} </th>
                         {% if request.user.role == "K" or request.user.role == "S" %}<th scope="col">Zastępuje</th>{% endif %}
                         <th scope="col">Status</th>
@@ -24,10 +24,10 @@
                 <tbody>
                     {% for leave_request in user_requests_holiday %}
                     <tr>
-                        <td class="content-center" data-title="Lp.">
+                        <td data-title="Lp.">
                             {{ forloop.counter0|add:user_requests_holiday.start_index }}.
                         </td>
-                        <td class="content-center" data-title="Złożony:">
+                        <td data-title="Złożony:">
                             {{leave_request.created|date:"d.m.y"}}
                         </td>
                         <td data-title="Nazwisko i imię:">
@@ -35,11 +35,11 @@
                             {{leave_request.author.last_name}}
                         </td>
 
-                        <td class="content-center" data-title="Okres">
+                        <td data-title="Okres:">
                             {{leave_request.start_date|date:"d.m.y"}}{% if leave_request.start_date != leave_request.end_date %}- {{leave_request.end_date|date:"d.m.y"}}{% endif %}
                             {% if leave_request.duvet_day == 1 %}(nż<span class="text-danger">*</span>){% endif %}
                         </td>
-                        <td data-title="L. dni:" class="content-center">
+                        <td data-title="L. dni:">
                             {{ leave_request.days}}
                         </td>
                         {% if request.user.role == "K" or request.user.role == "S" %}<td data-title="Zastępuje:">{{leave_request.substitute}}</td>{% endif %}
@@ -62,29 +62,25 @@
                 </tbody>
             </table>
             <div>
-                <p><span class="text-danger">*</span> urlop na żądanie</p>
+                <p class="px-1"><span class="text-danger">*</span> urlop na żądanie</p>
             </div>
         {% if user_requests_holiday %}
-            {% include 'includes/pagination.html' with page_obj=user_requests_holiday %}
+            {% include 'includes/pagination.html' with page_obj=user_requests_holiday id="user-requests-holiday" %}
         {% endif %}
     </section>
-    <section class="page-section page-scroll-fix mt-lg-3 mt-md-1" id="user-leave-requests-other">
-        <a href="#user-leave-requests-holiday" class="circle-link circle-link--2">
-            <i class="bi bi-arrow-up-circle" title="Przejdź do pozostałych wniosków"></i></a>
+    <section class="pagesection page-scroll-fix mb-3" id="user-requests-other">
+        <a href="#user-requests-holiday" class="circle-link circle-link--2">
+            <i class="bi bi-arrow-up-circle" title="Przejdź do wniosków urlopowych"></i></a>
             <table class="table">
-                <caption class="table-caption">Twoje wnioski o dni wolne za pracę w soboty/niedziele/święta</caption>
+                <caption class="table-caption">Twoje wnioski o dni wolne za pracę w soboty/inne</caption>
                 <thead>
                     <tr>
-                        <th class="content-center" scope="col">
-                            Lp.
-                        </th>
-                        <th class="content-center" scope="col">
-                            Z dnia
-                        </th>
+                        <th scope="col">Lp.</th>
+                        <th scope="col">Z dnia</th>
                         <th scope="col">Nazwisko i imię</th>
-                        <th class="content-center" scope="col">Okres</th>
-                        <th class="content-center" scope="col">Rodzaj</th>
-                        <th class="content-center" scope="col">Za pracę dnia</th>
+                        <th scope="col">Okres</th>
+                        <th scope="col">Rodzaj</th>
+                        <th scope="col">Za pracę dnia</th>
                         {% if request.user.role == "K" or request.user.role == "S" %}<th scope="col">Zastępujący</th>{% endif %}
                         <th scope="col">Status</th>
                         <th scope="col"></th>
@@ -132,7 +128,7 @@
                 </tbody>
             </table>
         {% if user_requests_other %}
-            {% include 'includes/pagination2.html' with page_obj2=user_requests_other %}
+            {% include 'includes/pagination2.html' with page_obj2=user_requests_other id="user-requests-other" %}
         {% endif %}
     </section>
 </main>
