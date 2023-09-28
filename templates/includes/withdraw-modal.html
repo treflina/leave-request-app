@@ -1,0 +1,32 @@
+<div class="modal fade" id="withdrawModal{{leave_request.id}}" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <p class="modal-title">
+                    Ostrzeżenie
+                </p>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Czy na pewno chcesz odrzucić wniosek <br />
+                    od {{leave_request.start_date|date:"d.m.y"}}
+                    do {{leave_request.end_date|date:"d.m.y"}}?
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-dismiss="modal">
+                    Wróć</button>
+                <form method="POST" action="{% url 'requests_app:reject_request' leave_request.id %}">
+                    {%csrf_token%}
+                    <button type="submit" class="btn btn-info">
+                        Tak, odrzucam
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

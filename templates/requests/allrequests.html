@@ -6,52 +6,52 @@
 <main>
     {% if requests_received|length > 0 %}
     <section class="pagesection mt-5 mb-3 px-1" id="to_accept">
-            <p class="pagesection__title mb-5">Wnioski otrzymane do zaopiniowania</p>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Lp.</th>
-                            <th scope="col">Złożony</th>
-                            <th scope="col">Nazwisko i imię</th>
-                            <th scope="col" class="content-center">Od</th>
-                            <th scope="col" class="content-center">Do</th>
-                            <th scope="col">L. dni<span class="text-danger">*</span></th>
-                            <th scope="col">Rodzaj<span class="text-danger">**</span></th>
-                            <th scope="col">Zastępuje</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for request in requests_received %}
-                        <tr>
-                            <td data-title="Lp.">{{ forloop.counter0|add:1 }}.</td>
-                            <td data-title="Złożony:" class="content-center">{{request.created|date:"d.m.y"}}</td>
-                            <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
-                                {{request.author.position_addinfo}}</td>
-                            <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
-                            <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
-                            <td data-title="L. dni*:" class="{% if request.days <= 0 %} small-width-hide {% endif %}">
-                                {%if request.leave_type == 'W'%}{{request.days}}{%endif%}</td>
-                            <td data-title="Rodzaj**:">
-                                {{request.leave_type}}{% if request.work_date %} za {{request.work_date|date:"d.m.y"}}{% endif %}{% if request.duvet_day %}
-                                (nż<span class="text-danger">***</span>){% endif %}</td>
-                            <td data-title="Zastępuje:" class="{% if not request.substitute %} small-width-hide {% endif %}">{{request.substitute}}</td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <form method="POST" action="{% url 'requests_app:accept_request' request.id %}">
-                                        {%csrf_token%}
-                                        <button class="btn btn-sm btn-success mr-1" type="submit">Zaakceptuj</button>
-                                    </form>
-                                    <form method="POST" action="{% url 'requests_app:reject_request' request.id %}">
-                                        {%csrf_token%}
-                                        <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <p class="pagesection__title mb-5">Wnioski otrzymane do zaopiniowania</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Lp.</th>
+                        <th scope="col">Złożony</th>
+                        <th scope="col">Nazwisko i imię</th>
+                        <th scope="col" class="content-center">Od</th>
+                        <th scope="col" class="content-center">Do</th>
+                        <th scope="col">L. dni<span class="text-danger">*</span></th>
+                        <th scope="col">Rodzaj<span class="text-danger">**</span></th>
+                        <th scope="col">Zastępuje</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests_received %}
+                    <tr>
+                        <td data-title="Lp.">{{ forloop.counter0|add:1 }}.</td>
+                        <td data-title="Złożony:" class="content-center">{{request.created|date:"d.m.y"}}</td>
+                        <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
+                            {{request.author.position_addinfo}}</td>
+                        <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
+                        <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
+                        <td data-title="L. dni*:" class="{% if request.days <= 0 %} small-width-hide {% endif %}">
+                            {%if request.leave_type == 'W'%}{{request.days}}{%endif%}</td>
+                        <td data-title="Rodzaj**:">
+                            {{request.leave_type}}{% if request.work_date %} za {{request.work_date|date:"d.m.y"}}{% endif %}{% if request.duvet_day %}
+                            (nż<span class="text-danger">***</span>){% endif %}</td>
+                        <td data-title="Zastępuje:" class="{% if not request.substitute %} small-width-hide {% endif %}">{{request.substitute}}</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <form method="POST" action="{% url 'requests_app:accept_request' request.id %}">
+                                    {%csrf_token%}
+                                    <button class="btn btn-sm btn-success mr-1" type="submit">Zaakceptuj</button>
+                                </form>
+                                <form method="POST" action="{% url 'requests_app:reject_request' request.id %}">
+                                    {%csrf_token%}
+                                    <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
 
             <div class="px-1"><p class="mb-1"><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                 czasu pracy.</p>
@@ -61,80 +61,83 @@
             </div>
         </section>
          {% endif %}
+        <section class="pagesection mt-sm-4 mt-md-4 mt-lg-5 px-1" id="holiday">
+            <p class="pagesection__title">Wnioski pracowników</p>
+            {% if requests_received|length == 0 %}<p class="px-1 text-center font-italic">Brak nowych wniosków otrzymanych do zaopiniowania.</p>{% endif %}
+            <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-1" method="get">
+                <div class="search-box mx-1">
+                    <label class="sr-only" for="other_fields">{{ filterset.form.other_fields.label }}</label>
+                    {{ filterset.form.other_fields }}
+                </div>
+                <div class="input-box search-box">
+                    <label class="sr-only" for="dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
+                    {{ filterset.form.dropdown_field }}
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="mb-0 pr-1 pl-2" for="start_date">{{ filterset.form.start_date.label }}</label>
+                    {{ filterset.form.start_date }}
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="mb-0 pr-1 pl-2" for="end_date">{{ filterset.form.end_date.label }}</label>
+                    {{ filterset.form.end_date }}
+                </div>
+                <button class="btn btn-secondary ml-1 mr-2 my-1" type="submit">Szukaj</button>
+            </form>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col" class="text-align-cl">Lp.</th>
+                        <th scope="col" class="">Z dnia</th>
+                        <th scope="col">Nazwisko i imię</th>
+                        <th scope="col" class="">Okres</th>
+                        <th scope="col" class="">Rodzaj<span class="text-danger">**</span></th>
+                        <th scope="col" class="text-align-cl">L.&nbsp;dni<span class="text-danger">*</span></th>
+                        <th scope="col">Zastępuje</th>
+                        <th scope="col">Status</th>
 
-      <section class="pagesection mt-sm-4 mt-md-4 mt-lg-5 px-1" id="holiday">
-                <p class="pagesection__title">Wnioski pracowników</p>
-                {% if requests_received|length == 0 %}<p class="px-1 text-center font-italic">Brak nowych wniosków otrzymanych do zaopiniowania.</p>{% endif %}
-                <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-1" method="get">
-                    <div class="search-box mx-1">
-                        <label class="sr-only" for="other_fields">{{ filterset.form.other_fields.label }}</label>
-                        {{ filterset.form.other_fields }}
-                    </div>
-                    <div class="input-box search-box">
-                        <label class="sr-only" for="dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
-                        {{ filterset.form.dropdown_field }}
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <label class="mb-0 pr-1 pl-2" for="start_date">{{ filterset.form.start_date.label }}</label>
-                        {{ filterset.form.start_date }}
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <label class="mb-0 pr-1 pl-2" for="end_date">{{ filterset.form.end_date.label }}</label>
-                        {{ filterset.form.end_date }}
-                    </div>
-                    <button class="btn btn-secondary ml-1 mr-2 my-1" type="submit">Szukaj</button>
-                </form>
-
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col" class="text-align-cl">Lp.</th>
-                            <th scope="col" class="">Z dnia</th>
-                            <th scope="col">Nazwisko i imię</th>
-                            <th scope="col" class="">Okres</th>
-                            <th scope="col" class="">Rodzaj<span class="text-danger">**</span></th>
-                            <th scope="col" class="text-align-cl">L.&nbsp;dni<span class="text-danger">*</span></th>
-                            <th scope="col">Zastępuje</th>
-                            <th scope="col">Status</th>
-
-                        </tr>
-                    </thead>
-                    <tbody class="myTable">
-                        {% for leave_request in requests_holiday %}
-                        <tr>
-                            <td data-title="Lp.">{{ forloop.counter0|add:page_obj.start_index }}.</td>
-                            <td data-title="Z dnia:" class="">{{leave_request.created|date:"d.m.y"}}</td>
-                            <td data-title="Nazwisko i imię:">{{leave_request.author.last_name}}
-                                {{leave_request.author.first_name}} {{leave_request.author.position_addinfo}}
-                            </td>
-                            <td data-title="Okres:" class="">{{leave_request.start_date|date:"d.m.y"}} {% if leave_request.start_date != leave_request.end_date  %} - {{leave_request.end_date|date:"d.m.y"}}{% endif %}
-                            </td>
-                            <td data-title="Rodzaj**:" class="">{{leave_request.leave_type}}{% if leave_request.work_date %} za {{leave_request.work_date|date:"d.m.y"}}{% endif %}
-                                {% if leave_request.duvet_day %} (nż<span class="text-danger">***</span>){% endif %}</td>
-                            <td data-title="L. dni*:" class="text-align-cl {% if leave_request.days <= 0 %} small-width-hide {% endif %}">{% if leave_request.days > 0 %}{{leave_request.days}} {% endif %}</td>
-                            <td data-title="Zastępuje:" class="{% if not leave_request.substitute %} small-width-hide {% endif %}">{% if leave_request.substitute %}{{leave_request.substitute}} {% endif %}</td>
-                            <td data-title="">
-                                 {% if leave_request.status == 'oczekujący' and leave_request.author != request.user %}
-                                <div class="btn-group btn-group-sm">
-                                    <form method="POST" action="{% url 'requests_app:accept_request' leave_request.id %}">
-                                        {%csrf_token%}
-                                        <button class="btn btn-sm btn-success mr-1" type="submit">Zaakceptuj</button>
-                                    </form>
-                                    <form method="POST" action="{% url 'requests_app:reject_request' leave_request.id %}">
-                                        {%csrf_token%}
-                                        <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
-                                    </form>
-                                </div>
-                                {% elif leave_request.status == 'zaakceptowany' or leave_request.status == 'odrzucony' %}
-                                {{leave_request.status}} {{leave_request.signed_by}}
-                                {%else%}
-                                {{leave_request.status}}
-                                {%endif%}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    </tr>
+                </thead>
+                <tbody class="myTable">
+                    {% for leave_request in requests_holiday %}
+                    <tr>
+                        <td data-title="Lp.">{{ forloop.counter0|add:page_obj.start_index }}.</td>
+                        <td data-title="Z dnia:" class="">{{leave_request.created|date:"d.m.y"}}</td>
+                        <td data-title="Nazwisko i imię:">{{leave_request.author.last_name}}
+                            {{leave_request.author.first_name}} {{leave_request.author.position_addinfo}}
+                        </td>
+                        <td data-title="Okres:" class="">{{leave_request.start_date|date:"d.m.y"}}
+                            {% if leave_request.start_date != leave_request.end_date  %} - {{leave_request.end_date|date:"d.m.y"}}{% endif %}
+                        </td>
+                        <td data-title="Rodzaj**:" class="">{{leave_request.leave_type}}
+                            {% if leave_request.work_date %} za {{leave_request.work_date|date:"d.m.y"}}{% endif %}
+                            {% if leave_request.duvet_day %} (nż<span class="text-danger">***</span>){% endif %}</td>
+                        <td data-title="L. dni*:" class="text-align-cl {% if leave_request.days <= 0 %} small-width-hide {% endif %}">
+                            {% if leave_request.days > 0 %}{{leave_request.days}} {% endif %}</td>
+                        <td data-title="Zastępuje:" class="{% if not leave_request.substitute %} small-width-hide {% endif %}">
+                            {% if leave_request.substitute %}{{leave_request.substitute}} {% endif %}</td>
+                        <td data-title="">
+                            {% if leave_request.status == 'oczekujący' and leave_request.author != request.user %}
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-sm btn-success mr-1" data-toggle="modal"
+                                    data-target="#acceptModal{{leave_request.id}}">
+                                    Zaakceptuj
+                                </button>
+                                {% include 'includes/accept-modal.html' %}
+                                <button type="button" class="btn btn-sm btn-danger mr-1" data-toggle="modal" data-target="#withdrawModal{{leave_request.id}}">
+                                    Odrzuć
+                                </button>
+                                {% include 'includes/withdraw-modal.html' %}
+                            </div>
+                            {% elif leave_request.status == 'zaakceptowany' or leave_request.status == 'odrzucony' %}
+                            {{leave_request.status}} {{leave_request.signed_by}}
+                            {%else%}
+                            {{leave_request.status}}
+                            {%endif%}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
             <div class="px-1">
                 <p class="mb-1"><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                     czasu pracy.</p>

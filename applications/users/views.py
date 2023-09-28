@@ -35,7 +35,7 @@ class UserRegisterView(TopManagerPermisoMixin, FormView):
 
     template_name = "users/register.html"
     form_class = UserRegisterForm
-    success_url = reverse_lazy("users_app:user-register")
+    success_url = reverse_lazy("users_app:admin-all-employees")
     login_url = reverse_lazy("users_app:user-login")
 
     def form_valid(self, form):
@@ -243,6 +243,7 @@ class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
     model = User
     template_name = "users/update_employee.html"
     login_url = reverse_lazy("users_app:user-login")
+    success_url = reverse_lazy("users_app:admin-all-employees")
 
     fields = [
         "username",
@@ -263,8 +264,6 @@ class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
         "is_staff",
         "additional_info",
     ]
-
-    success_url = reverse_lazy("users_app:admin-all-employees")
 
     def get_context_data(self, **kwargs):
         context = super(EmployeeUpdateView, self).get_context_data(**kwargs)

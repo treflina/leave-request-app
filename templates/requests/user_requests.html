@@ -50,7 +50,7 @@
                                 data-target="#deleteModal{{leave_request.id}}">
                                 Wycofaj
                             </button>
-                            {% include 'includes/delete_modal.html' %}
+                            {% include 'includes/delete-modal.html' %}
                         </td>
                         {% elif leave_request.status == "zaakceptowany" or leave_request.status == "odrzucony" %}
                         <td class="table-last-row">przez {{leave_request.signed_by}}</td>
@@ -116,7 +116,7 @@
                                 data-target="#deleteModal{{leave_request.id}}">
                                 Wycofaj
                             </button>
-                            {% include 'includes/delete_modal.html' %}
+                            {% include 'includes/delete-modal.html' %}
                         </td>
                         {% elif leave_request.status == "zaakceptowany" or leave_request.status == "odrzucony" %}
                         <td class="table-last-row">przez {{leave_request.signed_by}}</td>

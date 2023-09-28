@@ -2,7 +2,7 @@ from .models import Request
 
 
 def number_requests_received(request):
-    """It counts employees requests received by user that are still not accepted or
+    """Count employees requests received by user that are still not accepted or
     rejected."""
     if request.user.is_authenticated:
         return {
