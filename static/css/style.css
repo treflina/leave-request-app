@@ -20,37 +20,6 @@ body {
   padding-top: 76px;
 }
 
-.modal-title {
-  font-weight: 500;
-  font-size: 1.25rem;
-}
-
-.search-info-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  flex-wrap: wrap;
-  background-color: #dcd5d5;
-}
-
-.btn-violet {
-  background-color: #b79ce3;
-  transition: background-color 0.3s;
-}
-.btn-violet:hover, .btn-violet:active, .btn-violet:focus {
-  background-color: #c5afe9;
-}
-
-.btn-lightblue {
-  background-color: #C7E1F2;
-  transition: background-color 0.3s;
-}
-.btn-lightblue:hover, .btn-lightblue:active, .btn-lightblue:focus {
-  background-color: #72bef1;
-}
-
 .sr-only {
   clip: rect(1px, 1px, 1px, 1px);
   -webkit-clip-path: inset(50%);
@@ -197,8 +166,39 @@ body {
   padding-right: 15px;
 }
 
+.search-info-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  flex-wrap: wrap;
+  background-color: #dcd5d5;
+}
+
+.btn-violet {
+  background-color: #b79ce3;
+  transition: background-color 0.3s;
+}
+.btn-violet:hover, .btn-violet:active, .btn-violet:focus {
+  background-color: #c5afe9;
+}
+
+.btn-lightblue {
+  background-color: #C7E1F2;
+  transition: background-color 0.3s;
+}
+.btn-lightblue:hover, .btn-lightblue:active, .btn-lightblue:focus {
+  background-color: #72bef1;
+}
+
 .hide {
   display: none;
+}
+
+.modal-title {
+  font-weight: 500;
+  font-size: 1.25rem;
 }
 
 .text-align-cl {
@@ -222,8 +222,10 @@ body {
 
 .table-caption {
   caption-side: top;
+  width: 100vw;
+  max-width: 100%;
+  margin: 0 auto;
   font-size: 1.6rem;
-  width: 100%;
   color: black;
   text-align: center;
 }

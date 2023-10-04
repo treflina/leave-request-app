@@ -256,8 +256,10 @@ body {
 
 .table-caption {
     caption-side: top;
+    width: 100vw;
+    max-width: 100%;
+    margin: 0 auto;
     font-size: 1.6rem;
-    width: 100%;
     color: black;
     text-align: center;
 }

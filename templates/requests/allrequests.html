@@ -6,7 +6,7 @@
 <main>
     {% if requests_received|length > 0 %}
     <section class="pagesection mt-5 mb-3 px-1" id="to_accept">
-        <p class="pagesection__title mb-5">Wnioski otrzymane do zaopiniowania</p>
+        <p class="pagesection__title mb-2 mb-sm-3 mb-md-4 mb-lg-5">Wnioski otrzymane do zaopiniowania</p>
             <table class="table">
                 <thead>
                     <tr>
@@ -61,7 +61,7 @@
             </div>
         </section>
          {% endif %}
-        <section class="pagesection mt-sm-4 mt-md-4 mt-lg-5 px-1" id="holiday">
+        <section class="pagesection mt-5" id="holiday">
             <p class="pagesection__title">Wnioski pracowników</p>
             {% if requests_received|length == 0 %}<p class="px-1 text-center font-italic">Brak nowych wniosków otrzymanych do zaopiniowania.</p>{% endif %}
             <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-1" method="get">
