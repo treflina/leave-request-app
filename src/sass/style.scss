@@ -256,7 +256,7 @@ body {
 
 .table-caption {
     caption-side: top;
-    width: 100vw;
+    width: max-content;
     max-width: 100%;
     margin: 0 auto;
     font-size: 1.6rem;
@@ -362,6 +362,10 @@ body {
 
     .table td {
         padding-left: 40%;
+    }
+
+    .table-caption {
+        width: 100vw;
     }
 }
 

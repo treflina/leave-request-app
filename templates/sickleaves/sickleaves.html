@@ -18,12 +18,12 @@
             <div class="search-info-box mt-4 mb-2 py-1">
                 <form class="form-search filter-dropdown-form d-flex justify-content-center align-items-center" method="get" >{%csrf_token%}
                     <div class="search-box mx-1">
-                        <label class="sr-only" for="other_fields">{{ filterset.form.other_fields.label }}</label>
+                        <label class="sr-only" for="id_other_fields">{{ filterset.form.other_fields.label }}</label>
                         {{ filterset.form.other_fields }}
                     </div>
                     <div class="input-box search-box">
-                        <label class="sr-only" for="dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
-                        {{ filterset.form.yeardropdown_field }}
+                        <label class="sr-only" for="id_dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
+                        {{ filterset.form.dropdown_field }}
                     </div>
                     <button class="btn btn-violet ml-1 mr-2 my-1" type="submit">Szukaj</button>
                 </form>
@@ -103,3 +103,6 @@
 {%include 'includes/pagination.html'%}
 </section>
 {% endblock content %}
+{% block extra_js %}
+<script src="{% static 'js/forms-dropdown.js' %}"></script>
+{% endblock extra_js %}
