@@ -128,6 +128,8 @@ EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = get_secret("EMAIL_PORT")
 
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR.child("static")]
 STATIC_ROOT = BASE_DIR.child("staticfiles")
