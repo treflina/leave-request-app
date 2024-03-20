@@ -1,5 +1,6 @@
 import django_filters
 import operator
+import json
 from functools import reduce
 from datetime import date
 from django.shortcuts import render
@@ -8,7 +9,8 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from django.views.decorators.http import require_POST
 from django.views.generic import (
     View,
     ListView,
@@ -25,9 +27,11 @@ from .forms import (
     UpdatePasswordForm,
 )
 from .models import User
+from webpush.models import PushInformation
 from applications.requests.models import Request
 from applications.sickleaves.models import Sickleave
 from applications.users.mixins import TopManagerPermisoMixin
+
 
 
 class UserRegisterView(TopManagerPermisoMixin, FormView):
@@ -287,3 +291,21 @@ def add_annual_leave(request):
         employee.current_leave += employee.annual_leave
         employee.save()
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
+
+
+
+@require_POST
+def subscription_check(request):
+    """Needed in case one user is subscribed to different notification groups."""
+    try:
+        post_data = json.loads(request.body.decode("utf-8"))
+        subscription_endpoint = post_data["subscription"]["endpoint"]
+        group = post_data["group"]
+    except (ValueError, KeyError):
+        return HttpResponse(status=400)
+
+    if PushInformation.objects.filter(
+        subscription__endpoint=subscription_endpoint, group=group, user=request.user
+    ).exists():
+        return HttpResponse(status=200)
+    return HttpResponse(status=240)

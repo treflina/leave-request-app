@@ -26,4 +26,5 @@ urlpatterns = [
         views.add_annual_leave,
         name="add_annual_leave",
     ),
+    path("subscription-check/", views.subscription_check, name="subscription-check"),
 ]

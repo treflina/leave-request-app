@@ -4,6 +4,8 @@ import django_filters
 
 from functools import reduce
 from simple_history.utils import update_change_reason
+from webpush.utils import send_to_subscription
+from webpush import send_user_notification
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
@@ -107,6 +109,19 @@ class RequestFormView(LoginRequiredMixin, FormView):
             notification.send_notification()
         except Exception:
             logger.error("Email request notification not sent", exc_info=True)
+
+        try:
+            payload = {
+                "head": "Wniosek został złożony",
+                "body": f"Wniosek ({leave_type}) został wysłany do zaopiniowania do {send_to_person}"
+            }
+            user = self.request.user
+            send_user_notification(user=user, payload=payload, ttl=1000)
+            print("sent")
+
+        except Exception:
+            logger.error("Notification was not sent", exc_info=True)
+            print("not sent")
 
         return super(RequestFormView, self).form_valid(form)
 
