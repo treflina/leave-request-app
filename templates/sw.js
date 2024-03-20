@@ -20,6 +20,7 @@ self.addEventListener('push', function(event) {
     self.registration.showNotification(head, {
       body: body,
       icon: 'static/img/icons/apple-icon-180.png',
+      badge: 'static/img/icons/mbpbadge.png',
       data: {url: url}
     })
   );

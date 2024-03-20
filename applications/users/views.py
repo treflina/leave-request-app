@@ -33,7 +33,6 @@ from applications.sickleaves.models import Sickleave
 from applications.users.mixins import TopManagerPermisoMixin
 
 
-
 class UserRegisterView(TopManagerPermisoMixin, FormView):
     """Employee register form page."""
 
@@ -293,19 +292,16 @@ def add_annual_leave(request):
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
 
 
-
 @require_POST
 def subscription_check(request):
-    """Needed in case one user is subscribed to different notification groups."""
     try:
         post_data = json.loads(request.body.decode("utf-8"))
         subscription_endpoint = post_data["subscription"]["endpoint"]
-        group = post_data["group"]
     except (ValueError, KeyError):
         return HttpResponse(status=400)
 
     if PushInformation.objects.filter(
-        subscription__endpoint=subscription_endpoint, group=group, user=request.user
+        subscription__endpoint=subscription_endpoint, user=request.user
     ).exists():
         return HttpResponse(status=200)
     return HttpResponse(status=240)

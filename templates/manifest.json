@@ -1,7 +1,7 @@
 {
-  "short_name": "eTurawa",
-  "name": "eTurawa",
-  "description": "Aplikacja Mieszkańca",
+  "short_name": "Pracownik MBP",
+  "name": "Pracownik MBP",
+  "description": "Aplikacja Pracownika MBP",
   "icons": [
     {
         "src": "/static/img/icons/manifest-icon-192.maskable.png",

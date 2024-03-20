@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-20 08:55+0100\n"
+"POT-Creation-Date: 2024-03-20 13:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,15 +76,15 @@ msgstr "Błąd podczas wyłączania powiadomień."
 
 #: .\static\js\app.js:274
 msgid "Install App"
-msgstr "Zainstaluj aplikację."
+msgstr "Zainstaluj aplikację"
 
 #: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:49
 #: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:173
 msgid "Subscribe to Push Messaging"
-msgstr "Włącz powiadomienia."
+msgstr "Włącz powiadomienia"
 
 #: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:73
 #: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:120
 #: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:181
 msgid "Unsubscribe from Push Messaging"
-msgstr "Wyłącz powiadomienia."
+msgstr "Wyłącz powiadomienia"

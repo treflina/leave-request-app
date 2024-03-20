@@ -92,17 +92,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "wnioski.wsgi.application"
 
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": get_secret("DB_NAME"),
-        "USER": get_secret("DB_USER"),
-        "PASSWORD": get_secret("DB_PASSWORD"),
-        "HOST": "localhost",
-        "PORT": "3306",
+if get_secret("DEVIL"):
+        DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": get_secret("DB_NAME"),
+            "USER": get_secret("DB_USER"),
+            "PASSWORD": get_secret("DB_PASSWORD"),
+            "HOST": get_secret("DB_HOST"),
+            "PORT": "",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": get_secret("DB_NAME"),
+            "USER": get_secret("DB_USER"),
+            "PASSWORD": get_secret("DB_PASSWORD"),
+            "HOST": "localhost",
+            "PORT": "3306",
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -190,6 +201,8 @@ LOGGING = {
 AUTH_USER_MODEL = "users.User"
 
 LANGUAGE_CODE = "pl"
+
+LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
 TIME_ZONE = "Europe/Warsaw"
 

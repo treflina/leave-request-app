@@ -65,31 +65,23 @@ window.addEventListener("load", function () {
         // We need to get subscription state for push notifications and send the information to server
         reg.pushManager.getSubscription().then(function (subscription) {
             //
-            subBtn.isPushEnabled = false;
             if (subscription) {
-                // subBtn.isPushEnabled = false;
-                //
-                btnText = subBtn.querySelector(".btn-text");
-                btnText.textContent = btnText.textContent =
-                    gettext("Turn off notifications");
-                subBtn.setAttribute("aria-pressed", true);
-                subBtn.disabled = false;
-                subBtn.isPushEnabled = true;
+                subBtn.isPushEnabled = false;
 
-                // checkSubscription(
-                //     subscription,
-                //     subBtn,
-                //     function (response) {
-                //         if (response.status === 200) {
-                //             btnText = subBtn.querySelector(".btn-text");
-                //             btnText.textContent = btnText.textContent =
-                //                 gettext("Turn off notifications");
-                //             subBtn.setAttribute("aria-pressed", true);
-                //             subBtn.disabled = false;
-                //             subBtn.isPushEnabled = true;
-                //         }
-                //     }
-                // );
+                checkSubscription(
+                    subscription,
+                    subBtn,
+                    function (response) {
+                        if (response.status === 200) {
+                            btnText = subBtn.querySelector(".btn-text");
+                            btnText.textContent = btnText.textContent =
+                                gettext("Turn off notifications");
+                            subBtn.setAttribute("aria-pressed", true);
+                            subBtn.disabled = false;
+                            subBtn.isPushEnabled = true;
+                        }
+                    }
+                );
             }
         });
 
@@ -272,7 +264,7 @@ window.addEventListener("beforeinstallprompt", (e) => {
     const installButton = document.createElement("button");
 
     installButton.textContent = gettext("Install App");
-    installButton.classList.add("install-btn", "btn", "btn-dark");
+    installButton.classList.add("install-btn", "btn", "btn-dark", "mb-4");
 
     installButton.addEventListener("click", async () => {
         if (deferredPrompt !== null) {

@@ -24,9 +24,7 @@ class ModelTest(TestCase):
             get_user_model().objects.create_user("", "test123")
 
     def test_new_user_with_already_existing_username_should_fail(self):
-        get_user_model().objects.create_user(
-            username="test1", password="testpassword1"
-        )
+        get_user_model().objects.create_user(username="test1", password="testpassword1")
         with self.assertRaises(IntegrityError):
             get_user_model().objects.create_user(
                 username="test1", password="testpassword2"
