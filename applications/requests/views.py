@@ -359,10 +359,10 @@ def reject_request(request, pk):
     try:
         payload = {
             "head": "Wniosek został odrzucony",
-            "body": f"""Wniosek ({request_to_accept.leave_type}) {request_to_accept.start_date} \
-do {request_to_accept.end_date} został odrzucony.""",
+            "body": f"""Wniosek ({request_to_reject.leave_type}) {request_to_reject.start_date} \
+do {request_to_reject.end_date} został odrzucony.""",
         }
-        employee = request_to_accept.author
+        employee = request_to_reject.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
 
     except Exception:
