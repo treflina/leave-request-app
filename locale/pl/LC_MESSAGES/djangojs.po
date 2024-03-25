@@ -1,0 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-03-20 13:38+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+
+#: .\static\js\app.js:25
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:31
+msgid "Service workers are not supported in your browser."
+msgstr "Powiadomienia nie są obsługiwane w Twojej przeglądarce."
+
+#: .\static\js\app.js:37
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:40
+msgid "Showing notifications are not supported in your browser."
+msgstr "Wysyłanie powiadomień jest niedostępne w Twojej przeglądarce."
+
+#: .\static\js\app.js:50
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:51
+msgid "Push notifications are blocked by your browser."
+msgstr "Twoja przeglądarka blokuje wysyłanie powiadomień."
+
+#: .\static\js\app.js:60
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:60
+msgid "Push notifications are not available in your browser."
+msgstr "Powiadomienia nie są obsługiwane w Twojej przeglądarce."
+
+#: .\static\js\app.js:74 .\static\js\app.js:153
+msgid "Turn off notifications"
+msgstr "Wyłącz powiadomienia"
+
+#: .\static\js\app.js:123
+msgid "Turn on notifications"
+msgstr "Włącz powiadomienia"
+
+#: .\static\js\app.js:160
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:76
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:123
+msgid "Successfully subscribed to push notifications."
+msgstr "Wysyłanie powiadomień zostało włączone."
+
+#: .\static\js\app.js:169
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:129
+msgid "Error while subscribing to push notifications."
+msgstr "Błąd podczas włączania powiadomień."
+
+#: .\static\js\app.js:183
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:161
+msgid "Subscription is not available."
+msgstr "Usługa niedostępna."
+
+#: .\static\js\app.js:198 .\static\js\app.js:214
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:174
+msgid "Successfully unsubscribed from push notifications."
+msgstr "Wyłączono wysyłanie powiadomień."
+
+#: .\static\js\app.js:205
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:182
+msgid "Error while unsubscribing from push notifications."
+msgstr "Błąd podczas wyłączania powiadomień."
+
+#: .\static\js\app.js:274
+msgid "Install App"
+msgstr "Zainstaluj aplikację"
+
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:49
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:173
+msgid "Subscribe to Push Messaging"
+msgstr "Włącz powiadomienia"
+
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:73
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:120
+#: .\venv\Lib\site-packages\webpush\static\webpush\webpush.js:181
+msgid "Unsubscribe from Push Messaging"
+msgstr "Wyłącz powiadomienia"

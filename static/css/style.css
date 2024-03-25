@@ -51,6 +51,7 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+
 .pagesection__title {
   font-size: 1.6rem;
   text-align: center;
@@ -75,6 +76,7 @@ body {
 }
 .welcome__text-info {
   font-size: 2.5rem;
+  line-height: 1.1;
 }
 .welcome__text-info span {
   margin: 0 10px;
@@ -82,8 +84,8 @@ body {
   color: green;
 }
 .welcome__doclink-img {
-  width: 100px;
-  height: 80px;
+  width: 90px;
+  height: 70px;
 }
 .welcome__doclink-title {
   font-size: 0.6em;
@@ -156,14 +158,30 @@ body {
   z-index: 10;
 }
 
+.navbar-wrapper {
+  max-width: 1350px;
+}
+
 .nav-link {
   font-size: 1.2rem;
+  display: inline-block;
+  text-align: center;
+}
+
+.nav-notification {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 20px;
+  background-color: orange;
 }
 
 .logo-img {
   height: 50px;
   width: auto;
-  padding-right: 15px;
+  padding-right: 8px;
 }
 
 .search-info-box {
@@ -273,8 +291,8 @@ body {
   /* Hide table headers  */
   thead tr {
     position: absolute;
-    top: -9999px;
-    left: -9999px;
+    top: -9998px;
+    left: -9998px;
   }
   tr {
     border: 1px solid #ccc;
@@ -319,4 +337,130 @@ body {
   .palm {
     display: none;
   }
+}
+.webpush-msgbox {
+  height: 1.4rem;
+  margin-left: auto;
+}
+
+.webpush-message {
+  display: none;
+  margin-left: auto;
+  font-size: 1.4rem;
+}
+
+.Toggle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  gap: 1ch;
+}
+
+button.Toggle {
+  margin-left: auto;
+  border: 0;
+  padding: 0;
+  background-color: transparent;
+  font: inherit;
+}
+
+.Toggle__input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.Toggle__display {
+  --offset: 0.25em;
+  --diameter: 1.8em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-around;
+  box-sizing: content-box;
+  width: calc(var(--diameter) * 2 + var(--offset) * 2);
+  height: calc(var(--diameter) + var(--offset) * 2);
+  border: 0.1em solid rgba(0, 0, 0, 0.2);
+  position: relative;
+  border-radius: 100vw;
+  background-color: #fbe4e2;
+  transition: 250ms;
+}
+
+.Toggle__display::before {
+  content: "";
+  z-index: 2;
+  position: absolute;
+  top: 50%;
+  left: var(--offset);
+  box-sizing: border-box;
+  width: var(--diameter);
+  height: var(--diameter);
+  border: 0.1em solid rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  background-color: white;
+  transform: translate(0, -50%);
+  will-change: transform;
+  transition: inherit;
+}
+
+.Toggle:focus .Toggle__display,
+.Toggle__input:focus + .Toggle__display {
+  outline: 1px dotted #212121;
+  outline: 1px auto -webkit-focus-ring-color;
+  outline-offset: 2px;
+}
+
+.Toggle:focus,
+.Toggle:focus:not(:focus-visible) .Toggle__display,
+.Toggle__input:focus:not(:focus-visible) + .Toggle__display {
+  outline: 0;
+}
+
+.Toggle[aria-pressed=true] .Toggle__display,
+.Toggle__input:checked + .Toggle__display {
+  background-color: #e3f5eb;
+}
+
+.Toggle[aria-pressed=true] .Toggle__display::before,
+.Toggle__input:checked + .Toggle__display::before {
+  transform: translate(100%, -50%);
+}
+
+.Toggle[disabled] .Toggle__display,
+.Toggle__input:disabled + .Toggle__display {
+  opacity: 0.6;
+  filter: grayscale(40%);
+  cursor: not-allowed;
+}
+
+[dir=rtl] .Toggle__display::before {
+  left: auto;
+  right: var(--offset);
+}
+
+[dir=rtl] .Toggle[aria-pressed=true] + .Toggle__display::before,
+[dir=rtl] .Toggle__input:checked + .Toggle__display::before {
+  transform: translate(-100%, -50%);
+}
+
+.Toggle__icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  color: inherit;
+  fill: currentcolor;
+  vertical-align: middle;
+  overflow: hidden;
+}
+
+.Toggle__icon--cross {
+  color: #e74c3c;
+  font-size: 85%;
+}
+
+.Toggle__icon--checkmark {
+  color: #1fb978;
 }/*# sourceMappingURL=style.css.map */

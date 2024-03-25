@@ -4,6 +4,8 @@ import django_filters
 
 from functools import reduce
 from simple_history.utils import update_change_reason
+from webpush.utils import send_to_subscription
+from webpush import send_user_notification
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
@@ -107,6 +109,19 @@ class RequestFormView(LoginRequiredMixin, FormView):
             notification.send_notification()
         except Exception:
             logger.error("Email request notification not sent", exc_info=True)
+
+        try:
+            payload = {
+                "head": "Nowy wniosek do zaopiniowania",
+                "body": f"""{user} prosi o akceptację wniosku ({leave_type}) \
+    od {start_date} do {end_date}.""",
+                "url": reverse("requests_app:allrequests"),
+            }
+            recipient = send_to_person
+            send_user_notification(user=recipient, payload=payload, ttl=1000)
+
+        except Exception:
+            logger.error("Notification was not sent", exc_info=True)
 
         return super(RequestFormView, self).form_valid(form)
 
@@ -240,12 +255,12 @@ class RequestsFilter(django_filters.FilterSet):
             reduce(
                 operator.and_,
                 (
-                    Q(author__first_name__icontains=word) |
-                    Q(author__last_name__icontains=word)
+                    Q(author__first_name__icontains=word)
+                    | Q(author__last_name__icontains=word)
                     for word in query_words
                 ),
-            ) |
-            Q(start_date__icontains=value)
+            )
+            | Q(start_date__icontains=value)
             | Q(end_date__icontains=value)
             | Q(work_date__icontains=value)
             | Q(status__icontains=value)
@@ -316,6 +331,17 @@ def accept_request(request, pk):
     request_to_accept.status = "zaakceptowany"
     request_to_accept.signed_by = user.first_name + " " + user.last_name
     request_to_accept.save(update_fields=["status", "signed_by"])
+    try:
+        payload = {
+            "head": "Wniosek został zaakceptowany",
+            "body": f"""Wniosek ({request_to_accept.leave_type}) {request_to_accept.start_date} \
+do {request_to_accept.end_date} został zaakceptowany.""",
+        }
+        employee = request_to_accept.author
+        send_user_notification(user=employee, payload=payload, ttl=1000)
+
+    except Exception:
+        logger.error("Notification was not sent", exc_info=True)
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 
 
@@ -330,6 +356,17 @@ def reject_request(request, pk):
     request_to_reject.status = "odrzucony"
     request_to_reject.signed_by = user.first_name + " " + user.last_name
     request_to_reject.save(update_fields=["status", "signed_by"])
+    try:
+        payload = {
+            "head": "Wniosek został odrzucony",
+            "body": f"""Wniosek ({request_to_reject.leave_type}) {request_to_reject.start_date} \
+do {request_to_reject.end_date} został odrzucony.""",
+        }
+        employee = request_to_reject.author
+        send_user_notification(user=employee, payload=payload, ttl=1000)
+
+    except Exception:
+        logger.error("Notification was not sent", exc_info=True)
 
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 

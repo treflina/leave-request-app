@@ -14,17 +14,15 @@ class RequestManager(models.Manager):
 
     # managers for listing user requests
     def user_requests_holiday(self, user):
-        result = self.filter(
-            Q(author__id=user.id)
-            & Q(leave_type="W")
-        ).order_by("-created")
+        result = self.filter(Q(author__id=user.id) & Q(leave_type="W")).order_by(
+            "-created"
+        )
         return result
 
     def user_requests_other(self, user):
-        result = self.filter(
-            Q(author__id=user.id)
-            & (~Q(leave_type="W"))
-        ).order_by("-created")
+        result = self.filter(Q(author__id=user.id) & (~Q(leave_type="W"))).order_by(
+            "-created"
+        )
         return result
 
     def requests_received_counter(self, user):
@@ -33,7 +31,7 @@ class RequestManager(models.Manager):
             Q(send_to_person=user) & Q(status="oczekujący")
         ).count()
 
-        symbols = ["", "➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒",  "➓", "➓+"]
+        symbols = ["", "➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓", "➓+"]
 
         if employees_requests_received_count > 10:
             return "➓+"

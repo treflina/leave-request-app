@@ -1,4 +1,4 @@
-# Electronic requests approval workflow with other features (WebApp)
+# Electronic requests approval workflow with other features (PWA)
 
 This app enables an electronic requests approval workflow.
 Other main functions:
@@ -6,14 +6,15 @@ Other main functions:
 - information about the amount of time off left
 - employee listing for a manager that gives details like eg. a contract end date, a possibility to quickly check if an empoyee should be present at work today
 - e-mail notifications to a manager that a request's been sent
+- push notifications about requests status changes
 - pdf report generator about days off, sick leaves
 - sick leaves registration page
 - possibility to download documents (like regulations, private insurance contract rules etc.) for employees
 
-Written in Python with Django 3.2. Responsive (including tables).
-
+Django 3.2. used
 Python 3.6 or later is required.
 Settings are configured to work with MySQL database ( installation of mysqlclient driver is needed ).
+Or with Postgres (DEVIL is True) (installation of psycopg2 driver is needed)
 
 ## Configuration on Ubuntu 18.04 server with NGINX, Gunicorn & Supervisor
 
@@ -62,17 +63,25 @@ Place a file called secret.json in this base directory. The content should look 
     "DB_NAME": "yourdatabasename",
     "DB_USER": "databaseuser",
     "DB_PASSWORD": "databasepassword",
+    "DB_HOST": "",
     "ALLOWED_HOSTS": ["localhost", "127.0.0.1", "other IP adresses", "domain"],
     "DEFAULT_FROM_EMAIL": "",
     "EMAIL_HOST": "",
     "EMAIL_HOST_USER": "",
     "EMAIL_HOST_PASSWORD": "",
     "EMAIL_PORT": "",
-    "DEBUG": false
+    "DEBUG": false,
+    "VAPID_PUBLIC_KEY": "genaratedvapidpublicserverkeyforpushnotifications",
+    "VAPID_PRIVATE_KEY": "genaratedvapidprivatekeyforpushnotifications",
+    "ADMIN_EMAIL": "admin@example.com",
+    "DEVIL": false
 }
 ```
 
 DEBUG MODE should be set to FALSE in production.
+
+DEVIL and passenger_wsgi.py file are used in case of mydevil.net hosting
+(here settings with postgres db, psycopg2 should be installed)
 
 ## Gunicorn
 

@@ -37,9 +37,9 @@
                 <input type="text" readonly class="form-control-plaintext" id="position" value="{{request.user.position}}">
             </div>
         </div>
-        <div class="row">
+        <div class="row" role="radiogroup" aria-labelledby="goal">
             <div class="col-lg-2 col-md-3">
-                <p class="font-weight-bold ">Proszę o:</p>
+                <p class="font-weight-bold" id="goal">Proszę o:</p>
             </div>
             <div class="col">
                 <div class="form-check">
@@ -66,7 +66,7 @@
                         (DW) </label>
                 </div>
                 <div class="form-group row box_ws hide">
-                    <label class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
+                    <label for="id_work_date" class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
                     <div class="col-lg-6">
                         {{form.work_date|as_crispy_field}}
                     </div>
@@ -74,33 +74,33 @@
             </div>
         </div>
         <div class="form-group row mt-2">
-            <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">W okresie:</label>
+            <label for="id_start_date" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W okresie:</label>
             <div class="input-group col-lg-6 col-md-9" id="d">
                 {{form.start_date|as_crispy_field}}
-                <span class="input-group-addon ml-2 mr-2">do</span>
+                <label for="id_end_date" class="input-group-addon ml-2 mr-2">do</label>
                 {{form.end_date|as_crispy_field}}</div>
         </div>
         <div class="form-group row box_w">
-            <label for="number_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W wymiarze:</label>
+            <label for="id_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W wymiarze:</label>
             <div class="col col-lg-2 col-md-2 col-sm-2">
                 {{form.days|as_crispy_field}}
             </div>
             <div class="col">
-                <label class="col-form-label">{%if part%}godzin{%else%}dni roboczych{%endif%}</label>
+                <p class="col-form-label">{%if part%}godzin{%else%}dni roboczych{%endif%}</p>
             </div>
-           <label for="duvet-day" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na żądanie:</label>
+           <p class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na żądanie:</p>
             <div class="col col-lg-2 col-md-2 col-sm-2">
                 {{form.duvet_day|as_crispy_field}}
             </div>
         </div>
         <div class="form-group row">
-            <label for="substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
+            <label for="id_substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
             <div class="col">
                 {{form.substitute|as_crispy_field}}
             </div>
         </div>
         <div class="form-group row">
-            <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wyślij do:</label>
+            <label for="id_send_to_person" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wyślij do:</label>
             <div class="col">
                 {{form.send_to_person|as_crispy_field}}
             </div>

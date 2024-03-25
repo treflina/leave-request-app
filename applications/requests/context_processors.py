@@ -1,3 +1,4 @@
+from django.conf import settings
 from .models import Request
 
 
@@ -10,3 +11,8 @@ def number_requests_received(request):
         }
     else:
         return {"requests_list": 0}
+
+
+def vapid_key(request):
+    webpush_settings = getattr(settings, "WEBPUSH_SETTINGS", {})
+    return {"vapid_key": webpush_settings.get("VAPID_PUBLIC_KEY")}

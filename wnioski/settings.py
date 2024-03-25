@@ -50,6 +50,7 @@ THIRD_PARTY_APPS = [
     "simple_history",
     "constrainedfilefield",
     "django_filters",
+    "webpush",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
@@ -82,6 +83,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "applications.requests.context_processors.number_requests_received",
+                "applications.requests.context_processors.vapid_key",
             ],
         },
     },
@@ -90,17 +92,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "wnioski.wsgi.application"
 
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": get_secret("DB_NAME"),
-        "USER": get_secret("DB_USER"),
-        "PASSWORD": get_secret("DB_PASSWORD"),
-        "HOST": "localhost",
-        "PORT": "3306",
+if get_secret("DEVIL"):
+        DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": get_secret("DB_NAME"),
+            "USER": get_secret("DB_USER"),
+            "PASSWORD": get_secret("DB_PASSWORD"),
+            "HOST": get_secret("DB_HOST"),
+            "PORT": "",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": get_secret("DB_NAME"),
+            "USER": get_secret("DB_USER"),
+            "PASSWORD": get_secret("DB_PASSWORD"),
+            "HOST": "localhost",
+            "PORT": "3306",
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -132,10 +145,23 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR.child("static")]
-STATIC_ROOT = BASE_DIR.child("staticfiles")
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR.child("media")
+
+
+if get_secret("DEVIL"):
+    STATIC_ROOT = os.path.join(BASE_DIR, "public", "static")
+    MEDIA_ROOT = os.path.join(BASE_DIR, "public", "media")
+else:
+    STATIC_ROOT = BASE_DIR.child("staticfiles")
+    MEDIA_ROOT = BASE_DIR.child("media")
+
+
+WEBPUSH_SETTINGS = {
+    "VAPID_PUBLIC_KEY": get_secret("VAPID_PUBLIC_KEY"),
+    "VAPID_PRIVATE_KEY": get_secret("VAPID_PRIVATE_KEY"),
+    "VAPID_ADMIN_EMAIL": get_secret("ADMIN_EMAIL"),
+}
 
 MESSAGE_TAGS = {
     messages.SUCCESS: "alert-success",
@@ -175,6 +201,8 @@ LOGGING = {
 AUTH_USER_MODEL = "users.User"
 
 LANGUAGE_CODE = "pl"
+
+LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)
 
 TIME_ZONE = "Europe/Warsaw"
 

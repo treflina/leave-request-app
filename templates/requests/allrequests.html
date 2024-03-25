@@ -22,30 +22,31 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for request in requests_received %}
+                    {% for leave_request in requests_received %}
                     <tr>
                         <td data-title="Lp.">{{ forloop.counter0|add:1 }}.</td>
-                        <td data-title="Złożony:" class="content-center">{{request.created|date:"d.m.y"}}</td>
-                        <td data-title="Nazwisko i imię:">{{request.author.last_name}} {{request.author.first_name}}
-                            {{request.author.position_addinfo}}</td>
-                        <td data-title="Od:">{{request.start_date|date:"d.m.y"}}</td>
-                        <td data-title="Do:">{{request.end_date|date:"d.m.y"}}</td>
-                        <td data-title="L. dni*:" class="{% if request.days <= 0 %} small-width-hide {% endif %}">
-                            {%if request.leave_type == 'W'%}{{request.days}}{%endif%}</td>
+                        <td data-title="Złożony:" class="content-center">{{leave_request.created|date:"d.m.y"}}</td>
+                        <td data-title="Nazwisko i imię:">{{leave_request.author.last_name}} {{leave_request.author.first_name}}
+                            {{leave_request.author.position_addinfo}}</td>
+                        <td data-title="Od:">{{leave_request.start_date|date:"d.m.y"}}</td>
+                        <td data-title="Do:">{{leave_request.end_date|date:"d.m.y"}}</td>
+                        <td data-title="L. dni*:" class="{% if leave_request.days <= 0 %} small-width-hide {% endif %}">
+                            {%if leave_request.leave_type == 'W'%}{{leave_request.days}}{%endif%}</td>
                         <td data-title="Rodzaj**:">
-                            {{request.leave_type}}{% if request.work_date %} za {{request.work_date|date:"d.m.y"}}{% endif %}{% if request.duvet_day %}
+                            {{leave_request.leave_type}}{% if leave_request.work_date %} za {{leave_request.work_date|date:"d.m.y"}}{% endif %}{% if leave_request.duvet_day %}
                             (nż<span class="text-danger">***</span>){% endif %}</td>
-                        <td data-title="Zastępuje:" class="{% if not request.substitute %} small-width-hide {% endif %}">{{request.substitute}}</td>
+                        <td data-title="Zastępuje:" class="{% if not leave_request.substitute %} small-width-hide {% endif %}">{{leave_request.substitute}}</td>
                         <td>
                             <div class="btn-group btn-group-sm">
-                                <form method="POST" action="{% url 'requests_app:accept_request' request.id %}">
-                                    {%csrf_token%}
-                                    <button class="btn btn-sm btn-success mr-1" type="submit">Zaakceptuj</button>
-                                </form>
-                                <form method="POST" action="{% url 'requests_app:reject_request' request.id %}">
-                                    {%csrf_token%}
-                                    <button class="btn btn-sm btn-danger mr-1" type="submit">Odrzuć</button>
-                                </form>
+                                <button type="button" class="btn btn-sm btn-success mr-1" data-toggle="modal"
+                                    data-target="#acceptModal{{leave_request.id}}">
+                                    Zaakceptuj
+                                </button>
+                                {% include 'includes/accept-modal.html' %}
+                                <button type="button" class="btn btn-sm btn-danger mr-1" data-toggle="modal" data-target="#withdrawModal{{leave_request.id}}">
+                                    Odrzuć
+                                </button>
+                                {% include 'includes/withdraw-modal.html' %}
                             </div>
                         </td>
                     </tr>

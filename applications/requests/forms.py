@@ -7,7 +7,6 @@ from .models import Request
 
 
 class RequestForm(forms.ModelForm):
-
     history_change_reason = forms.CharField(
         label="Powód wprowadzanych zmian", max_length=255, required=False
     )
@@ -74,7 +73,9 @@ class RequestForm(forms.ModelForm):
         if start_date is None:
             raise forms.ValidationError("Proszę podać datę początkową urlopu.")
         if abs(int(start_date.strftime("%Y")) - td) > 2:
-            raise forms.ValidationError("Proszę podać prawidłowy rok w formacie 'RRRR'.")
+            raise forms.ValidationError(
+                "Proszę podać prawidłowy rok w formacie 'RRRR'."
+            )
         return start_date
 
     def clean_end_date(self):
@@ -134,7 +135,6 @@ class RequestForm(forms.ModelForm):
 
 
 class UpdateRequestForm(RequestForm):
-
     history_change_reason = forms.CharField(
         label="Powód wprowadzanych zmian", max_length=255, required=False
     )

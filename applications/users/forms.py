@@ -6,7 +6,6 @@ from .models import User
 
 
 class UserRegisterForm(forms.ModelForm):
-
     password1 = forms.CharField(
         label="Hasło",
         required=True,
@@ -19,7 +18,6 @@ class UserRegisterForm(forms.ModelForm):
     )
 
     class Meta:
-
         model = User
         fields = (
             "username",
@@ -65,7 +63,6 @@ class UserRegisterForm(forms.ModelForm):
 
 
 class LoginForm(forms.Form):
-
     username = forms.CharField(
         label="Nazwa użytkownika",
         required=True,
@@ -98,7 +95,6 @@ class LoginForm(forms.Form):
 
 
 class UpdatePasswordForm(forms.Form):
-
     password1 = forms.CharField(
         label="Dotychczasowe hasło",
         required=True,

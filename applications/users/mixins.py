@@ -13,7 +13,6 @@ def check_occupation_user(user, role):
 
 
 class TopManagerPermisoMixin(LoginRequiredMixin):
-
     login_url = reverse_lazy("users_app:user-login")
 
     def dispatch(self, request, *args, **kwargs):
