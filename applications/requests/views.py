@@ -113,8 +113,8 @@ class RequestFormView(LoginRequiredMixin, FormView):
         try:
             payload = {
                 "head": "Nowy wniosek do zaopiniowania",
-                "body": f"""{user} prosi o akcetację wniosku ({leave_type}) \
-            od {start_date} do {end_date}.""",
+                "body": f"""{user} prosi o akceptację wniosku ({leave_type}) \
+        od {start_date} do {end_date}.""",
                 "url": reverse("requests_app:allrequests"),
             }
             recipient = send_to_person
@@ -335,7 +335,7 @@ def accept_request(request, pk):
         payload = {
             "head": "Wniosek został zaakceptowany",
             "body": f"""Wniosek ({request_to_accept.leave_type}) {request_to_accept.start_date} \
-        do {request_to_accept.end_date} został zaakceptowany.""",
+    do {request_to_accept.end_date} został zaakceptowany.""",
         }
         employee = request_to_accept.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
@@ -360,7 +360,7 @@ def reject_request(request, pk):
         payload = {
             "head": "Wniosek został odrzucony",
             "body": f"""Wniosek ({request_to_accept.leave_type}) {request_to_accept.start_date} \
-        do {request_to_accept.end_date} został odrzucony.""",
+    do {request_to_accept.end_date} został odrzucony.""",
         }
         employee = request_to_accept.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
