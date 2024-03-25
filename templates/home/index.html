@@ -2,11 +2,10 @@
 {% load static %}
 {% block content %}
 {%include 'includes/navbar.html'%}
-
 <div class="container welcome pt-5 mt-lg-5">
     <h1 class="welcome__text-name">Witaj {{user.first_name}} {{user.last_name}}!</h1>
     <p class="welcome__text-position">({{user.position}})</p>
-    <p class="welcome__text-info mt-4">{%if onedayleft%}Został Ci{%else%}Zostało Ci{%endif%}
+    <p class="welcome__text-info mt-4 mb-4">{%if onedayleft%}Został Ci{%else%}Zostało Ci{%endif%}
         <span>{{user.current_leave}}</span>
         {%if part%}godzin urlopu{%else%}{%if onedayleft%}dzień{%else%}dni{%endif%}
         urlopu{%endif%}<span class="palm">🌴</span>
@@ -25,7 +24,7 @@
         <a href="{% url 'requests_app:request'%}" role="button" class="btn btn-success">Złóż wniosek</a>
     </div>
     {% endif %}
-    <a class="d-block position-relative mt-5 text-dark text-left mr-lg-auto mr-md-auto" href="{% url 'home_app:documents'%}">
+    <a class="d-block position-relative mt-3 mt-sm-5 text-dark text-left mr-lg-auto mr-md-auto" href="{% url 'home_app:documents'%}">
         <div class="welcome__doclink">
             <img class="welcome__doclink-img" src="{%static 'img/doc-img.png'%}" alt="segregatory z dokumentami">
             <p class="welcome__doclink-title text-center">Niezbędnik</p>
