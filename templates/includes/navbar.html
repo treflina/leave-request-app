@@ -15,29 +15,29 @@
             <ul class="navbar-nav ml-auto">
                 {%if user.role != 'S'%}
                 <li class="nav-item">
-                    <a class="nav-link link-hide" href="{% url 'requests_app:request'%}">Złóż wniosek</a>
+                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{% url 'requests_app:request'%}">Złóż wniosek</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link link-hide" href="{%url 'requests_app:user_requests'%}">Twoje wnioski</a>
+                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'requests_app:user_requests'%}">Twoje wnioski</a>
                 </li>
                 {%endif%}
                 {%if user.role != 'P'%}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'requests_app:allrequests'%}">Wnioski <span>pracowników<span style='color:orange;'>{{requests_list}}</span></span>
+                    <a class="nav-link w-100 text-lg-center text-left" href="{% url 'requests_app:allrequests'%}">Wnioski <span>pracowników<span style='color:orange;'>{{requests_list}}</span></span>
               </a>
                 </li>
                 {%endif%}
                 {% if user.role == "S" %}
                 <li class="nav-item">
-                    <a class="nav-link link-hide" href="{%url 'users_app:all-employees'%}">Lista pracowników</a>
+                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'users_app:all-employees'%}">Lista pracowników</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link link-hide" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
+                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
                 </li>
                 {% endif %}
                 {%if user.is_staff%}
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbardrop2" data-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle  w-100 text-lg-center text-left" href="#" id="navbardrop2" data-toggle="dropdown">
                 Admin</a>
                     <div class="dropdown-menu">
                         <a class="dropdown-item link-hide" href="{%url 'users_app:admin-all-employees'%}">Pracownicy: dodaj/zmień</a>
@@ -49,11 +49,11 @@
                 </li>
                 {%endif%}
                 <li class="nav-item">
-                    <a class="nav-link link-hide" href="{%url 'users_app:user-update'%}">Zmień hasło</a>
+                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'users_app:user-update'%}">Zmień hasło</a>
                 </li>
                 {%if user.is_authenticated%}
                 <li class="nav-item">
-                    <a class="nav-link link-hide" href="{%url 'users_app:user-logout'%}">Wyloguj się</a>
+                    <a class="nav-link link-hide  w-100 text-lg-center text-left" href="{%url 'users_app:user-logout'%}">Wyloguj się</a>
                 </li>
                 <li class="nav-item">
                     <button class="nav-link link-hide bg-transparent border-0" data-toggle="modal"
