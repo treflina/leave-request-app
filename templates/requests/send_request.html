@@ -25,21 +25,21 @@
     <h1 class="page-heading mt-3 mb-5"> Wniosek o udzielenie urlopu lub dnia wolnego</h1>
     <form id="send-request-form" action="" method="POST" autocomplete="off">{%csrf_token%}
         <div class="form-group row">
-            <label for="person" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Imię i nazwisko:</label>
+            <label for="person" class="col-lg-2 col-md-3 col-form-label font-weight-bold pb-0">Imię i nazwisko:</label>
             <div class="col">
                 <input type="text" readonly class="form-control-plaintext" id="person" value="{{request.user.get_full_name}}">
             </div>
         </div>
 
         <div class="form-group row">
-            <label for="position" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Stanowisko:</label>
+            <label for="position" class="col-lg-2 col-md-3 col-form-label font-weight-bold pb-0">Stanowisko:</label>
             <div class="col">
                 <input type="text" readonly class="form-control-plaintext" id="position" value="{{request.user.position}}">
             </div>
         </div>
         <div class="row" role="radiogroup" aria-labelledby="goal">
             <div class="col-lg-2 col-md-3">
-                <p class="font-weight-bold" id="goal">Proszę o:</p>
+                <p class="font-weight-bold pb-2 mb-0" id="goal">Proszę o:</p>
             </div>
             <div class="col">
                 <div class="form-check">
@@ -60,47 +60,54 @@
                     <label class="form-check-label" for="id_leave_type_2"> Wolne za pracę w niedzielę/święto
                         (WN)<span class="text-danger">*</span> </label>
                 </div>
-                <div class="form-check ">
+                <div class="form-check mb-3">
                     <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_3" value="DW">
                     <label class="form-check-label " for="id_leave_type_3"> Wolne za święto przypadające w wolną sobotę
                         (DW) </label>
                 </div>
-                <div class="form-group row box_ws hide">
-                    <label for="id_work_date" class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
-                    <div class="col-lg-6">
+                <div class="row box_ws hide">
+                    <label for="id_work_date" class="col-form-label ml-3 mr-1"><span class="text-danger">*</span> Praca miała miejsce w dniu:</label>
+                    <div class="ml-3" style="min-width:210px;">
                         {{form.work_date|as_crispy_field}}
                     </div>
                 </div>
             </div>
         </div>
         <div class="form-group row mt-2">
-            <label for="id_start_date" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W okresie:</label>
-            <div class="input-group col-lg-6 col-md-9" id="d">
+            <label for="id_start_date" class="col-lg-2 col-md-3 col-form-label font-weight-bold pb-2">W okresie:</label>
+            <div class="d-flex align-items-baseline input-group col-lg-6 col-md-9" id="d">
+                <div class="flex-grow-1">
                 {{form.start_date|as_crispy_field}}
-                <label for="id_end_date" class="input-group-addon ml-2 mr-2">do</label>
-                {{form.end_date|as_crispy_field}}</div>
+                </div>
+                <div class="d-flex flex-nowrap align-items-baseline flex-grow-1">
+                    <label for="id_end_date" class="input-group-addon ml-2 mr-2">do</label>
+                    <div class="flex-grow-1">
+                    {{form.end_date|as_crispy_field}}
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="form-group row box_w">
-            <label for="id_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W wymiarze:</label>
-            <div class="col col-lg-2 col-md-2 col-sm-2">
+            <label for="id_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2">W wymiarze:</label>
+            <div class="col col-lg-2 col-md-2 col-sm-2" style="margin-right:-15px;">
                 {{form.days|as_crispy_field}}
             </div>
             <div class="col">
                 <p class="col-form-label">{%if part%}godzin{%else%}dni roboczych{%endif%}</p>
             </div>
-           <p class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na żądanie:</p>
+           <p class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2">Na żądanie:</p>
             <div class="col col-lg-2 col-md-2 col-sm-2">
                 {{form.duvet_day|as_crispy_field}}
             </div>
         </div>
         <div class="form-group row">
-            <label for="id_substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
+            <label for="id_substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2">Zastępstwo:</label>
             <div class="col">
                 {{form.substitute|as_crispy_field}}
             </div>
         </div>
         <div class="form-group row">
-            <label for="id_send_to_person" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wyślij do:</label>
+            <label for="id_send_to_person" class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2">Wyślij do:</label>
             <div class="col">
                 {{form.send_to_person|as_crispy_field}}
             </div>

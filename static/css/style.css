@@ -51,7 +51,6 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
-
 .pagesection__title {
   font-size: 1.6rem;
   text-align: center;
@@ -188,6 +187,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25rem;
   width: 100%;
   padding: 0.5rem 1rem;
   flex-wrap: wrap;
@@ -291,8 +291,8 @@ body {
   /* Hide table headers  */
   thead tr {
     position: absolute;
-    top: -9998px;
-    left: -9998px;
+    top: -9999px;
+    left: -9999px;
   }
   tr {
     border: 1px solid #ccc;

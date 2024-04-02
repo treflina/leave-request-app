@@ -65,7 +65,7 @@
         <section class="pagesection mt-5" id="holiday">
             <p class="pagesection__title">Wnioski pracowników</p>
             {% if requests_received|length == 0 %}<p class="px-1 text-center font-italic">Brak nowych wniosków otrzymanych do zaopiniowania.</p>{% endif %}
-            <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-1" method="get">
+            <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-2" method="get">
                 <div class="search-box mx-1">
                     <label class="sr-only" for="id_other_fields">{{ filterset.form.other_fields.label }}</label>
                     {{ filterset.form.other_fields }}
@@ -82,7 +82,7 @@
                     <label class="mb-0 pr-1 pl-2" for="id_end_date">{{ filterset.form.end_date.label }}</label>
                     {{ filterset.form.end_date }}
                 </div>
-                <button class="btn btn-secondary ml-1 mr-2 my-1" type="submit">Szukaj</button>
+                <button class="btn btn-secondary ml-1 mr-2 mt-1" type="submit">Szukaj</button>
             </form>
             <table class="table table-striped">
                 <thead>
