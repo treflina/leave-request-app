@@ -22,7 +22,6 @@
                 <input type="text" readonly class="form-control-plaintext" id="person" value="{{request.author.get_full_name}} -  {{request.author.position}} ">
             </div>
         </div>
-
         <div class="row">
             <div class="col-lg-2 col-md-3">
                 <p class="font-weight-bold ">Wnioskowano o:</p>
@@ -46,14 +45,12 @@
                     <label class="form-check-label" for="id_leave_type_2"> Wolne za pracę w niedzielę/święto
                         (WN)<span class="text-danger">*</span> </label>
                 </div>
-                <div class="form-check ">
+                <div class="form-check mb-2">
                     <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_3" value="DW" {% if request.leave_type == 'DW' %} checked {% endif %}>
                     <label class="form-check-label " for="id_leave_type_3"> Wolne za święto przypadające w wolną sobotę
                         (DW) </label>
                 </div>
-
-                <div class="form-group row box_ws hide">
-
+                <div class="form-group row box_ws hide pt-1">
                     <label class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
                     <div class="col-lg-6">
                         {{form.work_date|as_crispy_field}}
@@ -61,9 +58,7 @@
                 </div>
             </div>
         </div>
-
         <div class="form-group row mt-2">
-
             <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na okres:</label>
             <div class="input-group col-lg-6 col-md-9" id="d">
                 {{form.start_date|as_crispy_field}}
@@ -93,7 +88,6 @@
                 {{form.substitute|as_crispy_field}}
             </div>
         </div>
-
         <div class="form-group row">
             <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wysłano do:</label>
             <div class="col">

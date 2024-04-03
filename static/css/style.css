@@ -38,8 +38,9 @@ body {
 }
 
 .page-heading {
-  font-size: 1.75rem;
+  font-size: 1.6rem;
   text-align: center;
+  font-weight: 500;
 }
 
 .pagesection {

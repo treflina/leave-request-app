@@ -63,7 +63,7 @@
         </section>
          {% endif %}
         <section class="pagesection mt-5" id="holiday">
-            <p class="pagesection__title">Wnioski pracowników</p>
+            <p class="page-heading">Wnioski pracowników</p>
             {% if requests_received|length == 0 %}<p class="px-1 text-center font-italic">Brak nowych wniosków otrzymanych do zaopiniowania.</p>{% endif %}
             <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-2" method="get">
                 <div class="search-box mx-1">
@@ -139,7 +139,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <div class="px-1">
+            <div class="px-2">
                 <p class="mb-1"><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
                     czasu pracy.</p>
                 <p class="mb-1"><span class="text-danger">**</span> W - urlop wypoczynkowy, WS/WN - wolne za pracę w
