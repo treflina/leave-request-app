@@ -7,13 +7,13 @@
             data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
             aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
-            {% if user.role != "P" and requests_list != 0 and requests_list != "" %}
+            {% if request.user.role != "P" and requests_list != 0 and requests_list != "" %}
             <span class="nav-notification"></span>
             {% endif %}
         </button>
         <div class="burger collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ml-auto">
-                {%if user.role != 'S'%}
+                {%if request.user.role != 'S'%}
                 <li class="nav-item">
                     <a class="nav-link link-hide w-100 text-lg-center text-left" href="{% url 'requests_app:request'%}">Złóż wniosek</a>
                 </li>
@@ -21,13 +21,13 @@
                     <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'requests_app:user_requests'%}">Twoje wnioski</a>
                 </li>
                 {%endif%}
-                {%if user.role != 'P'%}
+                {%if request.user.role != 'P'%}
                 <li class="nav-item">
                     <a class="nav-link w-100 text-lg-center text-left" href="{% url 'requests_app:allrequests'%}">Wnioski <span>pracowników<span style='color:orange;'>{{requests_list}}</span></span>
               </a>
                 </li>
                 {%endif%}
-                {% if user.role == "S" %}
+                {% if request.user.role == "S" %}
                 <li class="nav-item">
                     <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'users_app:all-employees'%}">Lista pracowników</a>
                 </li>
@@ -35,7 +35,7 @@
                     <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
                 </li>
                 {% endif %}
-                {%if user.is_staff%}
+                {%if request.user.is_staff%}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle  w-100 text-lg-center text-left" href="#" id="navbardrop2" data-toggle="dropdown">
                 Admin</a>
@@ -51,7 +51,7 @@
                 <li class="nav-item">
                     <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'users_app:user-update'%}">Zmień hasło</a>
                 </li>
-                {%if user.is_authenticated%}
+                {%if request.user.is_authenticated%}
                 <li class="nav-item">
                     <a class="nav-link link-hide  w-100 text-lg-center text-left" href="{%url 'users_app:user-logout'%}">Wyloguj się</a>
                 </li>

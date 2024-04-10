@@ -3,103 +3,109 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {%include 'includes/navbar.html'%}
-<div class="container">
+
+<section class="pagesection mt-5 w-100 px-md-3">
+    <h1 class="pagesection__title">Zwolnienia lekarskie</h1>
+    <div class="search-info-box mt-4 mb-2 py-1">
+        <form class="form-search filter-dropdown-form d-flex justify-content-center align-items-center" method="get" >{%csrf_token%}
+            <div class="search-box mx-1">
+                <label class="sr-only" for="id_other_fields">{{ filterset.form.other_fields.label }}</label>
+                {{ filterset.form.other_fields }}
+            </div>
+            <div class="input-box search-box">
+                <label class="sr-only" for="id_dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
+                {{ filterset.form.dropdown_field }}
+            </div>
+            <button class="btn btn-violet ml-1 mr-2 my-1" type="submit">Szukaj</button>
+        </form>
+        <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn mx-2 my-1 btn-light" ><span class="font-weight-bold">+</span> Dodaj zwolnienie</a>
+        {% if ezla  %}
+        <a href="{%url 'sickleaves_app:get_ezla'%}" role="button" class="btn mx-2 my-1 btn-success">Pobierz z ZUS</a>
+        {% endif %}
+
+    </div>
     {% for message in messages %}
-    <div class="alert {{ message.tags }} m-5" role="alert">
-        {{ message }}
+    <div class="alert {{ message.tags }} mb-2" role="alert">
+            {{ message }}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     {% endfor %}
-</div>
-<section class="pagesection mt-5">
-            <h1 class="pagesection__title">Zwolnienia lekarskie</h1>
-            <div class="search-info-box mt-4 mb-2 py-1">
-                <form class="form-search filter-dropdown-form d-flex justify-content-center align-items-center" method="get" >{%csrf_token%}
-                    <div class="search-box mx-1">
-                        <label class="sr-only" for="id_other_fields">{{ filterset.form.other_fields.label }}</label>
-                        {{ filterset.form.other_fields }}
-                    </div>
-                    <div class="input-box search-box">
-                        <label class="sr-only" for="id_dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
-                        {{ filterset.form.dropdown_field }}
-                    </div>
-                    <button class="btn btn-violet ml-1 mr-2 my-1" type="submit">Szukaj</button>
-                </form>
-                <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn mx-2 my-1 btn-light" ><span class="font-weight-bold">+</span> Dodaj zwolnienie</a>
-            </div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th scope="col">Lp.</th>
-                    <th scope="col">Nazwisko i imię</th>
-                    <th scope="col" class="text-align-cl">Numer dokumentu</th>
-                    <th scope="col" class="text-align-cl">Data wystawienia</th>
-                    <th scope="col" class="text-align-cl">Rodzaj<span class="text-danger">*</span></th>
-                    <th scope="col" class="text-align-cl">Od</th>
-                    <th scope="col" class="text-align-cl">Do</th>
-                    <th scope="col" class="text-align-cl">Inne</th>
-                    <th scope="col" class="text-align-cl"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for sickleave in sickleaves %}
-                <tr>
-                    <td data-title="Lp.">{{ forloop.counter0|add:page_obj.start_index }}.</td>
-                    <td data-title="Nazwisko i imię:">{{ sickleave.employee.last_name}}
-                        {{ sickleave.employee.first_name}} </td>
-                    <td data-title="Nr dokumentu:" class="text-align-cl">{% if sickleave.doc_number %}{{ sickleave.doc_number }} {% endif %}</td>
-                    <td data-title="Wystawiono:" class="text-align-cl">{{ sickleave.issue_date|date:"d.m.y"}}
-                    </td>
-                    <td data-title="Rodzaj:" class="text-align-cl">{{ sickleave.leave_type }}</td>
-                    <td data-title="Od:" class="text-align-cl">{{ sickleave.start_date|date:"d.m.y" }}</td>
-                    <td data-title="Do:" class="text-align-cl">{{ sickleave.end_date|date:"d.m.y" }}</td>
-                    <td data-title="Inne:" class="text-align-cl"> {% if sickleave.additional_info %} {{ sickleave.additional_info }}{% endif %}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{%url 'sickleaves_app:update_sickleave' sickleave.id%}" role="button" class="btn btn-sm btn-lightblue">Popraw</a>
-                            <button type="button" class="btn btn-sm btn-light" data-toggle="modal"
-                                data-target="#deleteModal{{sickleave.id}}">
-                                Usuń
-                            </button>
+    {% if ezla %}
+    <p class="text-muted text-sm px-1 text-center text-md-left">Data ostatniego pobrania raportów z ZUS: {{last_report_date|date:"d.m.Y"}}</p>
+    {% endif %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">Lp.</th>
+                <th scope="col">Nazwisko i imię</th>
+                <th scope="col" class="text-align-cl">Numer dokumentu</th>
+                <th scope="col" class="text-align-cl">Data wystawienia</th>
+                <th scope="col" class="text-align-cl">Rodzaj<span class="text-danger">*</span></th>
+                <th scope="col" class="text-align-cl">Od</th>
+                <th scope="col" class="text-align-cl">Do</th>
+                <th scope="col" class="text-align-cl info-cell">Uwagi</th>
+                <th scope="col" class="text-align-cl"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sickleave in sickleaves %}
+            <tr>
+                <td data-title="Lp.">{{ forloop.counter0|add:page_obj.start_index }}.</td>
+                <td data-title="Nazwisko i imię:">{{ sickleave.employee.last_name}}
+                    {{ sickleave.employee.first_name}} </td>
+                <td data-title="Nr dokumentu:" class="text-align-cl">{% if sickleave.doc_number %}{{ sickleave.doc_number }} {% endif %}</td>
+                <td data-title="Wystawiono:" class="text-align-cl">{{ sickleave.issue_date|date:"d.m.y"}}
+                </td>
+                <td data-title="Rodzaj:" class="text-align-cl">{{ sickleave.leave_type }}</td>
+                <td data-title="Od:" class="text-align-cl">{{ sickleave.start_date|date:"d.m.y" }}</td>
+                <td data-title="Do:" class="text-align-cl">{{ sickleave.end_date|date:"d.m.y" }}</td>
+                <td data-title="Inne:" class="text-align-cl"> {% if sickleave.additional_info %} {{ sickleave.additional_info }}{% endif %}</td>
+                <td>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{%url 'sickleaves_app:update_sickleave' sickleave.id%}" role="button" class="btn btn-sm btn-lightblue">Popraw</a>
+                        <button type="button" class="btn btn-sm btn-light" data-toggle="modal"
+                            data-target="#deleteModal{{sickleave.id}}">
+                            Usuń
+                        </button>
 
-                            <!-- Modal -->
-                            <div class="modal fade" id="deleteModal{{sickleave.id}}" tabindex="-1"
-                                aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <p class="modal-title">Ostrzeżenie</p>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Czy na pewno chcesz usunąć zwolnienie lekarskie?
-                                                <br>{{sickleave.employee.first_name}} {{sickleave.employee.last_name}}
-                                                od {{sickleave.start_date|date:"d.m.y"}} do
-                                                {{sickleave.end_date|date:"d.m.y"}}?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-light"
-                                                data-dismiss="modal">Wróć</button>
-                                            <form method="POST"
-                                                action="{% url 'sickleaves_app:delete_sickleave' sickleave.id %}">
-                                                {%csrf_token%}
-                                                <button type="submit" class="btn btn-info">Tak, usuń</button>
-                                            </form>
-                                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="deleteModal{{sickleave.id}}" tabindex="-1"
+                            aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <p class="modal-title">Ostrzeżenie</p>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Czy na pewno chcesz usunąć zwolnienie lekarskie?
+                                            <br>{{sickleave.employee.first_name}} {{sickleave.employee.last_name}}
+                                            od {{sickleave.start_date|date:"d.m.y"}} do
+                                            {{sickleave.end_date|date:"d.m.y"}}?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-light"
+                                            data-dismiss="modal">Wróć</button>
+                                        <form method="POST"
+                                            action="{% url 'sickleaves_app:delete_sickleave' sickleave.id %}">
+                                            {%csrf_token%}
+                                            <button type="submit" class="btn btn-info">Tak, usuń</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <p class="px-1"><span class="text-danger">*</span> C - chorobowe, O - opieka, K -kwarantanna, I - izolacja</p>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="px-1"><span class="text-danger">*</span> C - chorobowe, O - opieka, K -kwarantanna, I - izolacja</p>
 {%include 'includes/pagination.html'%}
 </section>
 {% endblock content %}

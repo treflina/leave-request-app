@@ -1,19 +1,29 @@
+import django_filters
 import logging
 import operator
 from functools import reduce
-import django_filters
-from datetime import date
+from datetime import date, timedelta
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.forms.widgets import Select, TextInput
 
-from applications.users.mixins import TopManagerPermisoMixin
-from .models import Sickleave
+from applications.users.mixins import (
+    TopManagerPermisoMixin,
+    check_occupation_user,
+)
+from .models import Sickleave, EZLAReportDownload
 from .forms import SickleaveForm
-from .utils import SickleaveNotification, SickAndAnnulalLeaveOverlappedAlertMixin
+from .utils import (
+    SickleaveNotification,
+    SickAndAnnulalLeaveOverlappedAlertMixin,
+)
+from .ezla import get_compiled_ezla_data
 
 
 logger = logging.getLogger("django")
@@ -24,7 +34,9 @@ class FilteredListView(ListView):
 
     def get_queryset(self):
         queryset = Sickleave.objects.all().order_by("-issue_date")
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        self.filterset = self.filterset_class(
+            self.request.GET, queryset=queryset
+        )
         return self.filterset.qs.distinct()
 
     def get_context_data(self, **kwargs):
@@ -53,15 +65,14 @@ class SickleavesFilter(django_filters.FilterSet):
     other_fields = django_filters.CharFilter(
         method="filter_other_fields",
         label="Wyszukaj",
-        widget=TextInput(attrs={"class": "form-control", "placeholder": "Wyszukaj..."})
-        )
+        widget=TextInput(
+            attrs={"class": "form-control", "placeholder": "Wyszukaj..."}
+        ),
+    )
 
     class Meta:
         model = Sickleave
-        fields = [
-            "other_fields",
-            "dropdown_field"
-        ]
+        fields = ["other_fields", "dropdown_field"]
 
     @staticmethod
     def filter_other_fields(qs, name, value):
@@ -70,23 +81,20 @@ class SickleavesFilter(django_filters.FilterSet):
             reduce(
                 operator.and_,
                 (
-                    Q(employee__first_name__icontains=word) |
-                    Q(employee__last_name__icontains=word)
+                    Q(employee__first_name__icontains=word)
+                    | Q(employee__last_name__icontains=word)
                     for word in query_words
                 ),
-            ) |
-            Q(start_date__icontains=value) |
-            Q(end_date__icontains=value) |
-            Q(issue_date__icontains=value) |
-            Q(additional_info__icontains=value)
+            )
+            | Q(start_date__icontains=value)
+            | Q(end_date__icontains=value)
+            | Q(issue_date__icontains=value)
+            | Q(additional_info__icontains=value)
         )
 
     @staticmethod
     def filter_year(qs, name, value):
-        return qs.filter(
-            Q(start_date__year=value) |
-            Q(end_date__year=value)
-        )
+        return qs.filter(Q(start_date__year=value) | Q(end_date__year=value))
 
 
 class SickleavesListView(FilteredListView):
@@ -98,6 +106,16 @@ class SickleavesListView(FilteredListView):
     template_name = "sickleaves/sickleaves.html"
     login_url = reverse_lazy("users_app:user-login")
     paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        last_download_report = EZLAReportDownload.objects.last()
+        if last_download_report:
+            context[
+                "last_report_date"
+            ] = last_download_report.last_download_date
+        context["ezla"] = getattr(settings, "EZLA_URL", None)
+        return context
 
 
 class SickleaveCreateView(
@@ -117,7 +135,8 @@ class SickleaveCreateView(
             notification.send_notification()
         except Exception:
             logger.error(
-                "Email notification about sickleave was not sent", exc_info=True
+                "Email notification about sickleave was not sent",
+                exc_info=True,
             )
         return super(SickleaveCreateView, self).form_valid(form)
 
@@ -135,7 +154,105 @@ class SickleaveUpdateView(
 
 
 @login_required(login_url="users_app:user-login")
+@user_passes_test(check_occupation_user)
 def delete_sickleave(request, pk):
     """Deletes sick leave."""
     Sickleave.objects.get(id=pk).delete()
+    return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))
+
+
+@login_required(login_url="users_app:user-login")
+@user_passes_test(check_occupation_user)
+def get_ezla(request):
+    """Get and save sick leaves from polish ZUS service."""
+    today = date.today()
+
+    last_download_report = EZLAReportDownload.objects.last()
+    if last_download_report:
+        last_download_date = last_download_report.last_download_date
+        date_since = last_download_date + timedelta(days=1)
+    else:
+        date_since = today - timedelta(days=1)
+        last_download_report = EZLAReportDownload.objects.create(
+            last_download_date=date_since
+        )
+
+    if date_since < (today - timedelta(days=28)):
+        date_since = today - timedelta(days=28)
+
+    data = get_compiled_ezla_data(date_since)
+    users = get_user_model()
+
+    if isinstance(data, list) and not data:
+        messages.success(request, "Brak nowych zwolnień do pobrania.")
+        last_download_report.last_download_date = today
+        last_download_report.save()
+        return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))
+
+    if isinstance(data, list) and len(data):
+        for sickleave in data:
+            sick_empl_first_name = sickleave.get("first_name")
+            sick_empl_last_name = sickleave.get("last_name")
+            empl = users.objects.filter(
+                first_name=sick_empl_first_name, last_name=sick_empl_last_name
+            )
+            sick_employee = empl.first()
+
+            if sick_employee is None:
+                messages.error(
+                    request,
+                    ("Nie udało się zapisać zwolnienia dla: "
+                        f"{sick_empl_first_name} {sick_empl_last_name}")
+                )
+            else:
+                try:
+                    doc_number = sickleave.get("doc_number")
+                    issue_date = sickleave.get("issue_date")
+                    sickleave_in_db = Sickleave.objects.filter(
+                        doc_number=doc_number, issue_date=issue_date
+                    )
+                    if sickleave_in_db:
+                        sickleave_in_db.update(
+                            leave_type=sickleave.get("leave_type"),
+                            start_date=sickleave.get("start_date"),
+                            end_date=sickleave.get("end_date"),
+                            additional_info=sickleave.get("additional_info"),
+                        )
+                        messages.warning(
+                            request,
+                            ("Zaktualizowano zwolnienie dla: "
+                                f"{sick_empl_first_name} {sick_empl_last_name}")  # noqa: E501
+                        )
+                    else:
+                        s = Sickleave(
+                            employee=sick_employee,
+                            leave_type=sickleave.get("leave_type"),
+                            issue_date=issue_date,
+                            doc_number=doc_number,
+                            start_date=sickleave.get("start_date"),
+                            end_date=sickleave.get("end_date"),
+                            additional_info=sickleave.get("additional_info"),
+                        )
+                        s.save()
+                        messages.success(
+                            request,
+                            (f"Pobrano zwolnienie dla: {sick_empl_first_name} "
+                                f"{sick_empl_last_name}"),
+                        )
+
+                except Exception as e:
+                    logger.error(
+                        f"Błąd podczas zapisywania zwolnienia do bazy: {e}"
+                    )
+                    messages.error(
+                        request,
+                        ("Błąd podczas zapisywania zwolnienia do bazy u: "
+                            f"{sick_empl_first_name} {sick_empl_last_name}")
+                    )
+        last_download_report.last_download_date = today
+        last_download_report.save()
+
+    else:
+        messages.error(request, data)
+
     return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))

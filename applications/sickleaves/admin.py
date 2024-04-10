@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Sickleave
+from .models import Sickleave, EZLAReportDownload
 
 
 class SickleavesAdmin(admin.ModelAdmin):
@@ -18,3 +18,4 @@ class SickleavesAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Sickleave, SickleavesAdmin)
+admin.site.register(EZLAReportDownload)

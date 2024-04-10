@@ -21,7 +21,10 @@ class SickAndAnnulalLeaveOverlappedAlertMixin:
         employee_leave_requests = Request.objects.filter(
             Q(author=employee)
             & ~Q(status="odrzucony")
-            & (Q(start_date__range=[start, end]) | Q(end_date__range=[start, end]))
+            & (
+                Q(start_date__range=[start, end])
+                | Q(end_date__range=[start, end])
+            )
         )
         if employee_leave_requests.exists() and leave_type != "O":
             messages.warning(
@@ -48,7 +51,9 @@ class SickleaveNotification:
     def __init__(self, form):
         self.form = form
         self.employee = self.form.cleaned_data["employee"]
-        self.start_date = self.form.cleaned_data["start_date"].strftime("%d.%m.%y")
+        self.start_date = self.form.cleaned_data["start_date"].strftime(
+            "%d.%m.%y"
+        )
         self.end_date = self.form.cleaned_data["end_date"].strftime("%d.%m.%y")
         self.leave_type = self.form.cleaned_data["leave_type"]
         self.head = self.form.cleaned_data["head"]
@@ -84,7 +89,9 @@ class SickleaveNotification:
                 person = User.objects.filter(Q(role="S")).first()
                 send_to_people.append(person.work_email)
             if self.manager:
-                person = User.objects.filter(Q(id=self.employee.manager.id)).first()
+                person = User.objects.filter(
+                    Q(id=self.employee.manager.id)
+                ).first()
                 send_to_people.append(person.work_email)
             if self.instructor:
                 person = User.objects.filter(
@@ -92,7 +99,9 @@ class SickleaveNotification:
                 ).first()
                 send_to_people.append(person.work_email)
 
-            send_to_people_list = [p for p in set(send_to_people)] + [EMAIL_HOST_USER]
+            send_to_people_list = [p for p in set(send_to_people)] + [
+                EMAIL_HOST_USER
+            ]
 
             send_mail(
                 subject,

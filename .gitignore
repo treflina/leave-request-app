@@ -1,18 +1,26 @@
+.env
 venv
 desktop.ini
 .vscode
 .idea
 __pycache__
 
+.flake8
+
+/raporty.xml
 /secret.json
 /wnioski.log
+/ezlaraporty.log
 
 /applications/users/migrations/*
 /applications/requests/migrations/*
 /applications/sickleaves/migrations/*
+/applications/sickleaves/raporty.xml
 /applications/home/migrations/*
 
 /media/*
+
+/extracted_files/*
 
 /data.json
 /data2.json
