@@ -20,5 +20,10 @@ urlpatterns = [
         views.SickleaveUpdateView.as_view(),
         name="update_sickleave",
     ),
+    path(
+        "sickleave-notification/<pk>/",
+        views.notify_about_sickleave,
+        name="notify_sickleave",
+    ),
     path("ezla/", views.get_ezla, name="get_ezla"),
 ]

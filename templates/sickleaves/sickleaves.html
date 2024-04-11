@@ -1,13 +1,14 @@
 {% extends "base.html" %}
-{% load  static %}
-{% load crispy_forms_tags %}
+{% load static crispy_forms_tags %}
+{% block title %}- zwolnienia lekarskie{% endblock title %}
 {% block content %}
 {%include 'includes/navbar.html'%}
 
 <section class="pagesection mt-5 w-100 px-md-3">
     <h1 class="pagesection__title">Zwolnienia lekarskie</h1>
     <div class="search-info-box mt-4 mb-2 py-1">
-        <form class="form-search filter-dropdown-form d-flex justify-content-center align-items-center" method="get" >{%csrf_token%}
+        <form class="form-search filter-dropdown-form d-flex justify-content-center align-items-center" method="get">
+            {%csrf_token%}
             <div class="search-box mx-1">
                 <label class="sr-only" for="id_other_fields">{{ filterset.form.other_fields.label }}</label>
                 {{ filterset.form.other_fields }}
@@ -18,22 +19,23 @@
             </div>
             <button class="btn btn-violet ml-1 mr-2 my-1" type="submit">Szukaj</button>
         </form>
-        <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn mx-2 my-1 btn-light" ><span class="font-weight-bold">+</span> Dodaj zwolnienie</a>
-        {% if ezla  %}
+        <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn mx-2 my-1 btn-light" ><span class="font-weight-bold">+</span> Dodaj</a>
+        {% if ezla %}
         <a href="{%url 'sickleaves_app:get_ezla'%}" role="button" class="btn mx-2 my-1 btn-success">Pobierz z ZUS</a>
         {% endif %}
 
     </div>
     {% for message in messages %}
     <div class="alert {{ message.tags }} mb-2" role="alert">
-            {{ message }}
+        {{ message }}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     {% endfor %}
     {% if ezla %}
-    <p class="text-muted text-sm px-1 text-center text-md-left">Data ostatniego pobrania raportów z ZUS: {{last_report_date|date:"d.m.Y"}}</p>
+    <p class="text-muted text-sm px-1 text-center text-md-left">Data ostatniego pobrania raportów z ZUS:
+        {{last_report_date|date:"d.m.Y"}}</p>
     {% endif %}
     <table class="table table-striped">
         <thead>
@@ -55,13 +57,15 @@
                 <td data-title="Lp.">{{ forloop.counter0|add:page_obj.start_index }}.</td>
                 <td data-title="Nazwisko i imię:">{{ sickleave.employee.last_name}}
                     {{ sickleave.employee.first_name}} </td>
-                <td data-title="Nr dokumentu:" class="text-align-cl">{% if sickleave.doc_number %}{{ sickleave.doc_number }} {% endif %}</td>
+                <td data-title="Nr dokumentu:" class="text-align-cl">{% if sickleave.doc_number %}
+                    {{sickleave.doc_number }} {% endif %}</td>
                 <td data-title="Wystawiono:" class="text-align-cl">{{ sickleave.issue_date|date:"d.m.y"}}
                 </td>
                 <td data-title="Rodzaj:" class="text-align-cl">{{ sickleave.leave_type }}</td>
                 <td data-title="Od:" class="text-align-cl">{{ sickleave.start_date|date:"d.m.y" }}</td>
                 <td data-title="Do:" class="text-align-cl">{{ sickleave.end_date|date:"d.m.y" }}</td>
-                <td data-title="Inne:" class="text-align-cl"> {% if sickleave.additional_info %} {{ sickleave.additional_info }}{% endif %}</td>
+                <td data-title="Inne:" class="text-align-cl"> {% if sickleave.additional_info %}
+                    {{sickleave.additional_info }}{% endif %}</td>
                 <td>
                     <div class="btn-group btn-group-sm">
                         <a href="{%url 'sickleaves_app:update_sickleave' sickleave.id%}" role="button" class="btn btn-sm btn-lightblue">Popraw</a>
@@ -72,11 +76,11 @@
 
                         <!-- Modal -->
                         <div class="modal fade" id="deleteModal{{sickleave.id}}" tabindex="-1"
-                            aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            aria-labelledby="deleteModalLabel{{sickleave.id}}" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <p class="modal-title">Ostrzeżenie</p>
+                                        <p class="modal-title" id="deleteModalLabel{{sickleave.id}}">Ostrzeżenie</p>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -85,11 +89,11 @@
                                         <p>Czy na pewno chcesz usunąć zwolnienie lekarskie?
                                             <br>{{sickleave.employee.first_name}} {{sickleave.employee.last_name}}
                                             od {{sickleave.start_date|date:"d.m.y"}} do
-                                            {{sickleave.end_date|date:"d.m.y"}}?</p>
+                                            {{sickleave.end_date|date:"d.m.y"}}?
+                                        </p>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-light"
-                                            data-dismiss="modal">Wróć</button>
+                                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
                                         <form method="POST"
                                             action="{% url 'sickleaves_app:delete_sickleave' sickleave.id %}">
                                             {%csrf_token%}
@@ -99,6 +103,57 @@
                                 </div>
                             </div>
                         </div>
+
+                        <a href="#" role="button" class="btn btn-sm btn-secondary" data-toggle="modal"
+                            data-target="#sendInfoModal{{sickleave.id}}" title="Wyślij informację o zwolnieniu">@</a>
+                        <!-- Modal -->
+                        <div class="modal fade" id="sendInfoModal{{sickleave.id}}" tabindex="-1"
+                            aria-labelledby="sendInfoLabel{{sickleave.id}}" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <p class="modal-title" id="sendInfoLabel{{sickleave.id}}">Powiadomienie o
+                                            zwolnieniu</p>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <form method="POST" action="{%url 'sickleaves_app:notify_sickleave' sickleave.id%}">
+                                        {%csrf_token%}
+                                        <div class="modal-body">
+                                            <p>Wyślij email o zwolnieniu lekarskim do:
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" name="head" id="head"
+                                                    checked>
+                                                <label class="form-check-label" for="head">
+                                                    dyrektora
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" name="instructor"
+                                                    id="instructor" checked>
+                                                <label class="form-check-label" for="instructor">
+                                                    instruktora
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" name="manager"
+                                                    id="manager" checked="checked">
+                                                <label class="form-check-label" for="manager">
+                                                    kierownika
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-light"
+                                                data-dismiss="modal">Wróć</button>
+                                            <button type="submit" class="btn btn-info">Wyślij</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </td>
             </tr>
@@ -106,7 +161,7 @@
         </tbody>
     </table>
     <p class="px-1"><span class="text-danger">*</span> C - chorobowe, O - opieka, K -kwarantanna, I - izolacja</p>
-{%include 'includes/pagination.html'%}
+    {%include 'includes/pagination.html'%}
 </section>
 {% endblock content %}
 {% block extra_js %}

@@ -322,14 +322,16 @@ body {
 
     /* Force table to not be like tables anymore */
     table,
-    thead,
     tbody,
     th,
     td,
     tr {
         display: block;
         min-height: 2.25em;
+    }
 
+    thead {
+        display: block;
     }
 
     /* Hide table headers  */

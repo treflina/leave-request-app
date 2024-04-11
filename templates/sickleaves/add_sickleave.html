@@ -1,16 +1,13 @@
 {% extends "base.html" %}
-{% load  static %}
-
+{% load  static crispy_forms_tags %}
+{% block title %}- dodaj zwolnienie{% endblock title %}
 {% block content %}
 {%include 'includes/navbar.html'%}
-{% load crispy_forms_tags %}
 
 <div class="container mt-5">
-
     <h1 class="page-heading">Dodaj zwolnienie lekarskie</h1>
-    <p>Jeżeli okres zwolnienia lekarskiego pokrywa się z okresem urlopu wypoczynkowego, proszę skorygować bieżący urlop
-        pracownika (panel admin).</p>
-
+    <p>Jeżeli okres zwolnienia lekarskiego pokrywa się z okresem urlopu wypoczynkowego,
+        proszę skorygować bieżący urlop pracownika (panel admin).</p>
     <form method="POST">{% csrf_token %}
         <div class="row">
             <div class="col-lg-6">
@@ -43,7 +40,6 @@
         </div>
         <div class="row">
             <div class="col">
-
             </div>
         </div>
         <div>
@@ -63,7 +59,4 @@
         </div>
     </form>
 </div>
-
-
-
 {% endblock content %}

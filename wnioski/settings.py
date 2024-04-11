@@ -231,8 +231,13 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
 # settings to extract reports from polish zus, set it to empty string if not the case
-# place them in .env file
+# should be placed in .env file
 EZLA_LOGIN = env("EZLA_LOGIN", default=None)
 EZLA_HASLO = env("EZLA_HASLO", default=None)
 EZLA_NIP = env("EZLA_NIP", default=None)

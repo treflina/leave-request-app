@@ -87,7 +87,7 @@ def decode_and_extract(input, filename, pswd=None):
     try:
         os.remove(zipped_file)
     except OSError as e:
-        print("Error: %s - %s." % (e.filename, e.strerror))
+        ezlalogger.error(f"Error while removing report from zus file: {e}")
 
 
 def get_data_from_zus(date=today):

@@ -22,6 +22,7 @@ from .forms import SickleaveForm
 from .utils import (
     SickleaveNotification,
     SickAndAnnulalLeaveOverlappedAlertMixin,
+    ModalSickleaveNotification
 )
 from .ezla import get_compiled_ezla_data
 
@@ -158,6 +159,29 @@ class SickleaveUpdateView(
 def delete_sickleave(request, pk):
     """Deletes sick leave."""
     Sickleave.objects.get(id=pk).delete()
+    return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))
+
+
+@login_required(login_url="users_app:user-login")
+@user_passes_test(check_occupation_user)
+def notify_about_sickleave(request, pk):
+    """Send email notification about sick leave."""
+
+    sickleave = Sickleave.objects.get(id=pk)
+    if request.method == 'POST':
+        head = request.POST.get("head")
+        instructor = request.POST.get("instructor")
+        manager = request.POST.get("manager")
+        try:
+            notification = ModalSickleaveNotification(
+                head, instructor, manager, sickleave
+                )
+            notification.send_notification()
+        except Exception:
+            logger.error(
+                "Email notification about sickleave was not sent",
+                exc_info=True,
+            )
     return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))
 
 
