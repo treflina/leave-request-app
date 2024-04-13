@@ -98,7 +98,7 @@ class SickleavesFilter(django_filters.FilterSet):
         return qs.filter(Q(start_date__year=value) | Q(end_date__year=value))
 
 
-class SickleavesListView(FilteredListView):
+class SickleavesListView(TopManagerPermisoMixin, FilteredListView):
     """Sick leaves listing page."""
 
     filterset_class = SickleavesFilter
@@ -177,9 +177,21 @@ def notify_about_sickleave(request, pk):
                 head, instructor, manager, sickleave
                 )
             notification.send_notification()
-        except Exception:
+            messages.success(
+                request, (
+                    "Informacja o zwolnieniu lekarskim pracownika "
+                    f"{sickleave.employee.get_full_name()} została wysłana."
+                )
+            )
+        except Exception as e:
+            messages.error(
+                request, (
+                    "Nie udało się wysłać inforamcji o zwolnieniu lekarskim "
+                    f"pracownika {sickleave.employee.get_full_name()}."
+                )
+            )
             logger.error(
-                "Email notification about sickleave was not sent",
+                f"Email notification about sickleave was not sent: {e}",
                 exc_info=True,
             )
     return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))

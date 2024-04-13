@@ -85,33 +85,36 @@ class SickleaveNotificationMixin:
             f"{self.text_info}\r\n \r\nWiadomość wygenerowana automatycznie."
         )
         EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
-        if self.employee.manager:
-            send_to_people = []
-            if self.head:
-                person = User.objects.filter(Q(role="S")).first()
+
+        send_to_people = []
+        if self.head:
+            person = User.objects.filter(Q(role="S")).first()
+            if person:
                 send_to_people.append(person.work_email)
-            if self.manager:
-                person = User.objects.filter(
-                    Q(id=self.employee.manager.id)
-                ).first()
+        if self.manager:
+            person = User.objects.filter(
+                Q(id=self.employee.manager.id)
+            ).first()
+            if person:
                 send_to_people.append(person.work_email)
-            if self.instructor:
-                person = User.objects.filter(
-                    Q(role="T") & Q(position__icontains="instruktor")
-                ).first()
+        if self.instructor:
+            person = User.objects.filter(
+                Q(role="T") & Q(position__icontains="instruktor")
+            ).first()
+            if person:
                 send_to_people.append(person.work_email)
 
-            send_to_people_list = [p for p in set(send_to_people)] + [
-                EMAIL_HOST_USER
-            ]
+        send_to_people_list = [p for p in set(send_to_people)] + [
+            EMAIL_HOST_USER
+        ]
 
-            send_mail(
-                subject,
-                message,
-                settings.EMAIL_HOST_USER,
-                send_to_people_list,
-                fail_silently=False,
-            )
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            send_to_people_list,
+            fail_silently=False,
+        )
 
 
 class SickleaveNotification(SickleaveNotificationMixin):

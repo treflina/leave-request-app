@@ -4,7 +4,11 @@ from . import views
 app_name = "sickleaves_app"
 
 urlpatterns = [
-    path("sickleaves/", views.SickleavesListView.as_view(), name="sickleaves"),
+    path(
+        "allsickleaves/",
+        views.SickleavesListView.as_view(),
+        name="sickleaves"
+        ),
     path(
         "add-sickleave/",
         views.SickleaveCreateView.as_view(),
