@@ -148,7 +148,12 @@ EMAIL_PORT = get_secret("EMAIL_PORT")
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [BASE_DIR.child("static")]
+
+if get_secret("DEVIL"):
+    STATICFILES_DIRS = [BASE_DIR.child("public").child("static")]
+else:
+    STATICFILES_DIRS = [BASE_DIR.child("static")]
+
 
 MEDIA_URL = "/media/"
 

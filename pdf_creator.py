@@ -18,14 +18,17 @@ from reportlab.lib.styles import ParagraphStyle
 
 from django.db.models import Q
 from django.http import FileResponse
+from django.contrib.staticfiles import finders
 
 from applications.requests.models import Request
 from applications.sickleaves.models import Sickleave
 from applications.users.models import User
 
+font_normal = finders.find('fonts/signika.ttf')
+font_bold = finders.find('fonts/signika-bold.ttf')
 
-pdfmetrics.registerFont(TTFont("signika", "./static/fonts/signika.ttf"))
-pdfmetrics.registerFont(TTFont("signika-bold", "./static/fonts/signika-bold.ttf"))
+pdfmetrics.registerFont(TTFont("signika", font_normal))
+pdfmetrics.registerFont(TTFont("signika-bold", font_bold))
 
 pdfmetrics.registerFontFamily(
     "signika",
@@ -67,10 +70,10 @@ def create_pdf_sheet(data, fileName, title, start_date, end_date):
     for person in data:
         if len(person["table_data"]) > 1:
             table = Table(person["table_data"])
-
             elems.append(
                 Paragraph(
-                    f"{title} w okresie od {start_date.strftime('%d-%m-%Y')} do {end_date.strftime('%d-%m-%Y')}",
+                    (f"{title} w okresie od {start_date.strftime('%d-%m-%Y')} "
+                        f"do {end_date.strftime('%d-%m-%Y')}"),
                     style=style,
                 )
             )
@@ -100,7 +103,8 @@ def create_pdf_sheet(data, fileName, title, start_date, end_date):
             elems.append(Spacer(1, 20))
             elems.append(
                 Paragraph(
-                    """Miejska Biblioteka Publiczna im. Jana Pawła II w Opolu. Wygenerowano z Pracownik MBP""",
+                    ("Miejska Biblioteka Publiczna im. Jana Pawła II w Opolu. "
+                        "Wygenerowano z Pracownik MBP"),
                     style=style1,
                 )
             )
@@ -152,7 +156,8 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
     table_data_employee = []
 
     def create_data_dict(name, position, employee_data):
-        """helper function to create dictionary with requested data about chosen employee"""
+        """helper function to create dictionary with requested data
+        about chosen employee"""
         data_employee = {}
         data_employee["name"] = name
         data_employee["position"] = position
@@ -196,7 +201,10 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
 
             for item in requests_data:
                 created_newformat = item.created.strftime("%d-%m-%y")
-                employee_repr = f"{item.author.last_name} {item.author.first_name} {item.author.position_addinfo}"
+                employee_repr = (
+                        f"{item.author.last_name} {item.author.first_name} "
+                        f"{item.author.position_addinfo}"
+                    )
 
                 data = [
                     x,
@@ -212,7 +220,9 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
                 x += 1
             create_data_dict(name, position, employee_data)
 
-        create_pdf_sheet(table_data_employee, pdf_buffer, title, start_date, end_date)
+        create_pdf_sheet(
+            table_data_employee, pdf_buffer, title, start_date, end_date
+            )
         pdf_buffer.seek(0)
         return FileResponse(
             pdf_buffer,
@@ -221,9 +231,12 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
         )
 
     elif leave_type == "WS":
-        """report about other type leaves"""
+        # report about other type leaves
 
-        title = "Wykaz wniosków o dni wolne za pracujące soboty (niedziele, święta)"
+        title = (
+            "Wykaz wniosków o dni wolne za pracujące soboty "
+            "(niedziele, święta)"
+            )
 
         for p in person:
             x = 1
@@ -235,7 +248,9 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
                 employee = "- wszyscy pracownicy"
                 requests_data = (
                     Request.objects.filter(
-                        ~Q(leave_type="W") & Q(start_date__range=(start_date, end_date))
+                        ~Q(leave_type="W") & Q(
+                            start_date__range=(start_date, end_date)
+                            )
                     )
                     .order_by("author", "created")
                     .all()
@@ -256,7 +271,10 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
 
             for item in requests_data:
                 created_newformat = item.created.strftime("%d-%m-%y")
-                employee_repr = f"{item.author.last_name} {item.author.first_name} {item.author.position_addinfo}"
+                employee_repr = (
+                    f"{item.author.last_name} {item.author.first_name} "
+                    f"{item.author.position_addinfo}"
+                    )
 
                 if not isinstance(item.work_date, date):
                     work_date = ""
@@ -277,7 +295,9 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
                 x += 1
             create_data_dict(name, position, employee_data)
 
-        create_pdf_sheet(table_data_employee, pdf_buffer, title, start_date, end_date)
+        create_pdf_sheet(
+            table_data_employee, pdf_buffer, title, start_date, end_date
+            )
         pdf_buffer.seek(0)
         return FileResponse(
             pdf_buffer,
@@ -298,7 +318,9 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
                 employee = "- wszyscy pracownicy"
                 sickleaves_data = (
                     Sickleave.objects.filter(
-                        Q(start_date__gte=start_date) & Q(start_date__lte=end_date)
+                        Q(start_date__gte=start_date) & Q(
+                            start_date__lte=end_date
+                            )
                     )
                     .order_by("employee__last_name", "start_date")
                     .all()
@@ -319,7 +341,11 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
                 )
 
             for item in sickleaves_data:
-                employee_repr = f"{item.employee.last_name} {item.employee.first_name} {item.employee.position_addinfo}"
+                employee_repr = (
+                    f"{item.employee.last_name} {item.employee.first_name} "
+                    f"{item.employee.position_addinfo}"
+                    )
+
                 additional_info = (
                     item.additional_info
                     if len(item.additional_info) < 25
@@ -341,8 +367,12 @@ def create_pdf_report(person, start_date, end_date, leave_type, attachment):
             create_data_dict(name, position, employee_data)
 
         title = "Wykaz zwolnień lekarskich"
-        create_pdf_sheet(table_data_employee, pdf_buffer, title, start_date, end_date)
+        create_pdf_sheet(
+            table_data_employee, pdf_buffer, title, start_date, end_date
+            )
         pdf_buffer.seek(0)
         return FileResponse(
-            pdf_buffer, as_attachment=attachment, filename=f"chorobowe {employee}.pdf"
+            pdf_buffer,
+            as_attachment=attachment,
+            filename=f"chorobowe {employee}.pdf"
         )
