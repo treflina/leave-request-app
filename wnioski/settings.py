@@ -1,3 +1,4 @@
+import environ
 import json
 import os
 
@@ -8,10 +9,8 @@ from unipath import Path
 
 BASE_DIR = Path(__file__).ancestor(2)
 
-
 with open(os.path.join(BASE_DIR, "secret.json")) as f:
     secret = json.loads(f.read())
-
 
 def get_secret(secret_name, secrets=secret):
     try:
@@ -19,6 +18,11 @@ def get_secret(secret_name, secrets=secret):
     except:
         msg = f"Nie mam dostępu do zmiennej {secret_name}"
         raise ImproperlyConfigured(msg)
+
+# config only for ZUS service in .env file
+env = environ.Env()
+env_file = '.env'
+env.read_env(env_file=os.path.join(BASE_DIR, ".env"))
 
 
 DEBUG = get_secret("DEBUG")
@@ -93,7 +97,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "wnioski.wsgi.application"
 
 if get_secret("DEVIL"):
-        DATABASES = {
+    DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
             "NAME": get_secret("DB_NAME"),
@@ -177,6 +181,11 @@ LOGGING = {
             "level": "INFO",
             "propagate": True,
         },
+        "ezla": {
+            "handlers": ["ezlalogfile"],
+            "level": "WARNING",
+            "propagate": True,
+        },
     },
     "handlers": {
         "logfile": {
@@ -184,6 +193,14 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": "wnioski.log",
             "formatter": "verbose",
+            "encoding": "utf-8",
+        },
+        "ezlalogfile": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": "ezlaraporty.log",
+            "formatter": "verbose",
+            "encoding": "utf-8",
         },
     },
     "formatters": {
@@ -213,3 +230,19 @@ USE_L10N = True
 USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# settings to extract reports from polish zus, set it to empty string if not the case
+# should be placed in .env file
+EZLA_LOGIN = env("EZLA_LOGIN", default=None)
+EZLA_HASLO = env("EZLA_HASLO", default=None)
+EZLA_NIP = env("EZLA_NIP", default=None)
+EZLA_EXTRACT_PSWD = env("EZLA_EXTRACT_PSWD", default=None)
+EZLA_URL=env("EZLA_URL", default=None)
+EZLA_SERVICE_USERNAME=env("EZLA_SERVICE_USERNAME", default=None)
+EZLA_SERVICE_PSWD=env("EZLA_SERVICE_PSWD", default=None)
+EZLA_SERVICE_IP=env("EZLA_SERVICE_IP", default=None)

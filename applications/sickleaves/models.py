@@ -25,7 +25,9 @@ class Sickleave(models.Model):
         "Rodzaj", max_length=10, choices=LEAVE_TYPE_CHOICES, default="C"
     )
     issue_date = models.DateField("Data wystawienia", null=True, blank=True)
-    doc_number = models.CharField("Nr dokumentu", max_length=20, null=True, blank=True)
+    doc_number = models.CharField(
+        "Nr dokumentu", max_length=20, null=True, blank=True
+    )
     start_date = models.DateField("Od", null=True)
     end_date = models.DateField("Do", null=True)
     additional_info = models.CharField(
@@ -42,3 +44,16 @@ class Sickleave(models.Model):
     def __str__(self):
         return f"""{self.employee.last_name} {self.employee.first_name}
             od {str(self.start_date)} do {str(self.end_date)}"""
+
+
+class EZLAReportDownload(models.Model):
+    """Model for reports downloaded from polish ZUS."""
+
+    last_download_date = models.DateField()
+
+    class Meta:
+        verbose_name = "Ostatnie pobranie raportu z ZUS"
+        verbose_name_plural = "Ostatnie pobranie raportu z ZUS"
+
+    def __str__(self):
+        return f"""Pobrano: {self.last_download_date}"""

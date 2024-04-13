@@ -6,7 +6,9 @@ from applications.users.models import User
 
 class UserModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
-        return obj.last_name + " " + obj.first_name + " " + obj.position_addinfo
+        return (
+            obj.last_name + " " + obj.first_name + " " + obj.position_addinfo
+        )
 
 
 class SickleaveForm(forms.ModelForm):
@@ -15,7 +17,6 @@ class SickleaveForm(forms.ModelForm):
     instructor = forms.BooleanField(label="instruktora", required=False)
 
     class Meta:
-
         model = Sickleave
         fields = (
             "employee",

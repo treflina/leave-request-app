@@ -6,9 +6,10 @@ Other main functions:
 - information about the amount of time off left
 - employee listing for a manager that gives details like eg. a contract end date, a possibility to quickly check if an empoyee should be present at work today
 - e-mail notifications to a manager that a request's been sent
-- push notifications about requests status changes
+- push notifications about leave requests status changes
 - pdf report generator about days off, sick leaves
 - sick leaves registration page
+- optional direct sick leaves data download from ZUS
 - possibility to download documents (like regulations, private insurance contract rules etc.) for employees
 
 Django 3.2. used
@@ -78,10 +79,25 @@ Place a file called secret.json in this base directory. The content should look 
 }
 ```
 
-DEBUG MODE should be set to FALSE in production.
+DEVIL set to true and passenger_wsgi.py file are used in case of mydevil.net hosting.
 
-DEVIL and passenger_wsgi.py file are used in case of mydevil.net hosting
-(here settings with postgres db, psycopg2 should be installed)
+## Optional configuration: direct sick leaves data download from polish ZUS
+
+Place .env file in the root directory with the content below:
+
+```
+EZLA_URL=https://...      //url taken from zus docs
+EZLA_SERVICE_USERNAME=username     //username taken from zusdocs
+EZLA_SERVICE_PSWD=password   //password from zus docs
+EZLA_SERVICE_IP=XXX.XXX.XX.XX  //IP adress of ZUS service
+EZLA_LOGIN=user@example.com  //set in zus pue
+EZLA_HASLO=strongpassword //set in zus pue
+EZLA_NIP=1111111100   //employer's tax number
+EZLA_EXTRACT_PSWD=passwordto_extract_data_from_reports //set in zus pue
+```
+
+More information: [ZUS docs](https://bip.zus.pl/inne/wymagania-dla-oprogramowania-interfejsowego/usluga-do-pobierania-raportow-e-zla-dla-platnikow)
+
 
 ## Gunicorn
 
