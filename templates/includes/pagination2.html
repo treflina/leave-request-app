@@ -1,6 +1,6 @@
 {% load filter_tags %}
 {% if is_paginated %}
-<nav aria-label="Paginacja" class="my-4">
+<nav aria-label="Paginacja" class="my-4" style="z-index:20;">
     <ul class="pagination justify-content-center">
             {% if page_obj2.has_previous %}
             <li class="page-item">

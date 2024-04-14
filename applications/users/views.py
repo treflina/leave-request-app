@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
 from django.views.decorators.http import require_POST
@@ -30,10 +30,13 @@ from .models import User
 from webpush.models import PushInformation
 from applications.requests.models import Request
 from applications.sickleaves.models import Sickleave
-from applications.users.mixins import TopManagerPermisoMixin
+from applications.users.mixins import (
+    StaffAndDirectorPermissionMixin,
+    check_staff
+)
 
 
-class UserRegisterView(TopManagerPermisoMixin, FormView):
+class UserRegisterView(StaffAndDirectorPermissionMixin, FormView):
     """Employee register form page."""
 
     template_name = "users/register.html"
@@ -116,7 +119,9 @@ class UsersFilter(django_filters.FilterSet):
     lookup_fields = django_filters.CharFilter(
         method="filter_fields",
         label="Wyszukaj",
-        widget=TextInput(attrs={"class": "form-control", "placeholder": "Wyszukaj..."}),
+        widget=TextInput
+        (attrs={"class": "form-control", "placeholder": "Wyszukaj..."}
+         ),
     )
 
     class Meta:
@@ -132,7 +137,8 @@ class UsersFilter(django_filters.FilterSet):
             reduce(
                 operator.and_,
                 (
-                    Q(first_name__icontains=word) | Q(last_name__icontains=word)
+                    Q(first_name__icontains=word)
+                    | Q(last_name__icontains=word)
                     for word in query_words
                 ),
             )
@@ -142,7 +148,7 @@ class UsersFilter(django_filters.FilterSet):
         )
 
 
-class AllEmployeesList(TopManagerPermisoMixin, ListView):
+class AllEmployeesList(StaffAndDirectorPermissionMixin, ListView):
     """Employees listing view for head/manager with notification
     if an employee should be present at work today."""
 
@@ -152,7 +158,11 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
     login_url = reverse_lazy("users_app:user-login")
 
     def get_queryset(self, **kwargs):
-        queryset = User.objects.filter(is_active=True).exclude(username="admin")
+        queryset = User.objects.filter(
+            is_active=True
+            ).exclude(
+                username="admin"
+                )
         filter = UsersFilter(self.request.GET, queryset)
         return filter.qs
 
@@ -200,10 +210,10 @@ class AllEmployeesList(TopManagerPermisoMixin, ListView):
         return context
 
 
-class AdminEmployeesList(TopManagerPermisoMixin, ListView):
-    """Employees listing view for HR with information about how many days off they are
-    entitled to, how many duvet days have been taken in the current year.
-    This view contains also a list of ex-employees"""
+class AdminEmployeesList(StaffAndDirectorPermissionMixin, ListView):
+    """Employees listing view for HR with information about how many days off
+    they are entitled to, how many duvet days have been taken in the
+    current year. This view contains also a list of ex-employees"""
 
     template_name = "users/admin_all_employees.html"
     model = User
@@ -240,7 +250,7 @@ class AdminEmployeesList(TopManagerPermisoMixin, ListView):
         return context
 
 
-class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
+class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
     """Employee details update form."""
 
     model = User
@@ -277,15 +287,17 @@ class EmployeeUpdateView(TopManagerPermisoMixin, UpdateView):
 
 
 @login_required(login_url="users_app:user-login")
+@user_passes_test(check_staff)
 def delete_employee(request, pk):
     User.objects.get(id=pk).delete()
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
 
 
 @login_required(login_url="users_app:user-login")
+@user_passes_test(check_staff)
 def add_annual_leave(request):
-    """Tool to add at the beginning of the year all employees annual leave entitlement
-    to their current leave entitlement."""
+    """Tool to add at the beginning of the year all employees annual leave
+    entitlement to their current leave entitlement."""
     for employee in User.objects.filter(is_active=True):
         employee.current_leave += employee.annual_leave
         employee.save()

@@ -16,6 +16,8 @@ from zeep.transports import Transport
 
 from django.conf import settings
 
+from .models import EZLAReportGeneration
+
 ezlalogger = logging.getLogger("ezla")
 
 URL = getattr(settings, "EZLA_URL", "")
@@ -142,14 +144,31 @@ def get_data_from_zus(date=today):
                 for i, item in enumerate(content_list):
                     generated_date = item.find("dataWygenerowania").text
 
+                reports_dates = []
                 for i, report in enumerate(content_list):
                     generated_date = report.find("dataWygenerowania").text
+                    generated_date_obj = datetime.strptime(
+                        generated_date, "%Y-%m-%d"
+                        ) if generated_date is not None else None
+                    reports_dates.append(generated_date_obj)
                     report_str_content = report.find("zawartosc").text
                     report_binary_content = report_str_content.encode("utf-8")
                     filename = f"{generated_date}-{i}"
                     decode_and_extract(
                         report_binary_content, filename, pswd=EZLA_EXTRACT_PSWD
                     )
+                last_report_date = max(reports_dates) if (
+                    all(isinstance(x, datetime) for x in reports_dates)
+                    ) else None
+                if last_report_date:
+                    last_date_in_db = EZLAReportGeneration.objects.last()
+                    if last_date_in_db:
+                        last_date_in_db.last_report_date = last_report_date
+                    else:
+                        EZLAReportGeneration.objects.create(
+                            last_report_date=last_report_date
+                            )
+
             except KeyError as e:
                 ezlalogger.error(
                     f"Sprawdź treść pobranego z ZUS raportu. Błąd: {e}"
@@ -194,11 +213,14 @@ def get_compiled_ezla_data(date):
         if isinstance(data, str):
             return data
     else:
-        return "Dzisiejszy raport został już pobrany z ZUS."
+        return "Ostatni raport wygenerowany przez ZUS został już pobrany."
 
     sickleaves_list = []
     if not glob.glob("extracted_files/**/*.xml", recursive=True):
-        return "Błąd. Brak pobranych raportów."
+        return (
+            "Błąd. Brak pobranych raportów. "
+            "Sprawdź w ZUS PUE czy raport został wygenerowany."
+            )
 
     for filename in glob.glob("extracted_files/**/*.xml"):
         tree = ET.parse(filename)

@@ -1,8 +1,6 @@
 {% extends 'base_login.html'%}
 {% load static %}
-
 {% block content %}
-
 <main>
     <div class="login mt-5">
         <form method="post">{%csrf_token%}
@@ -22,7 +20,7 @@
         </form>
     </div>
     <div class="logo app-logo">
-        <a href="https://mbp.opole.pl/"><img src="../static/img/mbp_logo.png" alt="logo link do strony MBP w Opolu"></a>
+        <a href="https://mbp.opole.pl/"><img src="{% static 'img/mbp_logo.png' %}" alt="logo"></a>
     </div>
 </main>
 {%endblock content%}

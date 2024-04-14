@@ -4,20 +4,22 @@ import django_filters
 
 from functools import reduce
 from simple_history.utils import update_change_reason
-from webpush.utils import send_to_subscription
 from webpush import send_user_notification
 
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import FormView, ListView, UpdateView
 from django.forms.widgets import Select, TextInput, DateInput
 
 from applications.users.models import User
-from applications.users.mixins import TopManagerPermisoMixin
-
+from applications.users.mixins import (
+    TopManagerPermisoMixin,
+    check_occupation_user
+)
 from .models import Request
 from .forms import RequestForm, UpdateRequestForm
 from .utils import RequestEmailNotification
@@ -39,7 +41,11 @@ class RequestFormView(LoginRequiredMixin, FormView):
         context = super(RequestFormView, self).get_context_data(**kwargs)
         context["form"].fields["send_to_person"].queryset = (
             User.objects.filter(
-                (Q(id=self.request.user.manager_id) | Q(role="S") | Q(role="T"))
+                (
+                    Q(id=self.request.user.manager_id)
+                    | Q(role="S")
+                    | Q(role="T")
+                )
                 & Q(is_active=True)
             )
             .exclude(id=self.request.user.id)
@@ -67,12 +73,14 @@ class RequestFormView(LoginRequiredMixin, FormView):
 
         send_to_person = form.cleaned_data["send_to_person"]
 
-        if (leave_type == "WS" or leave_type == "WN") and Request.objects.filter(
-            Q(author=user)
-            & Q(work_date=work_date)
-            & ~Q(status="odrzucony")
-            & ~Q(status="anulowany")
-        ).exists():
+        if (leave_type == "WS" or leave_type == "WN") and (
+                    Request.objects.filter(
+                        Q(author=user)
+                        & Q(work_date=work_date)
+                        & ~Q(status="odrzucony")
+                        & ~Q(status="anulowany")
+                    )
+                ).exists():
             messages.error(
                 self.request,
                 """Błąd. Wniosek o odebranie dnia wolnego za wskazaną pracującą
@@ -97,7 +105,9 @@ class RequestFormView(LoginRequiredMixin, FormView):
         messages.success(self.request, "Wniosek został pomyślnie złożony.")
 
         try:
+            base_url = 'https://' + self.request.get_host()
             notification = RequestEmailNotification(
+                base_url,
                 user,
                 leave_type,
                 start_date,
@@ -113,8 +123,10 @@ class RequestFormView(LoginRequiredMixin, FormView):
         try:
             payload = {
                 "head": "Nowy wniosek do zaopiniowania",
-                "body": f"""{user} prosi o akceptację wniosku ({leave_type}) \
-    od {start_date} do {end_date}.""",
+                "body": (
+                    f"{user} prosi o akceptację wniosku ({leave_type}) "
+                    f"od {start_date} do {end_date}."
+                ),
                 "url": reverse("requests_app:allrequests"),
             }
             recipient = send_to_person
@@ -137,15 +149,19 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(RequestChangeView, self).get_context_data(**kwargs)
-        context["form"].fields["send_to_person"].queryset = User.objects.filter(
-            (Q(role="K") | Q(role="S") | Q(role="T")) & Q(is_active=True)
+        context["form"].fields["send_to_person"].queryset = (
+            User.objects.filter(
+                (Q(role="K") | Q(role="S") | Q(role="T")) & Q(is_active=True)
+            )
         ).order_by("last_name")
 
         if self.object.author.working_hours < 1:
             context["part"] = True
 
         history_changereason = (
-            Request.history.filter(id=self.object.id).first().history_change_reason
+            Request.history.filter(id=self.object.id)
+            .first()
+            .history_change_reason
         )
         if history_changereason in ["None", "", None]:
             context["history_changereason"] = "brak"
@@ -162,7 +178,7 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
 
 
 class UserRequestsListView(LoginRequiredMixin, PaginationMixin, ListView):
-    """Authenticated user leave requests listing view."""
+    """User leave requests listing view."""
 
     template_name = "requests/user_requests.html"
     model = Request
@@ -175,8 +191,14 @@ class UserRequestsListView(LoginRequiredMixin, PaginationMixin, ListView):
         user_requests_holiday = Request.objects.user_requests_holiday(user)
         user_requests_other = Request.objects.user_requests_other(user)
 
-        context["user_requests_holiday"] = self.paginate(user_requests_holiday, "page")
-        context["user_requests_other"] = self.paginate(user_requests_other, "page2")
+        context["user_requests_holiday"] = self.paginate(
+            user_requests_holiday,
+            "page"
+            )
+        context["user_requests_other"] = self.paginate(
+            user_requests_other,
+            "page2"
+            )
 
         return context
 
@@ -186,7 +208,9 @@ class RequestsFilteredListView(ListView):
 
     def get_queryset(self):
         queryset = Request.objects.all().order_by("-start_date")
-        self.filterset = self.filterset_class(self.request.GET, queryset=queryset)
+        self.filterset = self.filterset_class(
+            self.request.GET, queryset=queryset
+            )
         return self.filterset.qs.distinct()
 
     def get_context_data(self, **kwargs):
@@ -236,7 +260,9 @@ class RequestsFilter(django_filters.FilterSet):
     other_fields = django_filters.CharFilter(
         method="filter_other_fields",
         label="Wyszukaj",
-        widget=TextInput(attrs={"class": "form-control", "placeholder": "Wyszukaj..."}),
+        widget=TextInput(
+            attrs={"class": "form-control", "placeholder": "Wyszukaj..."}
+            ),
     )
 
     class Meta:
@@ -324,6 +350,8 @@ class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
         return context
 
 
+@login_required(login_url="users_app:user-login")
+@user_passes_test(check_occupation_user)
 def accept_request(request, pk):
     """Accept the employee request."""
     user = request.user
@@ -334,8 +362,11 @@ def accept_request(request, pk):
     try:
         payload = {
             "head": "Wniosek został zaakceptowany",
-            "body": f"""Wniosek ({request_to_accept.leave_type}) {request_to_accept.start_date} \
-do {request_to_accept.end_date} został zaakceptowany.""",
+            "body": (
+                f"Wniosek ({request_to_accept.leave_type}) "
+                f"{request_to_accept.start_date} "
+                f"do {request_to_accept.end_date} został zaakceptowany."
+            ),
         }
         employee = request_to_accept.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
@@ -345,6 +376,8 @@ do {request_to_accept.end_date} został zaakceptowany.""",
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 
 
+@login_required(login_url="users_app:user-login")
+@user_passes_test(check_occupation_user)
 def reject_request(request, pk):
     """Reject the employee request."""
     user = request.user
@@ -359,8 +392,11 @@ def reject_request(request, pk):
     try:
         payload = {
             "head": "Wniosek został odrzucony",
-            "body": f"""Wniosek ({request_to_reject.leave_type}) {request_to_reject.start_date} \
-do {request_to_reject.end_date} został odrzucony.""",
+            "body": (
+                f"Wniosek ({request_to_reject.leave_type}) "
+                f"{request_to_reject.start_date} "
+                f"do {request_to_reject.end_date} został odrzucony."
+            ),
         }
         employee = request_to_reject.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
@@ -371,6 +407,7 @@ do {request_to_reject.end_date} został odrzucony.""",
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 
 
+@login_required(login_url="users_app:user-login")
 def delete_request(request, pk):
     """Withdraw the request."""
     user = request.user

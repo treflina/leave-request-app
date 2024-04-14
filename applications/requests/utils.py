@@ -3,10 +3,12 @@ from django.conf import settings
 
 
 class RequestEmailNotification:
-    """Handles sending email to manager about a new leave request made by employee."""
+    """Handles sending email to manager about a new leave request made by
+    employee."""
 
     def __init__(
         self,
+        base_url,
         author,
         leave_type,
         start_date,
@@ -15,6 +17,7 @@ class RequestEmailNotification:
         duvet_day,
         send_to_person,
     ):
+        self.base_url = base_url
         self.author = author
         self.leave_type = leave_type
         self.start_date = start_date.strftime("%d.%m.%y")
@@ -26,23 +29,38 @@ class RequestEmailNotification:
     def send_notification(self):
         if self.work_date:
             work_date = self.work_date.strftime("%d.%m.%y")
+
         if self.leave_type == "W" and self.start_date == self.end_date:
             text_msg = f"urlop wypoczynkowy w dniu {self.start_date}"
         elif self.leave_type == "W":
             text_msg = (
-                f"urlop wypoczynkowy w okresie {self.start_date} - {self.end_date}"
+                f"urlop wypoczynkowy w okresie {self.start_date} - "
+                f"{self.end_date}"
             )
         elif self.leave_type == "WS" or self.leave_type == "WN":
-            text_msg = f"dzień wolny ({self.leave_type}) {self.start_date} za pracę {work_date}"
+            text_msg = (
+                f"dzień wolny ({self.leave_type}) {self.start_date} za pracę "
+                f"{work_date}"
+            )
         elif self.leave_type == "DW":
-            text_msg = f"dzień wolny {self.start_date} za święto przypadające w sobotę"
+            text_msg = (
+                f"dzień wolny {self.start_date} za święto przypadające w "
+                "sobotę"
+            )
         else:
-            text_msg = f"wolne ({self.leave_type}) w okresie {self.start_date} - {self.end_date}"
+            text_msg = (
+                f"wolne ({self.leave_type}) w okresie "
+                f"{self.start_date} - {self.end_date}"
+            )
 
-        subject = f"{self.author} prosi o akceptację wniosku ({self.start_date}-{self.end_date})"
+        subject = (
+            f"{self.author} prosi o akceptację wniosku "
+            f"({self.start_date}-{self.end_date})"
+        )
+
         message = (
-            f"{self.author} prosi o akceptację wniosku o {text_msg}.\r\n \r\n"
-            f"Zaopiniuj otrzymany wniosek na: https://pracownik.mbp.opole.pl/ \r\n \r\n"
+            f"{self.author} prosi o akceptację wniosku o {text_msg}. \r\n \r\n"
+            f"Zaopiniuj otrzymany wniosek na: {self.base_url} \r\n \r\n"
             f"Wiadomość wygenerowana automatycznie."
         )
 

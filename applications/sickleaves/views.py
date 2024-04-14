@@ -14,10 +14,10 @@ from django.db.models import Q
 from django.forms.widgets import Select, TextInput
 
 from applications.users.mixins import (
-    TopManagerPermisoMixin,
-    check_occupation_user,
+    StaffAndDirectorPermissionMixin,
+    check_staff
 )
-from .models import Sickleave, EZLAReportDownload
+from .models import Sickleave, EZLAReportDownload, EZLAReportGeneration
 from .forms import SickleaveForm
 from .utils import (
     SickleaveNotification,
@@ -98,7 +98,7 @@ class SickleavesFilter(django_filters.FilterSet):
         return qs.filter(Q(start_date__year=value) | Q(end_date__year=value))
 
 
-class SickleavesListView(TopManagerPermisoMixin, FilteredListView):
+class SickleavesListView(StaffAndDirectorPermissionMixin, FilteredListView):
     """Sick leaves listing page."""
 
     filterset_class = SickleavesFilter
@@ -116,11 +116,21 @@ class SickleavesListView(TopManagerPermisoMixin, FilteredListView):
                 "last_report_date"
             ] = last_download_report.last_download_date
         context["ezla"] = getattr(settings, "EZLA_URL", None)
+
+        last_generated_report = EZLAReportGeneration.objects.last()
+        if last_generated_report:
+            context[
+                "last_generated_date"
+            ] = last_generated_report.last_report_date
+
+        context["ezla"] = getattr(settings, "EZLA_URL", None)
+
         return context
 
 
 class SickleaveCreateView(
-    TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, CreateView
+    StaffAndDirectorPermissionMixin, SickAndAnnulalLeaveOverlappedAlertMixin,
+    CreateView
 ):
     """Sick leave registration form."""
 
@@ -143,7 +153,8 @@ class SickleaveCreateView(
 
 
 class SickleaveUpdateView(
-    TopManagerPermisoMixin, SickAndAnnulalLeaveOverlappedAlertMixin, UpdateView
+    StaffAndDirectorPermissionMixin, SickAndAnnulalLeaveOverlappedAlertMixin,
+    UpdateView
 ):
     """Sickleave update form."""
 
@@ -155,7 +166,7 @@ class SickleaveUpdateView(
 
 
 @login_required(login_url="users_app:user-login")
-@user_passes_test(check_occupation_user)
+@user_passes_test(check_staff)
 def delete_sickleave(request, pk):
     """Deletes sick leave."""
     Sickleave.objects.get(id=pk).delete()
@@ -163,7 +174,7 @@ def delete_sickleave(request, pk):
 
 
 @login_required(login_url="users_app:user-login")
-@user_passes_test(check_occupation_user)
+@user_passes_test(check_staff)
 def notify_about_sickleave(request, pk):
     """Send email notification about sick leave."""
 
@@ -198,7 +209,7 @@ def notify_about_sickleave(request, pk):
 
 
 @login_required(login_url="users_app:user-login")
-@user_passes_test(check_occupation_user)
+@user_passes_test(check_staff)
 def get_ezla(request):
     """Get and save sick leaves from polish ZUS service."""
     today = date.today()
@@ -212,9 +223,18 @@ def get_ezla(request):
         last_download_report = EZLAReportDownload.objects.create(
             last_download_date=date_since
         )
+    last_generated_report = EZLAReportGeneration.objects.last()
 
-    if date_since < (today - timedelta(days=28)):
-        date_since = today - timedelta(days=28)
+    if last_generated_report and last_download_report:
+        date_since = min(
+            [
+                last_generated_report.last_report_date,
+                last_download_report.last_download_date
+            ]
+        )
+
+    if date_since < (today - timedelta(days=29)):
+        date_since = today - timedelta(days=29)
 
     data = get_compiled_ezla_data(date_since)
     users = get_user_model()

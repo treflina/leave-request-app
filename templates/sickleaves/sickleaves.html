@@ -35,7 +35,8 @@
     {% endfor %}
     {% if ezla %}
     <p class="text-muted text-sm px-1 text-center text-md-left">Data ostatniego pobrania raportów z ZUS:
-        {{last_report_date|date:"d.m.Y"}}</p>
+        {{last_report_date|date:"d.m.Y"}}
+        {% if last_generated_date %} (raport z&nbsp;{{last_generated_date|date:"d.m.Y"}}){%endif%}</p>
     {% endif %}
     <table class="table table-striped">
         <thead>

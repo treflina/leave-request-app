@@ -49,7 +49,7 @@ class Sickleave(models.Model):
 class EZLAReportDownload(models.Model):
     """Model for reports downloaded from polish ZUS."""
 
-    last_download_date = models.DateField()
+    last_download_date = models.DateField(verbose_name="ostatnie pobranie")
 
     class Meta:
         verbose_name = "Ostatnie pobranie raportu z ZUS"
@@ -57,3 +57,20 @@ class EZLAReportDownload(models.Model):
 
     def __str__(self):
         return f"""Pobrano: {self.last_download_date}"""
+
+
+class EZLAReportGeneration(models.Model):
+    """Model for reports downloaded from polish ZUS."""
+
+    last_report_date = models.DateField(
+        verbose_name="ostatni wygenerowany raport",
+        null=True,
+        blank=True
+        )
+
+    class Meta:
+        verbose_name = "Ostatni wygenerowany raport z ZUS"
+        verbose_name_plural = "Ostatni wygenerowany raport z ZUS"
+
+    def __str__(self):
+        return f"""Wygenerowanie: {self.last_download_date}"""
