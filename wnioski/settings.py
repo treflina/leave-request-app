@@ -159,7 +159,7 @@ MEDIA_URL = "/media/"
 
 
 if get_secret("DEVIL"):
-    STATIC_ROOT = os.path.join(BASE_DIR, "public", "static")
+    STATIC_ROOT = os.path.join(BASE_DIR, "public", "staticfiles")
     MEDIA_ROOT = os.path.join(BASE_DIR, "public", "media")
 else:
     STATIC_ROOT = BASE_DIR.child("staticfiles")

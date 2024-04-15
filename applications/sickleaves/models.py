@@ -73,4 +73,4 @@ class EZLAReportGeneration(models.Model):
         verbose_name_plural = "Ostatni wygenerowany raport z ZUS"
 
     def __str__(self):
-        return f"""Wygenerowanie: {self.last_download_date}"""
+        return f"""Wygenerowanie: {self.last_report_date}"""

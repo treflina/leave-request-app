@@ -19,8 +19,9 @@ __pycache__
 /applications/home/migrations/*
 
 /media/*
-
-/extracted_files/*
+staticfiles/
+extracted_files/
 
 /data.json
 /data2.json
+

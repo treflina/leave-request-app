@@ -157,7 +157,7 @@ def get_data_from_zus(date=today):
                     decode_and_extract(
                         report_binary_content, filename, pswd=EZLA_EXTRACT_PSWD
                     )
-                last_report_date = max(reports_dates) if (
+                last_report_date = max(reports_dates) if reports_dates and (
                     all(isinstance(x, datetime) for x in reports_dates)
                     ) else None
                 if last_report_date:
