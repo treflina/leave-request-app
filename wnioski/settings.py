@@ -195,10 +195,12 @@ LOGGING = {
     "handlers": {
         "logfile": {
             "level": "WARNING",
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 10*1024*1024,
+            "backupCount": 3,
             "filename": "wnioski.log",
             "formatter": "verbose",
-            "encoding": "utf-8",
+            "encoding": "utf-8"
         },
         "ezlalogfile": {
             "level": "WARNING",
