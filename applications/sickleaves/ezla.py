@@ -157,6 +157,7 @@ def get_data_from_zus(date=today):
                     decode_and_extract(
                         report_binary_content, filename, pswd=EZLA_EXTRACT_PSWD
                     )
+
                 last_report_date = max(reports_dates) if reports_dates and (
                     all(isinstance(x, datetime) for x in reports_dates)
                     ) else None
@@ -164,6 +165,7 @@ def get_data_from_zus(date=today):
                     last_date_in_db = EZLAReportGeneration.objects.last()
                     if last_date_in_db:
                         last_date_in_db.last_report_date = last_report_date
+                        last_date_in_db.save()
                     else:
                         EZLAReportGeneration.objects.create(
                             last_report_date=last_report_date
