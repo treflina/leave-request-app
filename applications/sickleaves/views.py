@@ -219,7 +219,7 @@ def get_ezla(request):
         last_download_date = last_download_report.last_download_date
         date_since = last_download_date + timedelta(days=1)
     else:
-        date_since = today - timedelta(days=1)
+        date_since = today
         last_download_report = EZLAReportDownload.objects.create(
             last_download_date=date_since
         )
@@ -231,7 +231,7 @@ def get_ezla(request):
                 last_generated_report.last_report_date,
                 last_download_report.last_download_date
             ]
-        )
+        ) + timedelta(days=1)
 
     if date_since < (today - timedelta(days=29)):
         date_since = today - timedelta(days=29)
