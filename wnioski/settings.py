@@ -183,7 +183,7 @@ LOGGING = {
     "loggers": {
         "django": {
             "handlers": ["logfile"],
-            "level": "INFO",
+            "level": "WARNING",
             "propagate": True,
         },
         "ezla": {
