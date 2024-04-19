@@ -15,7 +15,8 @@
                     {%csrf_token%}
                     <div class="form-group">
                         <label for="inputEmail">Prywatny adres email</label>
-                        <input type="email" name="email" class="form-control" id="inputEmail" value={{request.user.email}}>
+                        <input type="email" name="email" class="form-control" id="inputEmail"
+                        {% if request.user.email %} value={{request.user.email}} {% endif %}>
                     </div>
                     <div class="form-group form-check">
                         <input type="checkbox" name="agreement" class="form-check-input" id="check1"
