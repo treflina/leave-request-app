@@ -1,5 +1,6 @@
 {% load static %}
 {% load custom_tags %}
+
 <nav class="navbar fixed-top navbar-expand-lg navbar-dark w-100 ">
     <div class="container-fluid mx-auto navbar-wrapper">
         <a href="{%url 'home_app:index'%}" class="navbar-brand ml-1" id="nav_urlop"><img src="{% static 'img/mbp_logo5.png' %}" class="logo-img d-inline-block align-center" alt="logo"></a>
@@ -63,38 +64,10 @@
                         </svg><span class="sr-only">Ustawienia powiadomień</span>
                     </button>
                 </li>
-
                 {%endif%}
             </ul>
         </div>
     </div>
 </nav>
+{% include 'includes/settings.html' %}
 
-<!-- Settings modal -->
-<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <p class="modal-title" id="modalLabel">Ustawienia</p>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Zamknij">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="btn__wrapper"></div>
-                <p>Powiadomienia o składanych i otrzymywanych wnioskach urlopowych</p>
-                <button class="Toggle sub-btn" type="button" aria-pressed="false" id="webpush-subscribe-btn"
-                    data-url="/webpush/save_information">
-                    <span class="btn-text">Włącz</span>
-                    <span class="Toggle__display">
-                        <svg class="Toggle__icon Toggle__icon--checkmark"><use href="{% static 'img/svg/sprite.svg' %}#checkmark"></use></svg>
-                        <svg class="Toggle__icon Toggle__icon--cross"><use href="{% static 'img/svg/sprite.svg' %}#cross"></use></svg>
-                    </span>
-                </button>
-                <div class="webpush-msgbox mt-2 mb-4">
-                    <p id="webpush-message" class="webpush-message"></p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>

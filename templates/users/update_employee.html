@@ -69,11 +69,14 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 {{ form.is_active|as_crispy_field }}
             </div>
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 {{ form.is_staff|as_crispy_field }}
+            </div>
+            <div class="col-lg-4">
+                {{ form.email_notifications|as_crispy_field }}
             </div>
         </div>
         <div class="form-group">

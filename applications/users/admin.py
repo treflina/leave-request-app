@@ -38,6 +38,7 @@ class EmployeeAdmin(UserAdmin):
                     "first_name",
                     "last_name",
                     "email",
+                    "email_notifications",
                     "work_email",
                     "position",
                     "position_addinfo",
@@ -52,7 +53,10 @@ class EmployeeAdmin(UserAdmin):
         ),
         (
             _("Leave"),
-            {"classes": ("wide",), "fields": ("current_leave", "annual_leave")},
+            {
+                "classes": ("wide",),
+                "fields": ("current_leave", "annual_leave")
+                },
         ),
         (
             _("Permissions"),

@@ -20,10 +20,12 @@ from applications.users.mixins import (
     TopManagerPermisoMixin,
     check_occupation_user
 )
+from paginator import PaginationMixin
 from .models import Request
 from .forms import RequestForm, UpdateRequestForm
-from .utils import RequestEmailNotification
-from paginator import PaginationMixin
+from .utils import (
+    RequestEmailNotification, RequestChangedStatusEmailNotification
+    )
 
 
 logger = logging.getLogger("django")
@@ -88,7 +90,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
             )
             return self.form_invalid(form)
 
-        Request(
+        new_request = Request(
             author=user,
             leave_type=leave_type,
             work_date=work_date,
@@ -108,13 +110,7 @@ class RequestFormView(LoginRequiredMixin, FormView):
             base_url = 'https://' + self.request.get_host()
             notification = RequestEmailNotification(
                 base_url,
-                user,
-                leave_type,
-                start_date,
-                end_date,
-                work_date,
-                duvet_day,
-                send_to_person,
+                new_request
             )
             notification.send_notification()
         except Exception:
@@ -356,6 +352,7 @@ def accept_request(request, pk):
     """Accept the employee request."""
     user = request.user
     request_to_accept = Request.objects.get(id=pk)
+    employee = request_to_accept.author
     request_to_accept.status = "zaakceptowany"
     request_to_accept.signed_by = user.first_name + " " + user.last_name
     request_to_accept.save(update_fields=["status", "signed_by"])
@@ -368,11 +365,20 @@ def accept_request(request, pk):
                 f"do {request_to_accept.end_date} został zaakceptowany."
             ),
         }
-        employee = request_to_accept.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
 
     except Exception:
         logger.error("Notification was not sent", exc_info=True)
+
+    if employee.email and employee.email_notifications:
+        try:
+            notification = RequestChangedStatusEmailNotification(
+                request_to_accept
+            )
+            notification.send_notification()
+        except Exception:
+            logger.error("Email request notification not sent", exc_info=True)
+
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 
 
@@ -380,8 +386,10 @@ def accept_request(request, pk):
 @user_passes_test(check_occupation_user)
 def reject_request(request, pk):
     """Reject the employee request."""
+
     user = request.user
     request_to_reject = Request.objects.get(id=pk)
+    employee = request_to_reject.author
     if request_to_reject.leave_type == "W":
         employee_to_update = User.objects.get(id=request_to_reject.author.id)
         employee_to_update.current_leave += request_to_reject.days
@@ -398,11 +406,19 @@ def reject_request(request, pk):
                 f"do {request_to_reject.end_date} został odrzucony."
             ),
         }
-        employee = request_to_reject.author
         send_user_notification(user=employee, payload=payload, ttl=1000)
 
     except Exception:
         logger.error("Notification was not sent", exc_info=True)
+
+    if employee.email and employee.email_notifications:
+        try:
+            notification = RequestChangedStatusEmailNotification(
+                request_to_reject
+            )
+            notification.send_notification()
+        except Exception:
+            logger.error("Email request notification not sent", exc_info=True)
 
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 

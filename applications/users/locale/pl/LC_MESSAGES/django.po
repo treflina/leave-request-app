@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-06 10:44+0100\n"
+"POT-Creation-Date: 2024-04-19 17:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,11 +24,11 @@ msgstr ""
 msgid "Basic Information"
 msgstr "Podstawowe informacje"
 
-#: .\admin.py:54
+#: .\admin.py:55
 msgid "Leave"
 msgstr "Urlop"
 
-#: .\admin.py:58
+#: .\admin.py:62
 msgid "Permissions"
 msgstr "Uprawnienia"
 
@@ -36,13 +36,9 @@ msgstr "Uprawnienia"
 msgid "no"
 msgstr "Nie"
 
-#: .\models.py:13
+#: .\models.py:13 .\models.py:37
 msgid "manager"
 msgstr "Kierownik-przełożony"
-
-.\models.py:37
-msgid "manager"
-msgstr "Przełożony"
 
 #: .\models.py:14
 msgid "vice-director, instructor"
@@ -116,16 +112,20 @@ msgstr "Uprawnienia administratora"
 msgid "additional information"
 msgstr "Dodatkowe informacje"
 
-#: .\models.py:57
+#: .\models.py:52
+msgid "email notifications consent"
+msgstr "Zgoda na otrzymywanie powiadomień emailem"
+
+#: .\models.py:61
 msgid "employee"
 msgstr "pracownik"
 
-#: .\models.py:58
+#: .\models.py:62
 msgid "employees"
 msgstr "pracownicy"
 
 #~ msgid "No"
 #~ msgstr "Nie"
 
-msgid "January"
-msgstr "Styczeń"
+#~ msgid "January"
+#~ msgstr "Styczeń"

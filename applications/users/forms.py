@@ -37,6 +37,7 @@ class UserRegisterForm(forms.ModelForm):
             "additional_info",
             "is_active",
             "is_staff",
+            "email_notifications"
         )
         widgets = {
             "contract_end": forms.DateInput(
@@ -54,7 +55,9 @@ class UserRegisterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
         self.fields["manager"] = forms.ModelChoiceField(
-            queryset=User.objects.filter(~Q(role="P") & Q(is_active=True)).order_by(
+            queryset=User.objects.filter(
+                ~Q(role="P") & Q(is_active=True)
+                ).order_by(
                 "last_name"
             ),
             required=False,
@@ -89,7 +92,9 @@ class LoginForm(forms.Form):
         password = self.cleaned_data.get("password")
 
         if not authenticate(username=username, password=password):
-            raise forms.ValidationError("Dane podane do logowania nie są prawidłowe.")
+            raise forms.ValidationError(
+                "Dane podane do logowania nie są prawidłowe."
+                )
 
         return cleaned_data
 

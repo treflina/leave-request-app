@@ -276,6 +276,7 @@ class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
         "is_active",
         "is_staff",
         "additional_info",
+        "email_notifications"
     ]
 
     def get_context_data(self, **kwargs):
@@ -284,6 +285,22 @@ class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
             ~Q(role="P") & Q(is_active=True)
         ).order_by("last_name")
         return context
+
+
+@login_required(login_url="users_app:user-login")
+def email_notifications_settings(request, pk):
+    """Update user email notificationd agreement."""
+
+    if request.method == 'POST':
+        email = request.POST.get("email", None)
+        agreement = request.POST.get("agreement", False)
+        bool_agreement = True if agreement == "on" else False
+        user_to_update = User.objects.get(id=pk)
+        if user_to_update and email:
+            user_to_update.email = email
+            user_to_update.email_notifications = bool_agreement
+            user_to_update.save()
+    return HttpResponseRedirect(reverse("home_app:index"))
 
 
 @login_required(login_url="users_app:user-login")

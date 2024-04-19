@@ -1,0 +1,44 @@
+{% load static %}
+<!-- Settings modal -->
+<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content ">
+            <div class="modal-header bg-success text-light">
+                <p class="modal-title " id="modalLabel">Ustawienia</p>
+                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Zamknij">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="btn__wrapper"></div>
+                <form method="POST" action="{% url 'users_app:email-settings' request.user.id %}" class="mb-4">
+                    {%csrf_token%}
+                    <div class="form-group">
+                        <label for="inputEmail">Prywatny adres email</label>
+                        <input type="email" name="email" class="form-control" id="inputEmail" value={{request.user.email}}>
+                    </div>
+                    <div class="form-group form-check">
+                        <input type="checkbox" name="agreement" class="form-check-input" id="check1"
+                        {% if request.user.email_notifications %} checked {% endif %}>
+                        <label class="form-check-label" for="check1">Chcę otrzymywać na podany adres email informacje o zmianie
+                            statusu moich wniosków.</label>
+                    </div>
+                    <button type="submit" class="btn btn-success ml-auto d-block">Zapisz</button>
+                </form>
+                <hr>
+                <p>Powiadomienia push o składanych i otrzymywanych wnioskach urlopowych</p>
+                <button class="Toggle sub-btn" type="button" aria-pressed="false" id="webpush-subscribe-btn"
+                    data-url="/webpush/save_information">
+                    <span class="btn-text">Włącz</span>
+                    <span class="Toggle__display">
+                        <svg class="Toggle__icon Toggle__icon--checkmark"><use href="{% static 'img/svg/sprite.svg' %}#checkmark"></use></svg>
+                        <svg class="Toggle__icon Toggle__icon--cross"><use href="{% static 'img/svg/sprite.svg' %}#cross"></use></svg>
+                    </span>
+                </button>
+                <div class="webpush-msgbox mt-2 mb-4">
+                    <p id="webpush-message" class="webpush-message"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
