@@ -142,6 +142,7 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
     template_name = "requests/changerequest.html"
     login_url = reverse_lazy("users_app:user-login")
     success_url = reverse_lazy("requests_app:hrallrequests")
+    context_object_name = "leave_request"
 
     def get_context_data(self, **kwargs):
         context = super(RequestChangeView, self).get_context_data(**kwargs)
