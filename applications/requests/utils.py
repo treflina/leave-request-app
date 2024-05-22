@@ -47,7 +47,7 @@ class RequestEmailNotification(RequestEmailNotificationMixin):
     employee."""
 
     def __init__(self, leave_request, base_url):
-        super().__init__(self, leave_request)
+        super().__init__(leave_request)
         self.base_url = base_url
         self.send_to_person = leave_request.send_to_person
 

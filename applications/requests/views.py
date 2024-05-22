@@ -100,7 +100,8 @@ class RequestFormView(LoginRequiredMixin, FormView):
             duvet_day=duvet_day,
             substitute=form.cleaned_data["substitute"],
             send_to_person=send_to_person,
-        ).save()
+        )
+        new_request.save()
 
         user.current_leave -= days
         user.save(update_fields=["current_leave"])
@@ -109,8 +110,8 @@ class RequestFormView(LoginRequiredMixin, FormView):
         try:
             base_url = 'https://' + self.request.get_host()
             notification = RequestEmailNotification(
-                base_url,
-                new_request
+                base_url=base_url,
+                leave_request=new_request
             )
             notification.send_notification()
         except Exception:

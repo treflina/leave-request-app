@@ -276,13 +276,13 @@ def get_compiled_ezla_data(date):
                     additional_info = ""
 
                     if hospital_from is not None:
-                        hospital_start = ("-").join(
-                            hospital_from.split("-")[:-1]
+                        hospital_start = (".").join(
+                            hospital_from.split("-")[::-1]
                         )
                         hospital_end = (
-                            ("-").join(hospital_to.split("-")[:-1])
+                            (".").join(hospital_to.split("-")[::-1])
                             if hospital_to is not None
-                            else hospital_from
+                            else hospital_start
                         )
 
                         hospital_info = (
