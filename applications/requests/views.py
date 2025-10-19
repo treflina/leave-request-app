@@ -18,7 +18,8 @@ from django.forms.widgets import Select, TextInput, DateInput
 from applications.users.models import User
 from applications.users.mixins import (
     TopManagerPermisoMixin,
-    check_occupation_user
+    check_occupation_user,
+    StaffAndDirectorPermissionMixin
 )
 from paginator import PaginationMixin
 from .models import Request
@@ -327,7 +328,7 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
         return context
 
 
-class HRAllRequestsListView(TopManagerPermisoMixin, ListView):
+class HRAllRequestsListView(StaffAndDirectorPermissionMixin, ListView):
     """All employees requests listing page for HR department."""
 
     context_object_name = "requests_holiday"

@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 
 from applications.users.models import User
-from applications.users.mixins import TopManagerPermisoMixin
+from applications.users.mixins import StaffAndDirectorPermissionMixin
 from .models import UploadFile, CATEGORY_CHOICES
 from .forms import ReportForm
 from pdf_creator import create_pdf_report
@@ -32,7 +32,7 @@ class HomePage(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ReportView(TopManagerPermisoMixin, FormView):
+class ReportView(StaffAndDirectorPermissionMixin, FormView):
     """Creates pdf report about leave requests and sickleaves for a chosen
     time period."""
 
@@ -58,7 +58,8 @@ class ReportView(TopManagerPermisoMixin, FormView):
 
 
 class UploadFileView(LoginRequiredMixin, CreateView):
-    """Uploaded documents listing view. HR, topmanagers and users who are employed
+    """Uploaded documents listing view. HR, topmanagers
+    and users who are employed
     as informaticians can upload and delete files."""
 
     model = UploadFile

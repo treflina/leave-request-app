@@ -8,7 +8,6 @@ def check_occupation_user(user):
     or manager."""
     if user.is_anonymous:
         return False
-
     if user.role == "S" or user.role == "T" or user.role == "K":
         return True
     elif user.is_staff:
