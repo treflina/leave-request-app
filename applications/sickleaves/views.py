@@ -19,7 +19,7 @@ from applications.users.mixins import (
 )
 from .models import Sickleave, EZLAReportDownload, EZLAReportGeneration
 from .forms import SickleaveForm
-from .utils import (
+from .mixins import (
     SickleaveNotification,
     SickAndAnnulalLeaveOverlappedAlertMixin,
     ModalSickleaveNotification
@@ -213,25 +213,11 @@ def notify_about_sickleave(request, pk):
 def get_ezla(request):
     """Get and save sick leaves from polish ZUS service."""
     today = date.today()
-
-    last_download_report = EZLAReportDownload.objects.last()
-    if last_download_report:
-        last_download_date = last_download_report.last_download_date
-        date_since = last_download_date + timedelta(days=1)
-    else:
-        date_since = today
-        last_download_report = EZLAReportDownload.objects.create(
-            last_download_date=date_since
-        )
+    date_since = today - timedelta(days=29)
     last_generated_report = EZLAReportGeneration.objects.last()
 
-    if last_generated_report and last_download_report:
-        date_since = min(
-            [
-                last_generated_report.last_report_date,
-                last_download_report.last_download_date
-            ]
-        ) + timedelta(days=1)
+    if last_generated_report and last_generated_report.last_report_date:
+        date_since = last_generated_report.last_report_date + timedelta(days=1)
 
     if date_since < (today - timedelta(days=29)):
         date_since = today - timedelta(days=29)
@@ -241,8 +227,9 @@ def get_ezla(request):
 
     if isinstance(data, list) and not data:
         messages.success(request, "Brak nowych zwolnień do pobrania.")
-        last_download_report.last_download_date = today
-        last_download_report.save()
+        EZLAReportDownload.objects.update_or_create(
+            defaults={"last_download_date": today}
+        )
         return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))
 
     if isinstance(data, list) and len(data):
@@ -267,7 +254,7 @@ def get_ezla(request):
                     sickleave_in_db = Sickleave.objects.filter(
                         doc_number=doc_number, issue_date=issue_date
                     )
-                    if sickleave_in_db:
+                    if sickleave_in_db.exists():
                         sickleave_in_db.update(
                             leave_type=sickleave.get("leave_type"),
                             start_date=sickleave.get("start_date"),
@@ -305,9 +292,9 @@ def get_ezla(request):
                         ("Błąd podczas zapisywania zwolnienia do bazy u: "
                             f"{sick_empl_first_name} {sick_empl_last_name}")
                     )
-        last_download_report.last_download_date = today
-        last_download_report.save()
-
+        EZLAReportDownload.objects.update_or_create(
+            defaults={"last_download_date": today}
+        )
     else:
         messages.error(request, data)
 

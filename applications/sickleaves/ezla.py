@@ -1,22 +1,24 @@
 import base64
 import glob
+from io import BytesIO
 import logging
 import os
 import pyzipper
 import re
 import xml.etree.ElementTree as ET
 
-from datetime import date, datetime
+from datetime import datetime
 from requests import Session
 from requests.adapters import HTTPAdapter
 from requests.auth import HTTPBasicAuth
-from requests.exceptions import SSLError, HTTPError
+from requests.exceptions import ConnectionError, SSLError, HTTPError
 from zeep import Client, Settings
 from zeep.transports import Transport
 
 from django.conf import settings
 
-from .models import EZLAReportGeneration
+from .models import EZLAReportGeneration, Sickleave
+from .utils import get_text, safe_extract, cleanup_extracted_files
 
 ezlalogger = logging.getLogger("ezla")
 
@@ -34,8 +36,7 @@ headers = {
         "zus_channel_platnikRaportyZla_wsdlPlatnikRaportyZla_Binder_pobierzRaporty"  # noqa: E501
     )
 }
-settings = Settings(extra_http_headers=headers, raw_response=True)
-today = date.today()
+zeep_settings = Settings(extra_http_headers=headers, raw_response=True)
 
 
 class CustomHostNameCheckingAdapter(HTTPAdapter):
@@ -51,49 +52,70 @@ class UnpackingException(Exception):
     pass
 
 
-def decode_and_extract(input, filename, pswd=None):
-    """Decode input content, save as zip file and extract."""
-
+def decode_and_extract(input_data, password=None):
+    """
+    Decode base64 input and extract ZIP contents into a temp directory.
+    Returns a list of extracted XML file paths.
+    """
     altchars = b"+/"
-    data = re.sub(rb"[^a-zA-Z0-9%s]+" % altchars, b"", input)  # normalize
+    data = re.sub(rb"[^a-zA-Z0-9%s]+" % altchars, b"", input_data)
     missing_padding = len(data) % 4
     if missing_padding:
         data += b"=" * (4 - missing_padding)
 
-    zipped_file = f"{filename}.zip"
+    try:
+        decoded_data = base64.b64decode(data)
+    except Exception as e:
+        raise UnpackingException(f"Base64 decode error: {e}")
+
+    temp_dir = os.path.join(
+        "extracted_files",
+        f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    )
+    try:
+        os.makedirs(temp_dir, exist_ok=True)
+    except Exception as e:
+        raise UnpackingException(f"Failed to create temp directory: {e}")
+
+    zip_path = os.path.join(temp_dir, "report.zip")
 
     try:
-        with open(zipped_file, "wb") as result:
-            result.write(base64.b64decode(data))
-    except IOError as e:
-        ezlalogger.error(f"Błąd podczas zapisywania zapakowanego raportu: {e}")
-        raise IOError(f"Błąd podczas zapisywania zapakowanego raportu: {e}")
+        with open(zip_path, "wb") as f:
+            f.write(decoded_data)
 
-    with pyzipper.AESZipFile(
-        zipped_file,
-        "r",
-        compression=pyzipper.ZIP_DEFLATED,
-        encryption=pyzipper.WZ_AES,
-    ) as extracted_zip:
-        try:
-            extracted_zip.extractall(
-                pwd=str.encode(pswd), path=f"extracted_files/{filename}"
-            )
-        except Exception as e:
-            ezlalogger.error(f"Błąd podczas wypakowywania: {e}")
+        with pyzipper.AESZipFile(
+            zip_path,
+            "r",
+            compression=pyzipper.ZIP_DEFLATED,
+            encryption=pyzipper.WZ_AES,
+        ) as zip_file:
+            pwd = password.encode() if password else None
+            safe_extract(zip_file, temp_dir, password=pwd)
+
+        extracted_files = [
+            os.path.join(root, f)
+            for root, _, files in os.walk(temp_dir)
+            for f in files if f.lower().endswith(".xml")
+        ]
+
+        os.remove(zip_path)
+
+        if not extracted_files:
             raise UnpackingException(
-                "Błąd podczas wypakowywania raportów pobranych z ZUS"
-            )
+                "ZIP archive did not contain any XML files."
+                )
 
-    # remove unnecesary zip files
-    try:
-        os.remove(zipped_file)
-    except OSError as e:
-        ezlalogger.error(f"Error while removing report from zus file: {e}")
+        return extracted_files
+
+    except Exception as e:
+        raise UnpackingException(f"Failed to unpack ZIP: {e}")
 
 
-def get_data_from_zus(date=today):
+def get_data_from_zus(date=None):
     """Connection to ZUS service to get sick leaves reports"""
+
+    if date is None:
+        date = date.today()
 
     session = Session()
     session.auth = HTTPBasicAuth(EZLA_SERVICE_USERNAME, EZLA_SERVICE_PSWD)
@@ -101,7 +123,7 @@ def get_data_from_zus(date=today):
 
     try:
         client = Client(
-            URL, transport=Transport(session=session), settings=settings
+            URL, transport=Transport(session=session), settings=zeep_settings
         )
     except ValueError as e:
         ezlalogger.error(f"Błąd połączenia: {e}")
@@ -127,16 +149,15 @@ def get_data_from_zus(date=today):
             nip=NIP,
             dataOd=date,
         )
-        try:
-            with open("applications/sickleaves/raporty.xml", mode="wb") as f:
-                f.write(resp.content)
-        except IOError as e:
-            ezlalogger.error(f"Błąd podczas zapisywania raportu: {e}")
-            return f"Błąd podczas zapisywania raportu: {e}"
 
-        tree = ET.parse("applications/sickleaves/raporty.xml")
-        root = tree.getroot()
-        code = root.find(".//kod").text
+        try:
+            tree = ET.parse(BytesIO(resp.content))
+            root = tree.getroot()
+        except ET.ParseError as e:
+            ezlalogger.error(f"Błąd podczas parsowania XML z ZUS: {e}")
+            return f"Błąd podczas parsowania XML: {e}"
+
+        code = get_text(root, ".//kod")
 
         if code == "0":
             try:
@@ -153,9 +174,9 @@ def get_data_from_zus(date=today):
                     reports_dates.append(generated_date_obj)
                     report_str_content = report.find("zawartosc").text
                     report_binary_content = report_str_content.encode("utf-8")
-                    filename = f"{generated_date}-{i}"
+                    # filename = f"{generated_date}-{i}"
                     decode_and_extract(
-                        report_binary_content, filename, pswd=EZLA_EXTRACT_PSWD
+                        report_binary_content, password=EZLA_EXTRACT_PSWD
                     )
 
                 last_report_date = max(reports_dates) if reports_dates and (
@@ -209,7 +230,7 @@ def get_data_from_zus(date=today):
 def get_compiled_ezla_data(date):
     """Get and prepare sick leaves data from xml ZUS reports"""
 
-    if date <= today:
+    if date <= date.today():
         data = get_data_from_zus(date)
         # if data is string not None, return error message
         if isinstance(data, str):
@@ -224,26 +245,38 @@ def get_compiled_ezla_data(date):
             "Sprawdź w ZUS PUE czy raport został wygenerowany."
             )
 
-    for filename in glob.glob("extracted_files/**/*.xml"):
+    for filename in glob.glob("extracted_files/**/*.xml", recursive=True):
         tree = ET.parse(filename)
         root = tree.getroot()
         pos_num = root.find(".//liczbaDokumentowEzla")
-        dirname = os.path.dirname(filename)
 
         if pos_num is not None and pos_num.text != "0":
             try:
                 for doc in root.iter("dokumentyEzla"):
-                    empl_identifier = doc.find(".//identyfikator/wartosc").text
-                    first_name = doc.find(".//imie").text
-                    last_name = doc.find(".//nazwisko").text
-                    series = doc.find(".//seria").text
-                    number = doc.find(".//numer").text
-                    # status = doc[1][1].text
-                    issue_date = doc.find(".//dataWystawienia").text
-                    period_from = doc.find(".//okresZwolnienia/dataOd").text
-                    period_to = doc.find(".//okresZwolnienia/dataDo").text
-                    hospital_from = doc.find(".//okresWSzpitalu/dataOd").text
-                    hospital_to = doc.find(".//okresWSzpitalu/dataDo").text
+                    # TODO
+                    empl_identifier = get_text(doc, ".//identyfikator/wartosc")
+                    first_name = get_text(doc, ".//imie")
+                    last_name = get_text(doc, ".//nazwisko")
+                    # status = doc[1][1].texT
+                    issue_date = get_text(doc, ".//dataWystawienia")
+                    issue_date_dt = datetime.strptime(
+                        issue_date, "%Y-%m-%d").date() if issue_date else None
+
+                    series = get_text(doc, ".//seria")
+                    number = get_text(doc, ".//numer")
+                    doc_number = f"{series}{number}"
+
+                    # Skip already saved documents
+                    if Sickleave.objects.filter(
+                        doc_number=doc_number,
+                        issue_date=issue_date_dt
+                    ).exists():
+                        continue
+
+                    period_from = get_text(doc, ".//okresZwolnienia/dataOd")
+                    period_to = get_text(doc, ".//okresZwolnienia/dataDo")
+                    hospital_from = get_text(doc, ".//okresWSzpitalu/dataOd")
+                    hospital_to = get_text(doc, ".//okresWSzpitalu/dataDo")
                     codeA = (
                         "A"
                         if doc.find(".//kodChorobyA").text is not None
@@ -269,9 +302,9 @@ def get_compiled_ezla_data(date):
                         if doc.find(".//kodChorobyE").text is not None
                         else None
                     )
-                    can_walk = doc.find(".//wskazaniaLekarskie").text
-                    is_cancelled = doc.find(".//czyAnulowane").text
-                    family_member_care = doc.find(".//dataUrodzeniaOsoby").text
+                    can_walk = get_text(doc, ".//wskazaniaLekarskie")
+                    is_cancelled = get_text(doc, ".//czyAnulowane")
+                    family_member_care = get_text(doc, ".//dataUrodzeniaOsoby")
 
                     additional_info = ""
 
@@ -303,7 +336,7 @@ def get_compiled_ezla_data(date):
                     if can_walk is not None:
                         additional_info += f"{can_walk} "
 
-                    if is_cancelled.lower() == "tak":
+                    if is_cancelled and is_cancelled.lower() == "tak":
                         is_cancelled = True
                         cancelled_info = "ANULOWANE"
                         additional_info = cancelled_info
@@ -321,9 +354,7 @@ def get_compiled_ezla_data(date):
                                 ]
                             )
                         ),
-                        "issue_date": (
-                            datetime.strptime(issue_date, "%Y-%m-%d")
-                        ),
+                        "issue_date": issue_date_dt,
                         "doc_number": series + number,
                         "start_date": (
                             datetime.strptime(period_from, "%Y-%m-%d")
@@ -335,15 +366,12 @@ def get_compiled_ezla_data(date):
                         "additional_info": additional_info,
                         "is_cancelled": is_cancelled,
                     }
+
                     sickleaves_list.append(sickleave)
 
             except Exception as e:
                 ezlalogger.error(f"Błąd podczas parsowania danych: {e}")
                 return "Błąd podczas przetwarzania danych."
-        try:
-            os.remove(filename)
-            os.rmdir(dirname)
-        except OSError as e:
-            ezlalogger.warning(f"Nie udało się usunąć pliku lub katalogu {e}")
 
+    cleanup_extracted_files()
     return sickleaves_list
