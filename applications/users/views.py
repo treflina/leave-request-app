@@ -161,7 +161,7 @@ class AllEmployeesList(StaffAndDirectorPermissionMixin, ListView):
         queryset = User.objects.filter(
             is_active=True
             ).exclude(
-                username="admin"
+                username="hr_service"
                 )
         filter = UsersFilter(self.request.GET, queryset)
         return filter.qs
@@ -222,7 +222,8 @@ class AdminEmployeesList(StaffAndDirectorPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AdminEmployeesList, self).get_context_data(**kwargs)
-        employees = User.objects.filter(is_active=True).order_by(
+        employees = User.objects.filter(is_active=True).exclude(
+            username="hr_service").order_by(
             "-is_active", "last_name", "first_name"
         )
         current_year = date.today().year

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import api, views
 
 app_name = "requests_app"
 
@@ -43,5 +43,10 @@ urlpatterns = [
         "request-delete/<int:pk>/",
         views.delete_request,
         name="delete_request",
+    ),
+    path(
+        "api/hr/leaves/<int:year>/<int:month>/",
+        api.hr_leave_month_api,
+        name="hr_leave_month_api",
     ),
 ]

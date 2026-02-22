@@ -11,6 +11,7 @@ __pycache__
 /secret.json
 /wnioski.log
 /ezlaraporty.log
+/backups
 
 /applications/users/migrations/*
 /applications/requests/migrations/*

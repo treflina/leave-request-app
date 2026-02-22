@@ -50,10 +50,12 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    "crispy_forms",
-    "simple_history",
     "constrainedfilefield",
+    "crispy_forms",
     "django_filters",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "simple_history",
     "webpush",
 ]
 
