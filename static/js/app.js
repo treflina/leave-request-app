@@ -118,50 +118,38 @@ function btnOff(btn, msg) {
 }
 
 function subscribe(reg, subBtn) {
-    reg.pushManager.getSubscription().then(function (subscription) {
-        let metaObj, applicationServerKey, options;
-        metaObj = document.querySelector('meta[name="vapid-key"]');
-        applicationServerKey = metaObj.content;
-        options = {
-            userVisibleOnly: true,
-        };
+    reg.pushManager.getSubscription().then(async function (existingSub) {
+        const metaObj = document.querySelector('meta[name="vapid-key"]');
+        const applicationServerKey = metaObj.content;
+        const options = { userVisibleOnly: true };
         if (applicationServerKey) {
-            options.applicationServerKey =
-                urlB64ToUint8Array(applicationServerKey);
+            options.applicationServerKey = urlB64ToUint8Array(applicationServerKey);
         }
 
-        reg.pushManager
-            .subscribe(options)
-            .then(function (subscription) {
-                postSubscribeObj(
-                    "subscribe",
-                    subscription,
-                    subBtn,
-                    function (response) {
-                        // Check the information is saved successfully into server
-                        if (response.status === 201) {
-                            btnText = subBtn.querySelector(".btn-text");
-                            btnText.textContent = btnText.textContent = gettext(
-                                "Turn off notifications"
-                            );
-                            subBtn.setAttribute("aria-pressed", "true");
-                            subBtn.disabled = false;
-                            subBtn.isPushEnabled = true;
-                            showMessage(
-                                gettext(
-                                    "Successfully subscribed to push notifications."
-                                )
-                            );
-                        }
-                    }
-                );
-            })
-            .catch(function () {
-                console.log(
-                    gettext("Error while subscribing to push notifications."),
-                    arguments
-                );
+        try {
+            const subscription = await reg.pushManager.subscribe(options);
+            await postSubscribeObj("subscribe", subscription, subBtn, function (response) {
+                if (response.status === 201) {
+                    const btnText = subBtn.querySelector(".btn-text");
+                    btnText.textContent = gettext("Turn off notifications");
+                    subBtn.setAttribute("aria-pressed", "true");
+                    subBtn.disabled = false;
+                    subBtn.isPushEnabled = true;
+                    showMessage(gettext("Successfully subscribed to push notifications."));
+                }
             });
+        } catch (err) {
+            if (err.name === "InvalidStateError" && existingSub) {
+                console.warn("Old subscription detected, unsubscribing...");
+                await existingSub.unsubscribe();
+                console.log("Old subscription removed, retrying subscribe...");
+                subscribe(reg, subBtn);
+            } else {
+                console.error("Push subscription error:", err);
+                showMessage(gettext("Error while subscribing to push notifications."));
+                subBtn.disabled = false;
+            }
+        }
     });
 }
 

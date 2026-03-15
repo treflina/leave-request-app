@@ -52,6 +52,7 @@ LOCAL_APPS = [
 THIRD_PARTY_APPS = [
     "constrainedfilefield",
     "crispy_forms",
+    "crispy_bootstrap4",
     "django_filters",
     "rest_framework",
     "rest_framework.authtoken",
@@ -60,6 +61,8 @@ THIRD_PARTY_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [

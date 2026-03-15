@@ -1,9 +1,12 @@
 .env
 venv
+venv2026
 desktop.ini
 .vscode
 .idea
 __pycache__
+
+requirements2.txt
 
 .flake8
 
