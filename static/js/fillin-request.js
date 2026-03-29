@@ -1,38 +1,33 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const w = document.querySelector("#id_leave_type_0");
-    const ws = document.querySelector("#id_leave_type_1");
-    const wn = document.querySelector("#id_leave_type_2");
-    const dw = document.querySelector("#id_leave_type_3");
-    const box_w = document.querySelector(".box_w");
-    const box_ws = document.querySelector(".box_ws");
+    const workDateInput = document.querySelector("#id_work_date");
+    const radios = document.querySelectorAll('input[name="leave_type"]');
+    const boxW = document.querySelector(".box_w");
+    const boxWS = document.querySelector(".box_ws");
 
-    const hide_ws = function () {
-        box_w.classList.add("hide");
-        box_ws.classList.remove("hide");
+    if (!radios.length || !boxW || !boxWS) return;
+
+    const updateUI = (value) => {
+        boxW.classList.add("hide");
+        boxWS.classList.add("hide");
+
+        if (value === "W") {
+            boxW.classList.remove("hide");
+        } else if (value === "WS" || value === "WN") {
+            boxWS.classList.remove("hide");
+        }
+        if (value === "W" && workDateInput) {
+            workDateInput.value = "";
+        }
     };
 
-    const hide_w = function () {
-        box_ws.classList.add("hide");
-        box_w.classList.remove("hide");
-    };
-
-    const hide_all = () => {
-        box_ws.classList.add("hide");
-        box_w.classList.add("hide");
-    };
-    if (ws.checked == true || wn.checked == true) {
-        box_w.classList.add("hide");
-        box_ws.classList.remove("hide");
-    } else if (w.checked == true) {
-        box_ws.classList.add("hide");
-        box_w.classList.remove("hide");
-    } else if (dw.checked == true) {
-        box_ws.classList.add("hide");
-        box_w.classList.add("hide");
+    const checked = document.querySelector('input[name="leave_type"]:checked');
+    if (checked) {
+        updateUI(checked.value);
     }
 
-    w.addEventListener("change", hide_w);
-    ws.addEventListener("change", hide_ws);
-    wn.addEventListener("change", hide_ws);
-    dw.addEventListener("change", hide_all);
+    radios.forEach(radio => {
+        radio.addEventListener("change", (e) => {
+            updateUI(e.target.value);
+        });
+    });
 });

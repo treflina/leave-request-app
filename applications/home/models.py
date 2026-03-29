@@ -1,4 +1,4 @@
-from django.db import models                                                    
+from django.db import models
 from .validators import FileValidator
 
 CATEGORY_CHOICES = (
@@ -7,8 +7,12 @@ CATEGORY_CHOICES = (
     ("ppk", "Pracownicze Plany Kapitałowe"),
     ("pzu", "PZU Życie, PZU Opieka Medyczna"),
     ("zfss", "Zakładowy Fundusz Świadczeń Socjalnych"),
+    ("standardy", "Standardy ochrony dzieci i młodzieży"),
+    ("wolonatriat", "Wolontariat"),
+    ("druki", "Druki pracownicze"),
     ("inne", "Pozostałe"),
 )
+
 CONTENT_TYPES = (
     "text/plain",
     "application/pdf",
@@ -24,11 +28,19 @@ CONTENT_TYPES = (
 class UploadFile(models.Model):
     """Upload files model."""
 
-    validate_file = FileValidator(max_size=1024 * 10000, content_types=CONTENT_TYPES)
-    file = models.FileField("Plik", upload_to="documents/", validators=[validate_file])
+    validate_file = FileValidator(
+        max_size=1024 * 10000, content_types=CONTENT_TYPES
+        )
+
+    file = models.FileField(
+        "Plik", upload_to="documents/", validators=[validate_file]
+        )
     description = models.CharField("Opis", max_length=100, default="")
     category = models.CharField(
-        "Kategoria", max_length=50, choices=CATEGORY_CHOICES, default="Pozostałe"
+        "Kategoria",
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        default="Pozostałe"
     )
     priority = models.IntegerField("Sortowanie (1-5)", default=2)
     show_as_new = models.BooleanField("Oznacz jako nowo dodany", default=False)

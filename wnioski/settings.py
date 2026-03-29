@@ -31,6 +31,7 @@ ALLOWED_HOSTS = get_secret("ALLOWED_HOSTS")
 
 SECRET_KEY = get_secret("SECRET_KEY")
 
+CSRF_TRUSTED_ORIGINS = get_secret("CSRF_TRUSTED_ORIGINS")
 
 DJANGO_APPS = [
     "django.contrib.admin",
