@@ -9,7 +9,7 @@ from applications.users.models import User
 from applications.users.mixins import StaffAndDirectorPermissionMixin
 from .models import UploadFile, CATEGORY_CHOICES
 from .forms import ReportForm
-from pdf_creator import create_pdf_report
+from pdf_creator import create_pdf_report, create_text_report
 
 
 class HomePage(LoginRequiredMixin, TemplateView):
@@ -47,6 +47,26 @@ class ReportView(StaffAndDirectorPermissionMixin, FormView):
         start = form.cleaned_data["start_date"]
         end = form.cleaned_data["end_date"]
         attachment = form.cleaned_data["attachment"]
+        export_format = form.cleaned_data["report_format"]
+
+        if export_format == "certificate" and leave_type == "C":
+            return create_text_report(
+                person=person,
+                leave_type=leave_type,
+                start_date=start,
+                end_date=end,
+                attachment=attachment,
+                report_format="certificate",
+            )
+
+        if export_format == "txt":
+            return create_text_report(
+                person=person,
+                leave_type=leave_type,
+                start_date=start,
+                end_date=end,
+                attachment=attachment,
+            )
 
         return create_pdf_report(
             person=person,

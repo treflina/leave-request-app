@@ -14,13 +14,28 @@ class ReportForm(forms.Form):
     )
 
     ATTACHMENT_CHOICES = ((True, "Pobierz"), (False, "Wyświetl"))
+    REPORT_FORMAT_CHOICES = (
+        ("pdf", "PDF"),
+        ("txt", "TXT"),
+        ("certificate", "do świadectwa pracy"),
+    )
 
     person = forms.MultipleChoiceField(
         label="Wybierz osobę",
         widget=forms.SelectMultiple(attrs={"class": "selector"}),
         choices=(),
     )
-    leave_type = forms.ChoiceField(label="Rodzaj", choices=TYPE_CHOICES)
+    leave_type = forms.ChoiceField(
+        label="Rodzaj",
+        choices=TYPE_CHOICES,
+        initial="W",
+    )
+    report_format = forms.ChoiceField(
+        label="Format raportu",
+        choices=REPORT_FORMAT_CHOICES,
+        initial="pdf",
+        widget=forms.RadioSelect,
+    )
 
     start_date = forms.DateField(
         label="Od",
@@ -45,6 +60,14 @@ class ReportForm(forms.Form):
         widget=forms.RadioSelect(choices=ATTACHMENT_CHOICES),
         initial=True,
     )
+
+    def clean_person(self):
+        person = self.cleaned_data.get("person")
+        if not person:
+            raise forms.ValidationError(
+                "Proszę wybrać co najmniej jedną osobę."
+            )
+        return person
 
     def __init__(self, *args, **kwargs):
         super(ReportForm, self).__init__(*args, **kwargs)

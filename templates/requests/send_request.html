@@ -43,25 +43,25 @@
             </div>
             <div class="col">
                 <div class="form-check">
-                    <input class="form-check-input active" type="radio" name="leave_type" id="id_leave_type_0" value="W" checked>
+                    <input class="form-check-input active" type="radio" name="leave_type" id="id_leave_type_0" value="W" {% if form.leave_type.value == 'W' or form.leave_type.value is None %}checked{% endif %}>
                     <label class="form-check-label" for="id_leave_type_0"> Urlop wypoczynkowy (W) </label>
                 </div>
                 <div class="form-check">
                     <div class="row">
                         <div class="col">
-                            <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_1" value="WS">
+                            <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_1" value="WS" {% if form.leave_type.value == 'WS' %}checked{% endif %}>
                             <label class="form-check-label" for="id_leave_type_1"> Wolne za pracę w wolną sobotę
                                 (WS)<span class="text-danger">*</span> </label>
                         </div>
                     </div>
                 </div>
                 <div class="form-check ">
-                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_2" value="WN">
+                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_2" value="WN" {% if form.leave_type.value == 'WN' %}checked{% endif %}>
                     <label class="form-check-label" for="id_leave_type_2"> Wolne za pracę w niedzielę/święto
                         (WN)<span class="text-danger">*</span> </label>
                 </div>
                 <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_3" value="DW">
+                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_3" value="DW" {% if form.leave_type.value == 'DW' %}checked{% endif %}>
                     <label class="form-check-label " for="id_leave_type_3"> Wolne za święto przypadające w wolną sobotę
                         (DW) </label>
                 </div>

@@ -23,15 +23,71 @@
                         {{form.end_date|as_crispy_field}}
                     </div>
                 </div>
-                <div class="row mt-3">
+                <div class="row mt-3 align-items-end">
+                    <div class="col-lg-3 col-md-5 col-sm-6">
+                        {{form.report_format|as_crispy_field}}
+                    </div>
                     <div class="col-lg-3 col-md-5 col-sm-6 ml-2">
                         {{form.attachment|as_crispy_field}}
                     </div>
-                    <div>
-                        <button class="btn btn-info mt-2 ml-3" type="submit">Generuj raport PDF</button>
+                    <div class="col-lg-3 col-md-5 col-sm-6">
+                        <button class="btn btn-info mt-2" type="submit">Generuj raport</button>
                     </div>
                 </div>
+            </div>
         </form>
     </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const leaveTypeField = document.getElementById('id_leave_type');
+    const formatInputs = Array.from(document.querySelectorAll('input[name="report_format"]'));
+
+    if (!leaveTypeField || formatInputs.length === 0) return;
+
+    function getSelectedFormat() {
+        const checked = document.querySelector('input[name="report_format"]:checked');
+        return checked ? checked.value : null;
+    }
+
+    function setSelectedFormat(value) {
+        const target = document.querySelector(
+            'input[name="report_format"][value="' + value + '"]'
+        );
+        if (target) {
+            target.checked = true;
+        }
+    }
+
+    function toggleCertificateOption() {
+        const selected = leaveTypeField.value;
+        const certificateOption = formatInputs.find((option) => option.value === 'certificate');
+        if (!certificateOption) return;
+
+        const certificateWrapper = certificateOption.closest('label') || certificateOption.parentElement;
+        const isVisible = selected === 'C';
+
+        certificateOption.disabled = !isVisible;
+        if (certificateWrapper) {
+            certificateWrapper.style.display = isVisible ? '' : 'none';
+        }
+
+        if (!isVisible && getSelectedFormat() === 'certificate') {
+            setSelectedFormat('pdf');
+        }
+    }
+
+    leaveTypeField.addEventListener('change', toggleCertificateOption);
+    formatInputs.forEach(function (input) {
+        input.addEventListener('change', function () {
+            if (leaveTypeField.value !== 'C' && getSelectedFormat() === 'certificate') {
+                setSelectedFormat('pdf');
+            }
+        });
+    });
+
+    toggleCertificateOption();
+});
+</script>
 {% endblock content%}
