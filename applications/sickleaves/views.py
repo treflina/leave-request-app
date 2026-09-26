@@ -6,6 +6,8 @@ from datetime import date, timedelta
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, UpdateView
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -172,9 +174,10 @@ class SickleaveUpdateView(
 
 @login_required(login_url="users_app:user-login")
 @user_passes_test(check_staff)
+@require_POST
 def delete_sickleave(request, pk):
     """Deletes sick leave."""
-    Sickleave.objects.get(id=pk).delete()
+    get_object_or_404(Sickleave, pk=pk).delete()
     return HttpResponseRedirect(reverse("sickleaves_app:sickleaves"))
 
 

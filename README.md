@@ -209,6 +209,10 @@ server {
         alias   /webapps/wnioskivenv/wnioski/staticfiles/;
     }
 
+    location ^~ /media/attachments/ {
+        return 404;
+    }
+
     location /media/ {
         alias   /webapps/wnioskivenv/wnioski/media/;
     }

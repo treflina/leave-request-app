@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as CoreValidationError
 from django.db.models import Q
 
 from .models import User
@@ -49,8 +51,22 @@ class UserRegisterForm(forms.ModelForm):
         }
 
     def clean_password2(self):
-        if self.cleaned_data["password1"] != self.cleaned_data["password2"]:
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
             self.add_error("password2", "Wprowadzone hasła nie są identyczne.")
+        if password1:
+            temp_user = User(
+                username=self.cleaned_data.get("username", ""),
+                first_name=self.cleaned_data.get("first_name", ""),
+                last_name=self.cleaned_data.get("last_name", ""),
+                email=self.cleaned_data.get("email", ""),
+            )
+            try:
+                validate_password(password1, user=temp_user)
+            except CoreValidationError as error:
+                self.add_error("password1", error)
+        return password2
 
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
@@ -142,7 +158,8 @@ class UpdatePasswordForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user=None, *args, **kwargs):
+        self.user = user
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = (
@@ -150,3 +167,16 @@ class UpdatePasswordForm(forms.Form):
                 "px-3 py-2 text-sm text-slate-900 focus:border-[#28a745] "
                 "focus:outline-none focus:ring-2 focus:ring-[#28a745]/30"
             )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password2 = cleaned_data.get("password2")
+        password3 = cleaned_data.get("password3")
+        if password2 and password3 and password2 != password3:
+            self.add_error("password3", "Niepoprawnie powtórzono nowe hasło.")
+        if password2:
+            try:
+                validate_password(password2, user=self.user)
+            except CoreValidationError as error:
+                self.add_error("password2", error)
+        return cleaned_data

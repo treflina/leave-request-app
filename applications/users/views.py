@@ -1,10 +1,12 @@
 import django_filters
+import logging
 import operator
 import json
 from functools import reduce
 from datetime import date
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
+from django.db import transaction
 from django.db.models import Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -34,6 +36,8 @@ from applications.users.mixins import (
     StaffAndDirectorPermissionMixin,
     check_staff
 )
+
+logger = logging.getLogger("django")
 
 
 class UserRegisterView(StaffAndDirectorPermissionMixin, FormView):
@@ -91,25 +95,21 @@ class LogoutView(View):
 
 @login_required(login_url="users_app:user-login")
 def update_password(request):
-    form = UpdatePasswordForm()
     person = request.user
     if request.method == "POST":
-        form = UpdatePasswordForm(request.POST)
-        new_password = request.POST["password2"]
-        user = authenticate(
-            username=person.username, password=request.POST["password1"]
-        )
-        if user:
-            if request.POST["password3"] != new_password:
-                messages.error(request, "Niepoprawnie powtórzono nowe hasło.")
-            else:
-                user = request.user
-                user.set_password(new_password)
-                user.save()
+        form = UpdatePasswordForm(user=person, data=request.POST)
+        if form.is_valid():
+            if authenticate(
+                username=person.username,
+                password=form.cleaned_data["password1"],
+            ):
+                person.set_password(form.cleaned_data["password2"])
+                person.save()
                 logout(request)
                 return HttpResponseRedirect(reverse("users_app:user-login"))
-        else:
             messages.error(request, "Niepoprawnie podano dotychczasowe hasło.")
+    else:
+        form = UpdatePasswordForm(user=person)
     return render(request, "users/update_password.html", {"form": form})
 
 
@@ -333,8 +333,22 @@ def email_notifications_settings(request, pk):
 
 @login_required(login_url="users_app:user-login")
 @user_passes_test(check_staff)
+@require_POST
 def delete_employee(request, pk):
-    User.objects.get(id=pk).delete()
+    """Permanently deletes an employee. Request.author and Sickleave.employee
+    are on_delete=CASCADE, so this also removes all of their leave requests
+    and sick leaves, as disclosed in the confirmation dialog."""
+    employee = get_object_or_404(User, pk=pk)
+    requests_count = Request.objects.filter(author=employee).count()
+    sickleaves_count = Sickleave.objects.filter(employee=employee).count()
+    logger.warning(
+        "User %s (id=%s) deleted by %s, cascading %s requests and %s "
+        "sick leaves",
+        employee.username, employee.pk, request.user.username,
+        requests_count, sickleaves_count,
+    )
+    with transaction.atomic():
+        employee.delete()
     return HttpResponseRedirect(reverse("users_app:admin-all-employees"))
 
 

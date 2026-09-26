@@ -1,11 +1,14 @@
 from datetime import date, timedelta
 
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView, CreateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.views.decorators.http import require_POST
 
 from applications.requests.models import Request
 from applications.users.models import User
@@ -13,6 +16,14 @@ from applications.users.mixins import StaffAndDirectorPermissionMixin
 from .models import UploadFile, CATEGORY_CHOICES
 from .forms import ReportForm
 from pdf_creator import create_pdf_report, create_text_report
+
+
+def can_manage_documents(user):
+    return user.is_authenticated and (
+        user.is_staff
+        or user.role in {"T", "S"}
+        or "informatyk" in user.position.casefold()
+    )
 
 
 class HomePage(LoginRequiredMixin, TemplateView):
@@ -102,7 +113,7 @@ class ReportView(StaffAndDirectorPermissionMixin, FormView):
         )
 
 
-class UploadFileView(LoginRequiredMixin, CreateView):
+class UploadFileView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """Uploaded documents listing view. HR, topmanagers
     and users who are employed
     as informaticians can upload and delete files."""
@@ -113,6 +124,9 @@ class UploadFileView(LoginRequiredMixin, CreateView):
     success_url = "."
     login_url = reverse_lazy("users_app:user-login")
 
+    def test_func(self):
+        return can_manage_documents(self.request.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         data = []
@@ -122,15 +136,20 @@ class UploadFileView(LoginRequiredMixin, CreateView):
             )
             data.append((title, cat_files))
         context["categories"] = data
-        if "informatyk" in self.request.user.position:
-            context["informatyk"] = True
+        context["can_manage_documents"] = can_manage_documents(
+            self.request.user
+        )
         return context
 
 
 @login_required(login_url=reverse_lazy("users_app:user-login"))
+@require_POST
 def delete_file(request, pk):
     """Deletes the file."""
-    file_to_delete = UploadFile.objects.get(id=pk)
+    if not can_manage_documents(request.user):
+        raise PermissionDenied
+
+    file_to_delete = get_object_or_404(UploadFile, pk=pk)
     file_to_delete.delete()
     return HttpResponseRedirect(reverse("home_app:documents"))
 

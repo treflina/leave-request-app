@@ -60,6 +60,16 @@ urlpatterns = [
         name="delete_request",
     ),
     path(
+        "wniosek-zalacznik/<int:pk>/",
+        views.download_request_attachment,
+        name="download_request_attachment",
+    ),
+    path(
+        "media/attachments/<path:path>",
+        views.block_public_attachment,
+        name="block_public_attachment",
+    ),
+    path(
         "api/hr/leaves/<int:year>/<int:month>/",
         api.hr_leave_month_api,
         name="hr_leave_month_api",

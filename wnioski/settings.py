@@ -133,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "NAME": "applications.users.validators.MinimumLengthValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
@@ -153,9 +153,6 @@ EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = get_secret("EMAIL_PORT")
 
-if not DEBUG:
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
-
 STATIC_URL = "/static/"
 
 if get_secret("DEVIL"):
@@ -163,17 +160,24 @@ if get_secret("DEVIL"):
 else:
     STATICFILES_DIRS = [BASE_DIR.child("static")]
 
-
 MEDIA_URL = "/media/"
 
+if not DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    }
 
 if get_secret("DEVIL"):
-    STATIC_ROOT = os.path.join(BASE_DIR, "public", "staticfiles")
+    STATIC_ROOT = os.path.join(BASE_DIR, "public", "static")
     MEDIA_ROOT = os.path.join(BASE_DIR, "public", "media")
 else:
     STATIC_ROOT = BASE_DIR.child("staticfiles")
     MEDIA_ROOT = BASE_DIR.child("media")
-
 
 WEBPUSH_SETTINGS = {
     "VAPID_PUBLIC_KEY": get_secret("VAPID_PUBLIC_KEY"),
@@ -247,10 +251,10 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# if not DEBUG:
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
 #     SECURE_SSL_REDIRECT = True
-#     SESSION_COOKIE_SECURE = True
-#     CSRF_COOKIE_SECURE = True
 
 # settings to extract reports from polish zus, set it to empty string if not the case
 # should be placed in .env file

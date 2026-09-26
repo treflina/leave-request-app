@@ -82,7 +82,7 @@
                     </a>
 
                             {# Delete controls #}
-                            {% if user.is_staff or user.role == "T" or informatyk %}
+                            {% if can_manage_documents %}
 
                                 <button
                                     type="button"
@@ -186,7 +186,7 @@
 
 
         {# Add document section #}
-        {% if user.is_staff or user.role == "T" or user.role == "S" or informatyk %}
+        {% if can_manage_documents %}
 
             <section
                 class="rounded-xl bg-white p-5

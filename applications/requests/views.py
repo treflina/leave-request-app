@@ -7,12 +7,15 @@ from functools import reduce
 from simple_history.utils import update_change_reason
 from webpush import send_user_notification
 
-from django.http import HttpResponseRedirect
+from django.http import FileResponse, Http404, HttpResponseRedirect
+from django.db import transaction
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.http import require_POST
 from django.views.generic import FormView, ListView, RedirectView, UpdateView
 from django.forms.widgets import Select, TextInput, DateInput
 from django_filters.views import FilterView
@@ -22,6 +25,7 @@ from applications.users.models import User
 from applications.users.mixins import (
     TopManagerPermisoMixin,
     check_occupation_user,
+    check_staff,
     StaffAndDirectorPermissionMixin
 )
 from paginator import PaginationMixin
@@ -34,6 +38,16 @@ from .utils import (
 
 
 logger = logging.getLogger("django")
+
+
+def _acceptable_requests_lookup(user):
+    """Q object restricting accept/reject to requests the user may act on,
+    mirroring the visibility rules used by the requests listing views."""
+    if user.is_staff or user.role in ("T", "S"):
+        return Q()
+    if user.role == "K":
+        return Q(author__manager=user) | Q(send_to_person=user)
+    return Q(pk__isnull=True)
 
 
 class RequestFormView(LoginRequiredMixin, FormView):
@@ -401,14 +415,20 @@ class HRAllRequestsListView(StaffAndDirectorPermissionMixin, SingleTableMixin, F
 
 @login_required(login_url="users_app:user-login")
 @user_passes_test(check_occupation_user)
+@require_POST
 def accept_request(request, pk):
     """Accept the employee request."""
     user = request.user
-    request_to_accept = Request.objects.get(id=pk)
-    employee = request_to_accept.author
-    request_to_accept.status = "zaakceptowany"
-    request_to_accept.signed_by = user.first_name + " " + user.last_name
-    request_to_accept.save(update_fields=["status", "signed_by"])
+    with transaction.atomic():
+        lookup = Q(pk=pk) & Q(status="oczekujący") & _acceptable_requests_lookup(user)
+        request_to_accept = get_object_or_404(
+            Request.objects.select_for_update().select_related("author"),
+            lookup,
+        )
+        employee = request_to_accept.author
+        request_to_accept.status = "zaakceptowany"
+        request_to_accept.signed_by = user.first_name + " " + user.last_name
+        request_to_accept.save(update_fields=["status", "signed_by"])
     try:
         payload = {
             "head": "Wniosek został zaakceptowany",
@@ -444,19 +464,25 @@ def accept_request(request, pk):
 
 @login_required(login_url="users_app:user-login")
 @user_passes_test(check_occupation_user)
+@require_POST
 def reject_request(request, pk):
     """Reject the employee request."""
 
     user = request.user
-    request_to_reject = Request.objects.get(id=pk)
-    employee = request_to_reject.author
-    if request_to_reject.leave_type == "W":
-        employee_to_update = User.objects.get(id=request_to_reject.author.id)
-        employee_to_update.current_leave += request_to_reject.days
-        employee_to_update.save(update_fields=["current_leave"])
-    request_to_reject.status = "odrzucony"
-    request_to_reject.signed_by = user.first_name + " " + user.last_name
-    request_to_reject.save(update_fields=["status", "signed_by"])
+    with transaction.atomic():
+        lookup = Q(pk=pk) & Q(status="oczekujący") & _acceptable_requests_lookup(user)
+        request_to_reject = get_object_or_404(
+            Request.objects.select_for_update().select_related("author"),
+            lookup,
+        )
+        employee = request_to_reject.author
+        if request_to_reject.leave_type == "W":
+            employee_to_update = User.objects.get(id=request_to_reject.author.id)
+            employee_to_update.current_leave += request_to_reject.days
+            employee_to_update.save(update_fields=["current_leave"])
+        request_to_reject.status = "odrzucony"
+        request_to_reject.signed_by = user.first_name + " " + user.last_name
+        request_to_reject.save(update_fields=["status", "signed_by"])
     try:
         payload = {
             "head": "Wniosek został odrzucony",
@@ -491,12 +517,50 @@ def reject_request(request, pk):
 
 
 @login_required(login_url="users_app:user-login")
+@require_POST
 def delete_request(request, pk):
     """Withdraw the request."""
-    user = request.user
-    request_to_delete = Request.objects.get(id=pk)
-    if request_to_delete.leave_type == "W":
-        user.current_leave += request_to_delete.days
-        user.save(update_fields=["current_leave"])
-    request_to_delete.delete()
+    with transaction.atomic():
+        request_to_delete = get_object_or_404(
+            Request.objects.select_for_update(),
+            pk=pk,
+            author=request.user,
+            status="oczekujący",
+        )
+        if request_to_delete.leave_type == "W":
+            employee = request_to_delete.author
+            employee.current_leave += request_to_delete.days or 0
+            employee.save(update_fields=["current_leave"])
+        request_to_delete.delete()
+
     return HttpResponseRedirect(reverse("requests_app:user_requests"))
+
+
+@login_required(login_url="users_app:user-login")
+def download_request_attachment(request, pk):
+    leave_request = get_object_or_404(
+        Request.objects.select_related("author", "send_to_person"),
+        pk=pk,
+    )
+    user = request.user
+    can_access = (
+        user.pk in (leave_request.author_id, leave_request.send_to_person_id)
+        or check_staff(user)
+    )
+    if not can_access or not leave_request.attachment:
+        raise Http404
+
+    filename = leave_request.attachment.name.rsplit("/", 1)[-1]
+    response = FileResponse(
+        leave_request.attachment.open("rb"),
+        as_attachment=True,
+        filename=filename,
+        content_type="application/octet-stream",
+    )
+    response["Cache-Control"] = "private, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+def block_public_attachment(request, path):
+    raise Http404
