@@ -1,45 +1,143 @@
 {% load static %}
-<!-- Settings modal -->
-<div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content ">
-            <div class="modal-header bg-success text-light">
-                <p class="modal-title " id="modalLabel">Ustawienia</p>
-                <button type="button" class="close text-light" data-dismiss="modal" aria-label="Zamknij">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+
+<dialog
+    id="settingsModal"
+    aria-labelledby="settingsModalLabel"
+    class="w-full max-w-md rounded-xl border-0 p-0 shadow-xl
+           backdrop:bg-slate-900/40"
+>
+    <div class="px-6 py-2">
+    <div class="flex items-center justify-between gap-4">
+        <h2
+            id="settingsModalLabel"
+            tabindex="-1"
+            class="text-lg font-bold text-[#545460]"
+        >
+            Ustawienia
+        </h2>
+        <button
+            type="button"
+            id="settings-close-btn"
+            class="flex h-10 w-10 shrink-0 items-center justify-center
+                rounded-md
+                text-2xl leading-none text-slate-500
+                cursor-pointer
+                hover:bg-slate-100
+                focus:outline-none
+                focus-visible:ring-2
+                focus-visible:ring-[#28a745]
+                focus-visible:ring-offset-2"
+            aria-label="Zamknij"
+        >
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+        <form
+            method="post"
+            action="{% url 'users_app:email-settings' request.user.id %}"
+            class="mt-5 space-y-4"
+        >
+            {% csrf_token %}
+
+            <div>
+                <label
+                    for="inputEmail"
+                    class="block text-sm font-semibold text-slate-700"
+                >
+                    Prywatny adres e-mail
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    id="inputEmail"
+                    value="{{ request.user.email|default:'' }}"
+                    autocomplete="email"
+                    class="mt-1 w-full rounded-lg border border-slate-300
+                           px-3 py-2 text-sm
+                           focus:outline-none
+                           focus-visible:border-[#28a745]
+                           focus-visible:ring-2
+                           focus-visible:ring-[#28a745]
+                           focus-visible:ring-offset-1"
+                >
             </div>
-            <div class="modal-body">
-                <div class="btn__wrapper"></div>
-                <form method="POST" action="{% url 'users_app:email-settings' request.user.id %}" class="mb-4">
-                    {%csrf_token%}
-                    <div class="form-group">
-                        <label for="inputEmail">Prywatny adres email</label>
-                        <input type="email" name="email" class="form-control" id="inputEmail"
-                        {% if request.user.email %} value={{request.user.email}} {% endif %}>
-                    </div>
-                    <div class="form-group form-check">
-                        <input type="checkbox" name="agreement" class="form-check-input" id="check1"
-                        {% if request.user.email_notifications %} checked {% endif %}>
-                        <label class="form-check-label" for="check1">Chcę otrzymywać na podany adres email informacje o zmianie
-                            statusu moich wniosków.</label>
-                    </div>
-                    <button type="submit" class="btn btn-success ml-auto d-block">Zapisz</button>
-                </form>
-                <hr>
-                <p>Powiadomienia push o składanych i otrzymywanych wnioskach urlopowych</p>
-                <button class="Toggle sub-btn" type="button" aria-pressed="false" id="webpush-subscribe-btn"
-                    data-url="/webpush/save_information">
-                    <span class="btn-text">Włącz</span>
-                    <span class="Toggle__display">
-                        <svg class="Toggle__icon Toggle__icon--checkmark"><use href="{% static 'img/svg/sprite.svg' %}#checkmark"></use></svg>
-                        <svg class="Toggle__icon Toggle__icon--cross"><use href="{% static 'img/svg/sprite.svg' %}#cross"></use></svg>
+            <div>
+                <label
+                    for="emailNotifications"
+                    class="flex items-start gap-3 text-sm text-slate-700"
+                >
+                    <input
+                        type="checkbox"
+                        name="agreement"
+                        id="emailNotifications"
+                        class="mt-0.5 h-4 w-4 rounded border-slate-300
+                               text-[#28a745]
+                               focus:outline-none
+                               focus-visible:ring-2
+                               focus-visible:ring-[#28a745]
+                               focus-visible:ring-offset-2"
+                        {% if request.user.email_notifications %}
+                            checked
+                        {% endif %}
+                    >
+                    <span>
+                        Chcę otrzymywać informacje o zmianie statusu
+                        wniosków.
                     </span>
-                </button>
-                <div class="webpush-msgbox mt-2 mb-4">
-                    <p id="webpush-message" class="webpush-message"></p>
-                </div>
+                </label>
             </div>
+            <button type="submit" class="btn btn-primary">
+                Zapisz
+            </button>
+        </form>
+        <div class="mt-6 border-t border-slate-200 pt-4">
+            <p class="text-sm font-semibold text-slate-700">
+                Powiadomienia push
+            </p>
+            <button
+                type="button"
+                id="webpush-subscribe-btn"
+                class="Toggle sub-btn mt-3
+                       focus:outline-none
+                       focus-visible:ring-2
+                       focus-visible:ring-[#28a745]
+                       focus-visible:ring-offset-2"
+                aria-pressed="false"
+                data-url="/webpush/save_information"
+            >
+                <span class="btn-text">
+                    Włącz powiadomienia
+                </span>
+                <span
+                    class="Toggle__display"
+                    aria-hidden="true"
+                >
+                    <svg
+                        class="Toggle__icon Toggle__icon--checkmark"
+                        focusable="false"
+                    >
+                        <use
+                            href="{% static 'img/svg/sprite.svg' %}#checkmark"
+                        ></use>
+                    </svg>
+
+                    <svg
+                        class="Toggle__icon Toggle__icon--cross"
+                        focusable="false"
+                    >
+                        <use
+                            href="{% static 'img/svg/sprite.svg' %}#cross"
+                        ></use>
+                    </svg>
+                </span>
+            </button>
+            <p
+                id="webpush-message"
+                class="mt-2 text-sm text-slate-700"
+                role="status"
+                hidden
+            ></p>
         </div>
     </div>
-</div>
+</dialog>

@@ -1,6 +1,7 @@
 .env
 venv
 venv2026
+node_modules
 desktop.ini
 .vscode
 .idea
@@ -21,6 +22,7 @@ requirements2.txt
 /applications/sickleaves/migrations/*
 /applications/sickleaves/raporty.xml
 /applications/home/migrations/*
+/applications/inbox/migrations/*
 
 /media/*
 staticfiles/

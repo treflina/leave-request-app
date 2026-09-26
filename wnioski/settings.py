@@ -44,17 +44,19 @@ DJANGO_APPS = [
 ]
 
 LOCAL_APPS = [
+    "applications.home",
+    "applications.inbox",
     "applications.requests",
     "applications.sickleaves",
     "applications.users",
-    "applications.home",
 ]
 
 THIRD_PARTY_APPS = [
     "constrainedfilefield",
     "crispy_forms",
-    "crispy_bootstrap4",
     "django_filters",
+    "django_htmx",
+    "django_tables2",
     "rest_framework",
     "rest_framework.authtoken",
     "simple_history",
@@ -63,17 +65,17 @@ THIRD_PARTY_APPS = [
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
-CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "wnioski.middleware.NoCacheAuthenticatedMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]
@@ -151,7 +153,8 @@ EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = get_secret("EMAIL_PORT")
 
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+if not DEBUG:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 STATIC_URL = "/static/"
 

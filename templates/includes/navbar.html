@@ -1,75 +1,171 @@
 {% load static %}
-{% load custom_tags %}
 
-<nav class="navbar fixed-top navbar-expand-lg navbar-dark w-100 ">
-    <div class="container-fluid mx-auto navbar-wrapper">
-        <a href="{%url 'home_app:index'%}" class="navbar-brand ml-1" id="nav_urlop"><img src="{% static 'img/mbp_logo5.png' %}" class="logo-img d-inline-block align-center" alt="logo"></a>
-        <button class="navbar-toggler position-relative" type="button" data-toggle="collapse"
-            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-            {% if user.role != "P" and requests_list != 0 and requests_list != "" %}
-            <span class="nav-notification"></span>
-            {% endif %}
-        </button>
-        <div class="burger collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav ml-auto">
-                {%if user.role != 'S'%}
-                <li class="nav-item">
-                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{% url 'requests_app:request'%}">Złóż wniosek</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'requests_app:user_requests'%}">Twoje wnioski</a>
-                </li>
-                {% endif %}
-                {% if user.role != 'P' %}
-                <li class="nav-item">
-                    <a class="nav-link w-100 text-lg-center text-left" href="{% url 'requests_app:allrequests'%}">Wnioski <span>pracowników<span style='color:orange;'>{{requests_list}}</span></span>
-              </a>
-                </li>
-                {% endif %}
-                {% if user.role == "S" %}
-                <li class="nav-item">
-                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'users_app:all-employees'%}">Lista pracowników</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
-                </li>
-                {% endif %}
-                {% if user.is_staff %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle  w-100 text-lg-center text-left" href="#" id="navbardrop2" data-toggle="dropdown">
-                    {% if user.role != "T" %}Admin{% else %}Inne{% endif %}</a>
-                    <div class="dropdown-menu">
-                        {% if user.role != "T" %}
-                        <a class="dropdown-item link-hide" href="{%url 'users_app:admin-all-employees'%}">Pracownicy: dodaj/zmień</a>
-                        <a class="dropdown-item link-hide" href="{%url 'requests_app:hrallrequests'%}">Wnioski KADRY</a>
-                        {% endif %}
-                        <a class="dropdown-item link-hide" href="{%url 'users_app:all-employees'%}">Lista dyrektora</a>
-                        <a class="dropdown-item link-hide" href="{%url 'sickleaves_app:sickleaves'%}">Zwolnienia lekarskie</a>
-                        <a class="dropdown-item link-hide" href="{%url 'home_app:report'%}">Generuj raport</a>
-                    </div>
-                </li>
-                {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link link-hide w-100 text-lg-center text-left" href="{%url 'users_app:user-update'%}">Zmień hasło</a>
-                </li>
-                {%if user.is_authenticated%}
-                <li class="nav-item">
-                    <a class="nav-link link-hide  w-100 text-lg-center text-left" href="{%url 'users_app:user-logout'%}">Wyloguj się</a>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link link-hide bg-transparent border-0" data-toggle="modal"
-                        data-target="#settingsModal">
-                        <svg style="height:2rem; width:2rem;">
-                            <use href="{% static 'img/svg/sprite.svg' %}#gear"></use>
-                        </svg><span class="sr-only">Ustawienia powiadomień</span>
+<nav
+    class="w-full bg-[#545460] shadow-sm"
+    aria-label="Główna nawigacja"
+>
+    <div
+        class="mx-auto flex h-14 w-full max-w-[1350px] items-center justify-between
+               px-4 sm:px-6 lg:px-8"
+    >
+        <a
+            href="{% url 'home_app:index' %}"
+            class="shrink-0 rounded-md
+                   focus:outline-none
+                   focus-visible:ring-2
+                   focus-visible:ring-white
+                   focus-visible:ring-offset-2
+                   focus-visible:ring-offset-[#575864]"
+            aria-label="Strona główna"
+        >
+            <picture class="sm:hidden">
+                <source
+                    media="(max-width: 639px)"
+                    srcset="{% static 'img/mbp_logo7.png' %}"
+                >
+
+                <img
+                    src="{% static 'img/mbp_logo7.png' %}"
+                    alt="MBP"
+                    class="block w-auto h-12"
+                >
+            </picture>
+            <picture class="hidden sm:block">
+                <source
+                    media="(max-width: 639px)"
+                    srcset="{% static 'img/logo_white.png' %}"
+                >
+
+                <img
+                    src="{% static 'img/logo_white.png' %}"
+                    alt="MBP"
+                    class="block w-auto h-12 sm:h-20"
+                >
+            </picture>
+        </a>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+
+            {% if main_page %}
+
+                <button
+                    type="button"
+                    id="settings-open-btn"
+                    class="inline-flex items-center gap-2
+                           rounded-full
+                           border border-white/50
+                           bg-transparent
+                           px-3 py-2
+                           text-sm font-semibold
+                           text-white
+                           transition-colors
+                           cursor-pointer
+                           hover:bg-white/10
+                           hover:border-white
+                           focus:outline-none
+                           focus-visible:ring-2
+                           focus-visible:ring-white
+                           focus-visible:ring-offset-2
+                           focus-visible:ring-offset-[#575864]
+                           active:bg-white/20"
+                    aria-label="Ustawienia powiadomień"
+                    aria-controls="settingsModal"
+                >
+                    <svg
+                        class="h-5 w-5 text-white sm:hidden"
+                        aria-hidden="true"
+                        focusable="false"
+                        >
+                            <use
+                                href="{% static 'img/svg/sprite.svg' %}#gear"
+                            ></use>
+                    </svg>
+                    <span class="hidden sm:inline">
+                        Ustawienia
+                    </span>
+                </button>
+                <a
+                    href="{% url 'users_app:user-update' %}"
+                    class="inline-flex items-center rounded-full
+                           border border-white/50
+                           bg-transparent
+                           px-3 py-2
+                           text-center
+                           text-sm font-semibold
+                           text-white
+                           transition-colors
+                           hover:bg-white/10
+                           hover:border-white
+                           focus:outline-none
+                           focus-visible:ring-2
+                           focus-visible:ring-white
+                           focus-visible:ring-offset-2
+                           focus-visible:ring-offset-[#575864]
+                           active:bg-white/20"
+                >
+                    Zmień hasło
+                </a>
+                <form method="post" action="{% url 'users_app:user-logout' %}">
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="inline-flex items-center rounded-full
+                            bg-green-700
+                            px-4 py-2
+                            text-sm font-semibold
+                            text-white
+                            shadow-sm
+                            transition-colors
+                            cursor-pointer
+                            hover:bg-green-800
+                            focus:outline-none
+                            focus-visible:ring-2
+                            focus-visible:ring-white
+                            focus-visible:ring-offset-2
+                            focus-visible:ring-offset-[#575864]
+                            active:bg-emerald-900"
+                    >
+                        Wyloguj się
                     </button>
-                </li>
-                {%endif%}
-            </ul>
+                </form>
+            {% else %}
+                <a
+                    href="{% url 'home_app:index' %}"
+                    class="inline-flex items-center gap-2
+                           rounded-full
+                           border border-white/50
+                           bg-transparent
+                           px-4 py-2
+                           text-sm font-semibold
+                           text-white
+                           transition-colors
+                           hover:bg-white/10
+                           hover:border-white
+                           focus:outline-none
+                           focus-visible:ring-2
+                           focus-visible:ring-white
+                           focus-visible:ring-offset-2
+                           focus-visible:ring-offset-[#575864]"
+                >
+                    <svg
+                        class="hidden h-5 w-5 sm:block"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use
+                            href="{% static 'img/svg/sprite.svg' %}#home"
+                        ></use>
+                    </svg>
+
+                    <span>
+                        Strona główna
+                    </span>
+                </a>
+
+            {% endif %}
+
         </div>
     </div>
 </nav>
-{% include 'includes/settings.html' %}
 
+{% include 'includes/settings.html' %}

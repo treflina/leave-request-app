@@ -1,83 +1,431 @@
 {% extends "base.html" %}
-{% load  static %}
-{% load crispy_forms_tags %}
+{% block title %} - Dokumenty{% endblock title %}
 
 {% block content %}
-{% include 'includes/navbar.html'%}
-<div class="container documents mt-5">
-    {% for category, documents in categories %}
-    <ul class="documents__list mt-5">
-        <p class="documents__heading">{{category}}</p>
-        {% for file in documents %}
-        <li class="documents__list-item ml-5">
-            <a href="{{ file.file.url }}" class="documents__list-link file-link">{{ file.description}}</a>
-            {% if user.is_staff or user.role == "T" or informatyk %}
-            <button type="button" class="btn btn-light btn-sm ml-2 delete" data-toggle="modal"
-                data-target="#deleteModal{{file.id}}">✘</button>
-            {% endif %}
-        </li>
-        <!-- Modal -->
-        <div class="modal fade" id="deleteModal{{file.id}}" tabindex="-1"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <p class="modal-title">Ostrzeżenie</p>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
+
+{% include "includes/navbar.html" %}
+
+<main
+    class="min-h-screen bg-slate-100/70 px-4 py-6
+           font-['Signika_Negative',sans-serif]
+           sm:px-6 lg:px-8"
+>
+    <div class="mx-auto max-w-5xl space-y-6">
+
+        <header>
+            <h1 class="text-2xl font-bold tracking-tight text-[#545460]">
+                Niezbędnik
+            </h1>
+
+            <p class="mt-1 text-sm leading-6 text-slate-600">
+                Do pobrania: dokumenty, informacje, druki.
+            </p>
+        </header>
+
+
+        {% for category, documents in categories %}
+
+            <section
+                class="overflow-hidden rounded-xl bg-white
+                       shadow-sm ring-1 ring-slate-200/80"
+                aria-labelledby="category-{{ forloop.counter }}"
+            >
+                <h2
+                    id="category-{{ forloop.counter }}"
+                    class="border-b border-slate-200
+                           bg-slate-50 px-5 py-3.5
+                           text-sm font-bold text-[#545460]"
+                >
+                    {{ category }}
+                </h2>
+
+                <ul class="divide-y divide-slate-100">
+
+                    {% for file in documents %}
+
+                        <li
+                            class="flex min-h-14 items-center
+                                   justify-between gap-4 px-5 py-3
+                                   transition-colors hover:bg-slate-50"
+                        >
+
+
+                   <a href="{{ file.file.url }}"
+                        class="min-w-0 flex-1 rounded-sm
+                            text-sm font-semibold
+                            text-[#1f7a35]
+                            underline decoration-1
+                            underline-offset-4
+                            transition-colors
+                            hover:text-[#17612a]
+                            focus:outline-none
+                            focus-visible:ring-2
+                            focus-visible:ring-green-700
+                            focus-visible:ring-offset-2"
+                        aria-describedby="file-meta-{{ file.id }}"
+                    >
+                        <span class="break-words">
+                            {{ file.description }}
+
+                            <span
+                                id="file-meta-{{ file.id }}"
+                                class="font-normal text-slate-500"
+                            >
+                                ({{ file.file_extension }} ·
+                                {% if file.file_size %}
+                                    {{ file.file_size|filesizeformat }}
+                                {% else %}
+                                    rozmiar niedostępny
+                                {% endif %})
+                            </span>
+                        </span>
+                    </a>
+
+                            {# Delete controls #}
+                            {% if user.is_staff or user.role == "T" or informatyk %}
+
+                                <button
+                                    type="button"
+                                    id="openDelete{{ file.id }}"
+                                    class="btn btn-sm btn-danger shrink-0"
+                                    onclick="openDeleteModal('{{ file.id }}')"
+                                    aria-haspopup="dialog"
+                                    aria-controls="deleteModal{{ file.id }}"
+                                    aria-label="Usuń dokument: {{ file.description }}"
+                                >
+                                    Usuń
+                                </button>
+
+
+                                {# Delete confirmation dialog #}
+                                <dialog
+                                    id="deleteModal{{ file.id }}"
+                                    aria-labelledby="deleteModalLabel{{ file.id }}"
+                                    aria-describedby="deleteModalDescription{{ file.id }}"
+                                    class="w-[calc(100%-2rem)] max-w-md
+                                           rounded-xl border-0 p-0
+                                           shadow-xl
+                                           backdrop:bg-slate-900/50
+                                           backdrop:backdrop-blur-sm"
+                                >
+                                    <div class="p-6">
+
+                                        <h2
+                                            id="deleteModalLabel{{ file.id }}"
+                                            class="text-lg font-bold text-[#545460]"
+                                        >
+                                            Usunąć dokument?
+                                        </h2>
+
+                                        <p
+                                            id="deleteModalDescription{{ file.id }}"
+                                            class="mt-3 break-words
+                                                   text-sm leading-6
+                                                   text-slate-600"
+                                        >
+                                            Czy na pewno chcesz usunąć:
+                                            <span class="font-semibold text-slate-800">
+                                                {{ file.description }}
+                                            </span>?
+                                        </p>
+
+
+                                        <div
+                                            class="mt-6 flex flex-col-reverse
+                                                   gap-3 sm:flex-row
+                                                   sm:justify-end"
+                                        >
+
+                                            <button
+                                                type="button"
+                                                id="cancelDelete{{ file.id }}"
+                                                class="btn btn-tertiary w-full sm:w-auto"
+                                                onclick="closeDeleteModal('{{ file.id }}')"
+                                            >
+                                                Wróć
+                                            </button>
+
+
+                                            <form
+                                                method="post"
+                                                action="{% url 'home_app:delete-file' file.id %}"
+                                            >
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="btn btn-danger w-full sm:w-auto"
+                                                >
+                                                    Tak, usuń
+                                                </button>
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+                                </dialog>
+
+                            {% endif %}
+
+                        </li>
+
+                    {% empty %}
+
+                        <li class="px-5 py-5">
+                            <p class="text-sm text-slate-500">
+                                Brak dokumentów.
+                            </p>
+                        </li>
+
+                    {% endfor %}
+
+                </ul>
+            </section>
+
+        {% endfor %}
+
+
+        {# Add document section #}
+        {% if user.is_staff or user.role == "T" or user.role == "S" or informatyk %}
+
+            <section
+                class="rounded-xl bg-white p-5
+                       shadow-sm ring-1 ring-slate-200/80
+                       sm:p-6"
+                aria-labelledby="add-document-heading"
+            >
+
+                <div>
+                    <h2
+                        id="add-document-heading"
+                        class="text-lg font-bold text-[#545460]"
+                    >
+                        Dodaj dokument
+                    </h2>
+                    <p class="mt-1 text-sm leading-6 text-slate-600">
+                        Dodaj dokument, który będzie dostępny dla pracowników.
+                    </p>
+                </div>
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="mt-6 grid gap-5 sm:grid-cols-2"
+                >
+                    {% csrf_token %}
+                    <div class="sm:col-span-2">
+                        <label
+                            for="{{ form.description.id_for_label }}"
+                            class="mb-1.5 block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.description.label }}
+                        </label>
+
+                        <input
+                            type="text"
+                            name="{{ form.description.html_name }}"
+                            id="{{ form.description.id_for_label }}"
+                            value="{{ form.description.value|default_if_none:'' }}"
+                            {% if form.description.field.required %}required{% endif %}
+                            class="form-input"
+                            {% if form.description.errors %}
+                                aria-invalid="true"
+                                aria-describedby="description-error"
+                            {% endif %}
+                        >
+
+                        {% if form.description.errors %}
+
+                            <p
+                                id="description-error"
+                                class="mt-1.5 text-sm leading-5 text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.description.errors|join:", " }}
+                            </p>
+
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label
+                            for="{{ form.category.id_for_label }}"
+                            class="mb-1.5 block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.category.label }}
+                        </label>
+                        <select
+                            name="{{ form.category.html_name }}"
+                            id="{{ form.category.id_for_label }}"
+                            {% if form.category.field.required %}required{% endif %}
+                            class="form-select"
+                            {% if form.category.errors %}
+                                aria-invalid="true"
+                                aria-describedby="category-error"
+                            {% endif %}
+                        >
+
+                            {% for value, label in form.category.field.choices %}
+
+                                <option
+                                    value="{{ value }}"
+                                    {% if form.category.value|stringformat:"s" == value|stringformat:"s" %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+
+                            {% endfor %}
+                        </select>
+                        {% if form.category.errors %}
+                            <p
+                                id="category-error"
+                                class="mt-1.5 text-sm leading-5 text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.category.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label
+                            for="{{ form.priority.id_for_label }}"
+                            class="mb-1.5 block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.priority.label }}
+                        </label>
+                        <input
+                            type="number"
+                            name="{{ form.priority.html_name }}"
+                            id="{{ form.priority.id_for_label }}"
+                            value="{{ form.priority.value|default_if_none:'2' }}"
+                            min="1"
+                            max="5"
+                            step="1"
+                            inputmode="numeric"
+                            required
+                            class="form-input"
+                            aria-describedby="priority-help{% if form.priority.errors %} priority-error{% endif %}"
+                            {% if form.priority.errors %}
+                                aria-invalid="true"
+                            {% endif %}
+                        >
+
+                        <p
+                            id="priority-help"
+                            class="mt-1.5 text-xs leading-5 text-slate-500"
+                        >
+                            Wartość od 1 do 5.
+                            Niższa wartość oznacza wyższe miejsce na liście.
+                        </p>
+                        {% if form.priority.errors %}
+
+                            <p
+                                id="priority-error"
+                                class="mt-1.5 text-sm leading-5 text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.priority.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label
+                            for="{{ form.file.id_for_label }}"
+                            class="mb-1.5 block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.file.label }}
+                        </label>
+                        <input
+                            type="file"
+                            name="{{ form.file.html_name }}"
+                            id="{{ form.file.id_for_label }}"
+                            {% if form.file.field.required %}required{% endif %}
+                            class="form-file"
+                            aria-describedby="file-help{% if form.file.errors %} file-error{% endif %}"
+                            {% if form.file.errors %}
+                                aria-invalid="true"
+                            {% endif %}
+                        >
+
+                        <p
+                            id="file-help"
+                            class="mt-1.5 text-xs leading-5 text-slate-500"
+                        >
+                            Maksymalny rozmiar pliku: 10 MB.
+                            Dozwolone formaty: PDF, DOC, DOCX, XLS, XLSX.
+                        </p>
+                        {% if form.file.errors %}
+                            <p
+                                id="file-error"
+                                class="mt-1.5 text-sm leading-5 text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.file.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="sm:col-span-2 pt-1">
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                        >
+                            Dodaj dokument
                         </button>
                     </div>
-                    <div class="modal-body">
-                        <p>Czy na pewno chcesz usunąć {{file.description}}
-                        </p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
-                        <form method="POST" action="{% url 'home_app:delete-file' file.id %}">
-                            {%csrf_token%}
-                            <button type="submit" class="btn btn-info">Tak, usuń.</button>
-                        </form>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        {%endfor%}
-    </ul>
-    {%endfor%}
-</div>
-{%if user.is_staff or user.role == "T" or user.role == "S" or informatyk%}
-<div class="container mt-5">
-    <div>
-        {% if form.file.errors %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            {{ form.file.errors }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+                </form>
+            </section>
         {% endif %}
     </div>
-    <form method="post" , enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group row">
-            <div class="col-lg-3">
-                {{ form.file|as_crispy_field }}
-            </div>
-            <div class="col-lg-3">
-                {{ form.description|as_crispy_field }}
-            </div>
-            <div class="col-lg-2">
-                {{ form.category|as_crispy_field }}
-            </div>
-            <div class="col-lg-2">
-                {{ form.priority|as_crispy_field }}
-            </div>
-            <div class="col-lg-1">
-                <button class="btn btn-md btn-light position-relative" style="top:30px;" type="submit">Wyślij</button>
-            </div>
-        </div>
-    </form>
-</div>
-{% endif %}
-{% endblock %}
+</main>
+<script>
+    function openDeleteModal(id) {
+        const dialog = document.getElementById(`deleteModal${id}`);
+        const cancelButton = document.getElementById(`cancelDelete${id}`);
+
+        if (!dialog) {
+            return;
+        }
+
+        dialog.showModal();
+
+        requestAnimationFrame(() => {
+            if (cancelButton) {
+                cancelButton.focus();
+            }
+        });
+    }
+
+
+    function closeDeleteModal(id) {
+        const dialog = document.getElementById(`deleteModal${id}`);
+        const trigger = document.getElementById(`openDelete${id}`);
+
+        if (!dialog) {
+            return;
+        }
+
+        dialog.close();
+
+        requestAnimationFrame(() => {
+            if (trigger) {
+                trigger.focus();
+            }
+        });
+    }
+
+
+    document.querySelectorAll("dialog").forEach((dialog) => {
+        dialog.addEventListener("close", () => {
+            const id = dialog.id.replace("deleteModal", "");
+            const trigger = document.getElementById(`openDelete${id}`);
+
+            if (trigger) {
+                requestAnimationFrame(() => {
+                    trigger.focus();
+                });
+            }
+        });
+    });
+</script>
+
+{% endblock content %}

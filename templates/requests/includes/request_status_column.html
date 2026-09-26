@@ -1,0 +1,137 @@
+{% load static %}
+
+<div class="flex flex-wrap items-center gap-2">
+
+    {% if record.status == 'zaakceptowany' %}
+
+        {# Accepted #}
+
+        <span class="inline-flex items-center gap-1.5
+                     text-xs font-medium text-emerald-700">
+
+            <span class="h-1.5 w-1.5 shrink-0 rounded-full
+                         bg-emerald-500"
+                  aria-hidden="true">
+            </span>
+
+            <span>
+                Zaakceptowany
+            </span>
+        </span>
+        {% if record.signed_by %}
+
+            <span class="text-xs text-slate-400">
+                {{ record.signed_by_short }}
+            </span>
+
+        {% endif %}
+
+
+    {% elif record.status == 'odrzucony' %}
+
+        {# Rejected #}
+
+        <span class="inline-flex items-center gap-1.5
+                     text-xs font-medium text-rose-700">
+
+            <span class="h-1.5 w-1.5 shrink-0 rounded-full
+                         bg-rose-500"
+                  aria-hidden="true">
+            </span>
+
+            <span>
+                Odrzucony
+            </span>
+
+        </span>
+
+
+        {% if record.signed_by %}
+
+            <span class="text-xs text-slate-400">
+                {{ record.signed_by_short }}
+            </span>
+
+        {% endif %}
+
+
+    {% elif record.status == 'oczekujący' and record.author != request.user %}
+
+        {# Pending — actions make the state obvious #}
+
+        <div class="inline-flex items-center gap-1.5">
+
+            <button type="button"
+                    class="inline-flex min-h-6 min-w-6
+                           items-center justify-center
+                           rounded-md
+                           bg-[#218838]
+                           px-2.5 py-1.5
+                           text-xs font-medium text-white
+                           shadow-sm transition-colors
+                           hover:bg-[#196c2c]
+                           focus-visible:outline-none
+                           focus-visible:ring-2
+                           focus-visible:ring-[#218838]
+                           focus-visible:ring-offset-2"
+                    onclick="document.getElementById('acceptModal{{ record.id }}').showModal()">
+
+                Zaakceptuj
+
+            </button>
+
+
+            <button type="button"
+                    class="inline-flex min-h-6 min-w-6
+                           items-center justify-center
+                           rounded-md
+                           border border-slate-300
+                           bg-white
+                           px-2.5 py-1.5
+                           text-xs font-medium text-slate-700
+                           shadow-sm transition-colors
+                           hover:border-rose-300
+                           hover:bg-rose-50
+                           hover:text-rose-700
+                           focus-visible:outline-none
+                           focus-visible:ring-2
+                           focus-visible:ring-rose-500
+                           focus-visible:ring-offset-2"
+                    onclick="document.getElementById('withdrawModal{{ record.id }}').showModal()">
+
+                Odrzuć
+
+            </button>
+
+        </div>
+
+
+        {% with leave_request=record %}
+
+            {% include 'includes/accept-modal.html' %}
+            {% include 'includes/withdraw-modal.html' %}
+
+        {% endwith %}
+
+
+    {% else %}
+
+        {# Pending — own request, therefore no actions #}
+
+        <span class="inline-flex items-center gap-1.5
+                     text-xs font-medium text-slate-600">
+
+            <span class="h-1.5 w-1.5 shrink-0 rounded-full
+                         bg-slate-400"
+                  aria-hidden="true">
+            </span>
+
+            <span>
+                Oczekujący
+            </span>
+
+        </span>
+
+    {% endif %}
+
+</div>

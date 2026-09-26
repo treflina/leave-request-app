@@ -14,6 +14,7 @@ urlpatterns = [
     path("", include("applications.users.urls")),
     path("", include("applications.sickleaves.urls")),
     path("", include("applications.home.urls")),
+    path("", include("applications.inbox.urls")),
     path(
         "reset_password/",
         auth_views.PasswordResetView.as_view(

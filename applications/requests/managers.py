@@ -30,9 +30,10 @@ class RequestManager(models.Manager):
         employees_requests_received_count = self.filter(
             Q(send_to_person=user) & Q(status="oczekujący")
         ).count()
+        return employees_requests_received_count
 
-        symbols = ["", "➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓", "➓+"]
+        # symbols = ["", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "10+"]
 
-        if employees_requests_received_count > 10:
-            return "➓+"
-        return symbols[employees_requests_received_count]
+        # if employees_requests_received_count > 10:
+        #     return "10+"
+        # return symbols[employees_requests_received_count]

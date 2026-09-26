@@ -99,11 +99,10 @@ window.addEventListener("load", function () {
 
 function showMessage(message) {
     const messageBox = document.getElementById("webpush-message");
+
     if (messageBox) {
         messageBox.textContent = message;
-        messageBox.style.display = "block";
-        messageBox.style.color = "green";
-        messageBox.style.fontSize = "1rem";
+        messageBox.hidden = false;
     }
 }
 

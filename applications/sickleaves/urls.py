@@ -5,27 +5,27 @@ app_name = "sickleaves_app"
 
 urlpatterns = [
     path(
-        "allsickleaves/",
+        "zwolnienia/",
         views.SickleavesListView.as_view(),
         name="sickleaves"
         ),
     path(
-        "add-sickleave/",
+        "zwolnienie-dodaj/",
         views.SickleaveCreateView.as_view(),
         name="add-sickleave",
     ),
     path(
-        "sickleave-delete/<pk>/",
+        "zwolnienie-usun/<pk>/",
         views.delete_sickleave,
         name="delete_sickleave",
     ),
     path(
-        "sickleave-update/<pk>/",
+        "zwolnienie-edycja/<pk>/",
         views.SickleaveUpdateView.as_view(),
         name="update_sickleave",
     ),
     path(
-        "sickleave-notification/<pk>/",
+        "zwolnienie-powiadomienie/<pk>/",
         views.notify_about_sickleave,
         name="notify_sickleave",
     ),

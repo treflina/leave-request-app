@@ -1,32 +1,68 @@
-{% load static %}
-{% load crispy_forms_tags %}
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wnioski urlopowe</title>
+{% extends 'base_login.html' %}
+{% block content %}
+<main
+	class="!my-0 !flex !min-h-screen !h-auto !w-full !flex-nowrap !items-center !justify-center px-6 py-10">
+	<section class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
+		aria-labelledby="new-password-heading">
+		<h1 id="new-password-heading" class="text-2xl font-bold text-[#545460]">
+			Ustaw nowe hasło
+		</h1>
+		{% if validlink %}
+			<p class="mt-2 text-sm text-slate-600">
+				Wprowadź i potwierdź nowe hasło.
+			</p>
+			<form method="post" class="mt-6 space-y-4">
+				{% csrf_token %}
+				{% if form.non_field_errors %}
+					<div class="rounded-lg bg-[#8b1e1e] px-3 py-2 text-sm text-white" role="alert">
+						{{ form.non_field_errors }}
+					</div>
+				{% endif %}
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="{% static 'css/style_login.css' %}">
-    <script src="https://kit.fontawesome.com/455e063248.js" crossorigin="anonymous"></script>
-</head>
-<body>
-    <main>
-        <div class ="container reset">
-            <p style="font-size: 1.5rem;">Wprowadź nowe hasło</p>
-            <div class="form-group">
-                <form class="reset-form" method="POST"> {%csrf_token%}
-                    {{form|crispy}}
-                    <button class = "btn btn-sm btn-light" type="submit">Wyślij</button>
-                </form>
-            </div>
-        </div>
-    </main>
-</body>
-</html>
+				<div>
+					<label for="id_new_password1" class="block text-sm font-semibold text-slate-700">
+						{{ form.new_password1.label }}
+					</label>
+					<input type="password" name="new_password1" id="id_new_password1"
+						autocomplete="new-password" required
+						class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#28a745] focus:outline-none focus:ring-2 focus:ring-[#28a745]/30"
+						{% if form.new_password1.errors %} aria-invalid="true" aria-describedby="new-password1-errors"{% endif %}>
+					{% if form.new_password1.errors %}
+						<p id="new-password1-errors" class="mt-1 text-sm text-rose-700" role="alert">
+							{{ form.new_password1.errors|join:", " }}
+						</p>
+					{% endif %}
+				</div>
+
+				<div>
+					<label for="id_new_password2" class="block text-sm font-semibold text-slate-700">
+						{{ form.new_password2.label }}
+					</label>
+					<input type="password" name="new_password2" id="id_new_password2"
+						autocomplete="new-password" required
+						class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-[#28a745] focus:outline-none focus:ring-2 focus:ring-[#28a745]/30"
+						{% if form.new_password2.errors %} aria-invalid="true" aria-describedby="new-password2-errors"{% endif %}>
+					{% if form.new_password2.errors %}
+						<p id="new-password2-errors" class="mt-1 text-sm text-rose-700" role="alert">
+							{{ form.new_password2.errors|join:", " }}
+						</p>
+					{% endif %}
+				</div>
+
+				<button type="submit"
+					class="min-h-11 w-full rounded-lg bg-[#1f7a35] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#17612a] focus:outline-none focus:ring-2 focus:ring-[#28a745] focus:ring-offset-2">
+					Ustaw nowe hasło
+				</button>
+			</form>
+		{% else %}
+			<p class="mt-4 text-sm leading-6 text-slate-700">
+				Link do resetowania hasła jest nieprawidłowy lub wygasł. Poproś o nowy link.
+			</p>
+			<a href="{% url 'reset_password' %}"
+				class="mt-6 inline-flex rounded-lg bg-[#1f7a35] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#17612a]">
+				Resetuj hasło
+			</a>
+		{% endif %}
+	</section>
+</main>
+{% endblock content %}

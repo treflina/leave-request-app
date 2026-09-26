@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} - Wiadomości{% endblock title %}
+
+{% block content %}
+{% include 'includes/navbar.html' %}
+
+<div class="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+    <header class="mb-6 sm:mb-8">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                    Wiadomości
+                </h1>
+                <p class="mt-1 text-sm text-slate-600">
+                    Zarządzaj wiadomościami wyświetlanymi pracownikom.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'inbox_app:message_create' %}"
+                class="btn btn-primary w-full sm:w-auto"
+            >
+                <svg
+                    class="mr-2 h-5 w-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                    />
+                </svg>
+                Nowa wiadomość
+            </a>
+        </div>
+    </header>
+
+    {% if messages %}
+        <section
+            aria-labelledby="messages-heading"
+            class="rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
+            <h2 id="messages-heading" class="sr-only">
+                Lista wiadomości
+            </h2>
+
+            <ul
+                class="divide-y divide-slate-200 rounded-xl"
+                role="list"
+            >
+                {% for message in messages %}
+                    <li class="group">
+                        <div class="flex flex-col gap-4 p-5 transition-colors hover:bg-slate-50 sm:flex-row sm:items-start sm:justify-between sm:p-6">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex flex-wrap items-start gap-x-3 gap-y-2">
+                                    <h3 class="min-w-0 text-base font-semibold text-slate-900">
+                                        <a
+                                            href="{% url 'inbox_app:message_update' message.pk %}"
+                                            class="rounded-sm underline decoration-transparent underline-offset-2 transition-colors hover:text-green-700 hover:decoration-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                                        >
+                                            {{ message.msg_title }}
+                                        </a>
+                                    </h3>
+
+                                    <a
+                                        href="{% url 'inbox_app:message_recipients' message.pk %}"
+                                        class="inline-flex min-h-7 items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-800 transition-colors hover:bg-green-100 hover:text-green-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                                        aria-label="Zobacz odbiorców wiadomości: {{ message.msg_title }}"
+                                    > Zobacz:
+                                        <span class="ml-1" aria-hidden="true">
+                                            {{ message.employees.count }}
+                                        </span>
+
+                                        <span class="ml-1">
+                                            {% if message.employees.count == 1 %}
+                                                pracownik
+                                            {% else %}
+                                                pracowników
+                                            {% endif %}
+                                        </span>
+                                    </a>
+                                </div>
+
+                                <p class="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
+                                    {{ message.msg_content }}
+                                </p>
+                            </div>
+
+                            <div class="shrink-0">
+                                <a
+                                    href="{% url 'inbox_app:message_update' message.pk %}"
+                                    class="btn btn-tertiary w-full sm:w-auto"
+                                    aria-label="Edytuj wiadomość: {{ message.msg_title }}"
+                                >
+                                    <svg
+                                        class="mr-2 h-4 w-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"
+                                        />
+                                    </svg>
+                                    Edytuj
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% else %}
+        <section
+            aria-labelledby="empty-messages-heading"
+            class="rounded-xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm"
+        >
+            <div
+                class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-100"
+                aria-hidden="true"
+            >
+                <svg
+                    class="h-6 w-6 text-slate-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16h6m-3 5a9 9 0 1 0 0-18"
+                    />
+                </svg>
+            </div>
+
+            <h2
+                id="empty-messages-heading"
+                class="mt-4 text-sm font-semibold text-slate-900"
+            >
+                Brak wiadomości
+            </h2>
+
+            <p class="mt-1 text-sm text-slate-600">
+                Nie utworzono jeszcze żadnych wiadomości.
+            </p>
+
+            <div class="mt-6">
+                <a
+                    href="{% url 'inbox_app:message_create' %}"
+                    class="btn btn-primary"
+                >
+                    <svg
+                        class="mr-2 h-5 w-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
+                    Utwórz pierwszą wiadomość
+                </a>
+            </div>
+        </section>
+    {% endif %}
+</div>
+{% endblock %}

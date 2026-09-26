@@ -1,10 +1,13 @@
+from datetime import date, timedelta
+
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, CreateView, FormView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 
+from applications.requests.models import Request
 from applications.users.models import User
 from applications.users.mixins import StaffAndDirectorPermissionMixin
 from .models import UploadFile, CATEGORY_CHOICES
@@ -20,21 +23,43 @@ class HomePage(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        if self.request.user.working_hours < 1:
-            context["part"] = True
-        if self.request.user.current_leave == 1:
-            context["onedayleft"] = True
-        if self.request.user.role == "S":
-            context["show_director"] = True
-        if self.request.user.role == "T" or self.request.user.role == "K":
-            context["show_manager"] = True
+        user = self.request.user
+        current_year = date.today().year
+
+        context["part"] = user.working_hours < 1
+        context["onedayleft"] = user.current_leave == 1
+        context["show_director"] = user.role == "S"
+        context["show_manager"] = user.role in ("T", "K")
+
+        if user.role != "S":
+            user_requests = Request.objects.filter(
+                author=user,
+                start_date__year=current_year
+                )
+            context["upcoming_leaves"] = (
+                user_requests.filter(start_date__gte=date.today())
+                .exclude(status="odrzucony")
+                .order_by("start_date")[:3]
+            )
+        else:
+            context["upcoming_leaves"] = []
+            context["upcoming_end_of_contracts"] = (
+                User.objects.filter(
+                    contract_end__gte=date.today()).filter(
+                        contract_end__lte=date.today()+timedelta(
+                            days=61)).order_by("contract_end")
+            )
+        context["current_year"] = current_year
+
+        context["user_messages"] = user.message_set.all()
+
+        context["main_page"] = True
 
         return context
 
 
 class ReportView(StaffAndDirectorPermissionMixin, FormView):
-    """Creates pdf report about leave requests and sickleaves for a chosen
-    time period."""
+    """Create a report about leave requests and sick leaves."""
 
     form_class = ReportForm
     template_name = "home/report.html"
@@ -44,35 +69,35 @@ class ReportView(StaffAndDirectorPermissionMixin, FormView):
     def form_valid(self, form):
         person = form.cleaned_data["person"]
         leave_type = form.cleaned_data["leave_type"]
-        start = form.cleaned_data["start_date"]
-        end = form.cleaned_data["end_date"]
+        start_date = form.cleaned_data["start_date"]
+        end_date = form.cleaned_data["end_date"]
         attachment = form.cleaned_data["attachment"]
-        export_format = form.cleaned_data["report_format"]
+        report_format = form.cleaned_data["report_format"]
 
-        if export_format == "certificate" and leave_type == "C":
+        if report_format == "certificate" and leave_type == "C":
             return create_text_report(
                 person=person,
                 leave_type=leave_type,
-                start_date=start,
-                end_date=end,
+                start_date=start_date,
+                end_date=end_date,
                 attachment=attachment,
                 report_format="certificate",
             )
 
-        if export_format == "txt":
+        if report_format == "txt":
             return create_text_report(
                 person=person,
                 leave_type=leave_type,
-                start_date=start,
-                end_date=end,
+                start_date=start_date,
+                end_date=end_date,
                 attachment=attachment,
             )
 
         return create_pdf_report(
             person=person,
             leave_type=leave_type,
-            start_date=start,
-            end_date=end,
+            start_date=start_date,
+            end_date=end_date,
             attachment=attachment,
         )
 
@@ -97,7 +122,6 @@ class UploadFileView(LoginRequiredMixin, CreateView):
             )
             data.append((title, cat_files))
         context["categories"] = data
-
         if "informatyk" in self.request.user.position:
             context["informatyk"] = True
         return context
@@ -109,3 +133,10 @@ def delete_file(request, pk):
     file_to_delete = UploadFile.objects.get(id=pk)
     file_to_delete.delete()
     return HttpResponseRedirect(reverse("home_app:documents"))
+
+
+def robots_txt(request):
+    content = """User-agent: *
+Disallow: /
+"""
+    return HttpResponse(content, content_type="text/plain")

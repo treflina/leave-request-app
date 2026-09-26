@@ -1,5 +1,6 @@
 import logging
 import operator
+from datetime import date
 import django_filters
 
 from functools import reduce
@@ -12,8 +13,10 @@ from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import FormView, ListView, UpdateView
+from django.views.generic import FormView, ListView, RedirectView, UpdateView
 from django.forms.widgets import Select, TextInput, DateInput
+from django_filters.views import FilterView
+from django_tables2 import SingleTableMixin
 
 from applications.users.models import User
 from applications.users.mixins import (
@@ -24,6 +27,7 @@ from applications.users.mixins import (
 from paginator import PaginationMixin
 from .models import Request
 from .forms import RequestForm, UpdateRequestForm
+from .tables import RequestsTable, HRRequestsTable
 from .utils import (
     RequestEmailNotification, RequestChangedStatusEmailNotification
     )
@@ -153,6 +157,27 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
                 (Q(role="K") | Q(role="S") | Q(role="T")) & Q(is_active=True)
             )
         ).order_by("last_name")
+        for field in context["form"].fields.values():
+            if field.widget.input_type == "checkbox":
+                field.widget.attrs["class"] = (
+                    "h-4 w-4 rounded border-slate-300 text-[#28a745] "
+                    "focus:ring-[#28a745]"
+                )
+            else:
+                field.widget.attrs["class"] = (
+                    "mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 "
+                    "px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] "
+                    "focus:bg-white focus:outline-none focus:ring-2 "
+                    "focus:ring-[#28a745]/20"
+                )
+        for field_name, errors in context["form"].errors.items():
+            if field_name in context["form"].fields and errors:
+                context["form"].fields[field_name].widget.attrs.update(
+                    {
+                        "aria-invalid": "true",
+                        "aria-describedby": f"id_{field_name}-errors",
+                    }
+                )
 
         if self.object.author.working_hours < 1:
             context["part"] = True
@@ -176,30 +201,46 @@ class RequestChangeView(TopManagerPermisoMixin, UpdateView):
         return response
 
 
-class UserRequestsListView(LoginRequiredMixin, PaginationMixin, ListView):
-    """User leave requests listing view."""
+class UserHolidayRequestsListView(LoginRequiredMixin, ListView):
+    """Current user's holiday requests listing view."""
 
-    template_name = "requests/user_requests.html"
+    template_name = "requests/user_holiday_requests.html"
     model = Request
     login_url = reverse_lazy("users_app:user-login")
     paginate_by = 10
+    context_object_name = "user_requests"
 
-    def get_context_data(self, **kwargs):
-        context = super(UserRequestsListView, self).get_context_data(**kwargs)
-        user = self.request.user
-        user_requests_holiday = Request.objects.user_requests_holiday(user)
-        user_requests_other = Request.objects.user_requests_other(user)
+    def get_queryset(self):
+        return Request.objects.user_requests_holiday(self.request.user)
 
-        context["user_requests_holiday"] = self.paginate(
-            user_requests_holiday,
-            "page"
-            )
-        context["user_requests_other"] = self.paginate(
-            user_requests_other,
-            "page2"
-            )
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request") == "true":
+            return ["requests/partials/user_holiday_requests_table.html"]
+        return [self.template_name]
 
-        return context
+
+class UserOtherRequestsListView(LoginRequiredMixin, ListView):
+    """Current user's non-holiday requests listing view."""
+
+    template_name = "requests/user_other_requests.html"
+    model = Request
+    login_url = reverse_lazy("users_app:user-login")
+    paginate_by = 10
+    context_object_name = "user_requests"
+
+    def get_queryset(self):
+        return Request.objects.user_requests_other(self.request.user)
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request") == "true":
+            return ["requests/partials/user_other_requests_table.html"]
+        return [self.template_name]
+
+
+class UserRequestsListView(LoginRequiredMixin, RedirectView):
+    """Redirect the legacy combined user-request list to holiday requests."""
+
+    pattern_name = "requests_app:user_holiday_requests"
 
 
 class RequestsFilteredListView(ListView):
@@ -221,87 +262,80 @@ class RequestsFilteredListView(ListView):
 class RequestsFilter(django_filters.FilterSet):
     """Filter for listing leave requests views."""
 
-    LEAVE_TYPE_CHOICES = [("W", "W"), ("WS", "WS"), ("WN", "WN"), ("DW", "DW")]
+    LEAVE_TYPE_CHOICES = [
+        ("W", "Urlop wypoczynkowy (W)"),
+        ("WS", "Wolne za sobotę (WS)"),
+        ("WN", "Wolne za niedzielę/święto (WN)"),
+        ("DW", "Wolne za święto w sobotę (DW)"),
+    ]
 
     dropdown_field = django_filters.ChoiceFilter(
         field_name="leave_type",
         lookup_expr="exact",
         choices=LEAVE_TYPE_CHOICES,
         label="Wybierz rodzaj wolnego",
-        empty_label="Rodzaj",
-        widget=Select(attrs={"class": "form-control"}),
+        empty_label="Wszystkie rodzaje",
     )
     start_date = django_filters.DateFilter(
         field_name="start_date",
         lookup_expr="gte",
         label="Od:",
-        widget=DateInput(
-            format="%d.%m.%y",
-            attrs={
-                "class": "form-control",
-                "type": "date",
-            },
-        ),
     )
     end_date = django_filters.DateFilter(
         field_name="end_date",
         lookup_expr="lte",
         label="Do:",
-        widget=DateInput(
-            format="%d.%m.%y",
-            attrs={
-                "class": "form-control",
-                "type": "date",
-            },
-        ),
     )
 
     other_fields = django_filters.CharFilter(
         method="filter_other_fields",
         label="Wyszukaj",
-        widget=TextInput(
-            attrs={"class": "form-control", "placeholder": "Wyszukaj..."}
-            ),
     )
 
     class Meta:
         model = Request
         fields = [
+            "other_fields",
             "dropdown_field",
             "start_date",
             "end_date",
-            "other_fields",
         ]
 
     @staticmethod
     def filter_other_fields(qs, name, value):
-        query_words = value.split()
+        query_words = value.strip().split()
+        if not query_words:
+            return qs
         return qs.filter(
             reduce(
                 operator.and_,
                 (
                     Q(author__first_name__icontains=word)
                     | Q(author__last_name__icontains=word)
+                    | Q(status__icontains=word)
+                    | Q(leave_type__icontains=word)
+                    | Q(substitute__icontains=word)
                     for word in query_words
                 ),
             )
             | Q(start_date__icontains=value)
             | Q(end_date__icontains=value)
             | Q(work_date__icontains=value)
-            | Q(status__icontains=value)
         )
 
     @staticmethod
     def filter_year(qs, name, value):
+        if not value:
+            return qs
         return qs.filter(Q(start_date__year=value) | Q(end_date__year=value))
 
 
-class RequestsListView(TopManagerPermisoMixin, ListView):
-    """Leave requests listing view for managers where they can accept or reject
-    reuests they have received.
-    Topmanagers can view requests sent from all employees."""
+class RequestsListView(TopManagerPermisoMixin, SingleTableMixin, FilterView):
+    """Filtered leave requests listing view for managers."""
 
-    context_object_name = "requests_holiday"
+    model = Request
+    table_class = RequestsTable
+    filterset_class = RequestsFilter
     template_name = "requests/allrequests.html"
     login_url = reverse_lazy("users_app:user-login")
     paginate_by = 20
@@ -309,44 +343,60 @@ class RequestsListView(TopManagerPermisoMixin, ListView):
     def get_queryset(self):
         user = self.request.user
         if user.role == "T" or user.role == "S" or user.is_staff:
-            queryset = Request.objects.all().order_by("-start_date")
+            queryset = Request.objects.all().select_related("author").order_by("-start_date")
         elif user.role == "K":
-            queryset = Request.objects.filter(author__manager=user)
+            queryset = Request.objects.filter(author__manager=user).select_related("author").order_by("-start_date")
         else:
-            queryset = None
-        filter = RequestsFilter(self.request.GET, queryset)
-        return filter.qs
+            queryset = Request.objects.none()
+        return queryset
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        queryset = self.get_queryset()
-        filter = RequestsFilter(self.request.GET, queryset)
-        context["filterset"] = filter
-        context["requests_received"] = Request.objects.requests_to_accept(
-            self.request.user
+    def get_template_names(self):
+        if getattr(self.request, "htmx", False) or self.request.headers.get("HX-Request") == "true":
+            return ["tables/base_table_partial.html"]
+        return [self.template_name]
+
+
+
+class RequestsToAcceptListView(TopManagerPermisoMixin, ListView):
+    """Pending requests assigned to the current manager."""
+
+    model = Request
+    template_name = "requests/requests_to_accept.html"
+    context_object_name = "requests_to_accept"
+    login_url = reverse_lazy("users_app:user-login")
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Request.objects.requests_to_accept(self.request.user).select_related(
+            "author"
         )
-        return context
+
+    def get_template_names(self):
+        if self.request.headers.get("HX-Request"):
+            return ["requests/partials/requests_to_accept_list.html"]
+
+        return [self.template_name]
 
 
-class HRAllRequestsListView(StaffAndDirectorPermissionMixin, ListView):
+class HRAllRequestsListView(StaffAndDirectorPermissionMixin, SingleTableMixin, FilterView):
     """All employees requests listing page for HR department."""
 
-    context_object_name = "requests_holiday"
+    model = Request
+    table_class = HRRequestsTable
+    filterset_class = RequestsFilter
     template_name = "requests/hrallrequests.html"
     login_url = reverse_lazy("users_app:user-login")
     paginate_by = 20
 
     def get_queryset(self):
-        queryset = Request.objects.all().order_by("-start_date")
-        filter = RequestsFilter(self.request.GET, queryset)
-        return filter.qs
+        return Request.objects.all().select_related("author").order_by("-start_date")
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        queryset = self.get_queryset()
-        filter = RequestsFilter(self.request.GET, queryset)
-        context["filterset"] = filter
-        return context
+    def get_template_names(self):
+        if getattr(self.request, "htmx", False) or self.request.headers.get("HX-Request") == "true":
+            return ["tables/base_table_partial.html"]
+        return [self.template_name]
+
+
 
 
 @login_required(login_url="users_app:user-login")
@@ -381,6 +431,13 @@ def accept_request(request, pk):
             notification.send_notification()
         except Exception:
             logger.error("Email request notification not sent", exc_info=True)
+
+    next_page = request.GET.get("next")
+
+    if next_page == "requests_to_accept":
+        return HttpResponseRedirect(
+            reverse("requests_app:requests_to_accept")
+        )
 
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 
@@ -422,6 +479,13 @@ def reject_request(request, pk):
             notification.send_notification()
         except Exception:
             logger.error("Email request notification not sent", exc_info=True)
+
+    next_page = request.GET.get("next")
+
+    if next_page == "requests_to_accept":
+        return HttpResponseRedirect(
+            reverse("requests_app:requests_to_accept")
+        )
 
     return HttpResponseRedirect(reverse("requests_app:allrequests"))
 

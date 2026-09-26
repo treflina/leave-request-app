@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} - Odbiorcy wiadomości{% endblock title %}
+
+{% block content %}
+{% include 'includes/navbar.html' %}
+
+<div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
+    <header class="mb-6 sm:mb-8">
+        <a
+            href="{% url 'inbox_app:message_list' %}"
+            class="inline-flex items-center text-sm font-medium text-slate-600 transition-colors hover:text-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+        >
+            <svg
+                class="mr-2 h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                />
+            </svg>
+
+            Wiadomości
+        </a>
+
+        <div class="mt-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="min-w-0">
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900">
+                    Odbiorcy wiadomości
+                </h1>
+
+                <p class="mt-1 text-sm text-slate-600">
+                    {{ message.msg_title }}
+                </p>
+            </div>
+
+            <a
+                href="{% url 'inbox_app:message_update' message.pk %}"
+                class="btn btn-tertiary w-full sm:w-auto"
+            >
+                <svg
+                    class="mr-2 h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"
+                    />
+                </svg>
+
+                Edytuj wiadomość
+            </a>
+        </div>
+    </header>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <section
+            aria-labelledby="recipients-heading"
+            class="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
+            <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2
+                            id="recipients-heading"
+                            class="text-base font-semibold text-slate-900"
+                        >
+                            Lista odbiorców
+                        </h2>
+
+                        <p
+                            id="recipient-count"
+                            data-result-count
+                            class="mt-1 text-sm text-slate-500"
+                            aria-live="polite"
+                        >
+                            {{ message.employees.count }} pracowników
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+                        <span
+                            id="selected-count"
+                            class="text-sm text-slate-500"
+                            aria-live="polite"
+                        >
+                            Nie zaznaczono pracowników
+                        </span>
+
+                        <button
+                            type="submit"
+                            id="remove-selected"
+                            class="btn btn-danger"
+                            disabled
+                        >
+                            <svg
+                                class="mr-2 h-4 w-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-8 0h10"
+                                />
+                            </svg>
+
+                            Usuń zaznaczonych
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative mt-5 max-w-xl">
+                    <label
+                        for="employee-search"
+                        class="sr-only"
+                    >
+                        Szukaj odbiorcy
+                    </label>
+
+                    <input
+                        type="search"
+                        id="employee-search"
+                        data-employee-search
+                        placeholder="Szukaj pracownika..."
+                        autocomplete="off"
+                        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                        aria-controls="recipient-list"
+                        aria-describedby="recipient-search-status"
+                    >
+
+                    <svg
+                        class="pointer-events-none absolute left-3 top-3 h-5 w-5 text-slate-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+                        />
+                    </svg>
+                </div>
+
+                <p
+                    id="recipient-search-status"
+                    data-search-status
+                    class="mt-2 min-h-4 text-xs text-slate-500"
+                    aria-live="polite"
+                ></p>
+            </div>
+
+            <div
+                id="recipient-list"
+                class="grid grid-cols-1 gap-px bg-slate-100 sm:grid-cols-2 lg:grid-cols-3"
+            >
+                {% for employee in message.employees.all %}
+                    <label
+                        data-employee-row
+                        data-name="{{ employee.get_full_name|default:employee.username|lower }}"
+                        class="recipient-row flex cursor-pointer items-center gap-3 bg-white px-5 py-3.5 transition-colors hover:bg-slate-50 has-[:checked]:bg-rose-50 sm:px-6"
+                    >
+                        <input
+                            type="checkbox"
+                            name="remove_employees"
+                            value="{{ employee.pk }}"
+                            class="employee-remove-checkbox h-4 w-4 rounded border-slate-300 text-green-700 focus:ring-2 focus:ring-green-700 focus:ring-offset-1"
+                        >
+
+                        <span class="min-w-0 truncate text-sm font-medium text-slate-800">
+                            {{ employee.get_full_name|default:employee.username }}
+                        </span>
+                    </label>
+                {% empty %}
+                    <div class="col-span-full bg-white px-6 py-12 text-center">
+                        <p class="text-sm text-slate-500">
+                            Ta wiadomość nie ma jeszcze odbiorców.
+                        </p>
+                    </div>
+                {% endfor %}
+
+                <div
+                    id="no-results"
+                    data-no-results
+                    class="col-span-full hidden bg-white px-6 py-12 text-center"
+                >
+                    <p class="text-sm font-medium text-slate-900">
+                        Nie znaleziono pracownika
+                    </p>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Spróbuj użyć innej frazy.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/msg-employee-search.js' %}" defer></script>
+<script src="{% static 'js/msg-recipients.js' %}" defer></script>
+{% endblock extra_js %}
+

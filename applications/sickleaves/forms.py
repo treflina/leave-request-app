@@ -61,3 +61,23 @@ class SickleaveForm(forms.ModelForm):
         self.fields["employee"] = UserModelChoiceField(
             label="Osoba", queryset=User.objects.all()
         )
+        for field_name, field in self.fields.items():
+            if field.widget.input_type == "checkbox":
+                field.widget.attrs["class"] = (
+                    "h-4 w-4 rounded border-slate-300 text-[#28a745] "
+                    "focus:ring-[#28a745]"
+                )
+            else:
+                field.widget.attrs["class"] = (
+                    "mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 "
+                    "px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] "
+                    "focus:bg-white focus:outline-none focus:ring-2 "
+                    "focus:ring-[#28a745]/20"
+                )
+            if field_name in self.errors:
+                field.widget.attrs.update(
+                    {
+                        "aria-invalid": "true",
+                        "aria-describedby": f"id_{field_name}-errors",
+                    }
+                )

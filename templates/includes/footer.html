@@ -1,8 +1,6 @@
   {% load  static %}
-  <footer class="text-center mt-auto">
+  <footer class="text-center mt-auto bg-[#545460] text-white py-4 px-6 sm:px-8">
       <p>
-        <script>
-          new Date().getFullYear() > 2020 && document.write(new Date().getFullYear());
-        </script> Pracownik MBP
+        {% now "Y" %} Pracownik MBP
       </p>
   </footer>

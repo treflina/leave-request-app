@@ -1,0 +1,97 @@
+{% load filter_tags %}
+<div id="sickleaves-table" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80" aria-live="polite">
+    <div class="overflow-x-auto"><table class="responsive-table min-w-full divide-y divide-slate-200 text-left text-sm text-slate-700">
+        <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-[#545460]">
+            <tr>
+                <th scope="col" class="px-4 py-3">Lp.</th>
+                <th scope="col" class="px-4 py-3">Nazwisko i imię</th>
+                <th scope="col" class="px-4 py-3">Numer dokumentu</th>
+                <th scope="col" class="px-4 py-3">Data wystawienia</th>
+                <th scope="col" class="px-4 py-3">Rodzaj*</th>
+                <th scope="col" class="px-4 py-3">Od</th>
+                <th scope="col" class="px-4 py-3">Do</th>
+                <th scope="col" class="px-4 py-3">Uwagi</th>
+                <th scope="col" class="px-4 py-3"><span class="sr-only">Akcje</span></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 bg-white">
+            {% for sickleave in sickleaves %}
+            <tr class="transition-colors hover:bg-green-50/40">
+                <td data-title="Lp." class="px-4 py-3.5 font-medium text-slate-500">{{ forloop.counter0|add:page_obj.start_index }}.</td>
+                <td data-title="Nazwisko i imię" class="px-4 py-3.5 font-semibold text-slate-900">{{ sickleave.employee.last_name }} {{ sickleave.employee.first_name }}</td>
+                <td data-title="Nr dokumentu" class="px-4 py-3.5">{{ sickleave.doc_number|default:"-" }}</td>
+                <td data-title="Wystawiono" class="px-4 py-3.5">{{ sickleave.issue_date|date:"d.m.y"|default:"-" }}</td>
+                <td data-title="Rodzaj" class="px-4 py-3.5">
+                    <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold">{{ sickleave.leave_type }}</span>
+                </td>
+                <td data-title="Od" class="px-4 py-3.5">{{ sickleave.start_date|date:"d.m.y" }}</td>
+                <td data-title="Do" class="px-4 py-3.5">{{ sickleave.end_date|date:"d.m.y" }}</td>
+                <td data-title="Uwagi" class="px-4 py-3.5">{{ sickleave.additional_info|default:"-" }}</td>
+                <td data-title="Akcje" class="px-4 py-3.5">
+                    <div class="flex flex-nowrap gap-1">
+                        <a href="{% url 'sickleaves_app:update_sickleave' sickleave.id %}"
+                        class="btn-sm bg-sky-100 text-sky-800 hover:bg-sky-200">Popraw
+                        </a>
+                        <button type="button" class="btn-sm bg-slate-100 text-stone-700 hover:bg-rose-100"
+                        onclick="document.getElementById('deleteModal{{ sickleave.id }}').showModal()">Usuń</button>
+                        <button type="button" class="btn-sm bg-[#545460] text-white hover:bg-slate-700"
+                        onclick="document.getElementById('sendInfoModal{{ sickleave.id }}').showModal()" aria-label="Wyślij informację o zwolnieniu">@</button>
+                    </div>
+<dialog id="deleteModal{{ sickleave.id }}" aria-labelledby="deleteModalLabel{{ sickleave.id }}"
+class="w-full max-w-md rounded-xl border-0 p-0 shadow-xl backdrop:bg-slate-900/40">
+<div class="p-6">
+    <h2 id="deleteModalLabel{{ sickleave.id }}"
+    class="text-lg font-bold text-[#545460]">Usunąć zwolnienie?</h2>
+    <p class="mt-3 text-sm text-slate-600">{{ sickleave.employee.first_name }} {{ sickleave.employee.last_name }}, od {{ sickleave.start_date|date:"d.m.y" }} do {{ sickleave.end_date|date:"d.m.y" }}.</p><div class="mt-6 flex justify-end gap-3"><button type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700" onclick="this.closest('dialog').close()">Wróć</button>
+        <form method="post" action="{% url 'sickleaves_app:delete_sickleave' sickleave.id %}">
+            {% csrf_token %}
+            <button type="submit" class="rounded-lg bg-rose-700 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-800">Tak, usuń</button></form></div></div></dialog>
+<dialog id="sendInfoModal{{ sickleave.id }}" aria-labelledby="sendInfoLabel{{ sickleave.id }}"
+    class="w-full max-w-md rounded-xl border-0 p-0 shadow-xl backdrop:bg-slate-900/40"><form method="post" action="{% url 'sickleaves_app:notify_sickleave' sickleave.id %}"
+    class="p-6"><h2 id="sendInfoLabel{{ sickleave.id }}" class="text-lg font-bold text-[#545460]">Powiadomienie o zwolnieniu</h2>
+    <fieldset class="mt-4 space-y-3">
+        <legend class="text-sm text-slate-600">Wyślij e-mail do:</legend>
+        <label class="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="head" checked class="h-4 w-4 text-[#28a745]">dyrektora</label>
+            <label class="flex items-center gap-2 text-sm">
+                <input type="checkbox" name="instructor" checked class="h-4 w-4 text-[#28a745]">instruktora</label>
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="manager" checked class="h-4 w-4 text-[#28a745]">kierownika</label>
+    </fieldset>
+    <div class="mt-6 flex justify-end gap-3">
+        <button type="button" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700" onclick="this.closest('dialog').close()">Wróć</button>
+        {% csrf_token %}<button type="submit" class="rounded-lg bg-[#1f7a35] px-3 py-2 text-sm font-semibold text-white hover:bg-[#17612a]">Wyślij</button>
+    </div>
+    </form>
+    </dialog>
+    </td></tr>{% empty %}<tr><td colspan="9" class="px-4 py-12 text-center text-sm text-slate-500">Brak zwolnień spełniających kryteria wyszukiwania.</td></tr>{% endfor %}</tbody>
+        </table>
+    </div>
+        {% if is_paginated %}<nav aria-label="Paginacja"
+    class="flex items-center justify-between border-t border-slate-100 bg-slate-50/70 px-4 py-3">
+    <span class="text-xs text-slate-500">Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}</span>
+    <div class="flex gap-2">{% if page_obj.has_previous %}
+        <a href="?{% param_replace page=page_obj.previous_page_number %}"
+        hx-get="?{% param_replace page=page_obj.previous_page_number %}"
+        hx-target="#sickleaves-table"
+        hx-swap="outerHTML"
+        hx-push-url="true"
+        class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700
+        hover:border-[#28a745] hover:text-[#28a745] focus:outline-none focus:ring-2
+                focus:ring-[#28a745] focus:ring-offset-2">Poprzednia</a>
+        {% endif %}
+        {% if page_obj.has_next %}
+        <a href="?{% param_replace page=page_obj.next_page_number %}"
+        hx-get="?{% param_replace page=page_obj.next_page_number %}"
+        hx-target="#sickleaves-table"
+        hx-swap="outerHTML"
+        hx-push-url="true"
+        class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700
+        hover:border-[#28a745] hover:text-[#28a745] focus:outline-none focus:ring-2
+                focus:ring-[#28a745] focus:ring-offset-2">Następna</a>
+        {% endif %}
+    </div></nav>
+    {% endif %}
+    <p class="border-t border-slate-100 px-5 py-3 text-xs text-slate-600">
+        <span class="font-bold text-rose-700">*</span> C - chorobowe, O - opieka, K - kwarantanna, I - izolacja.</p>
+</div>

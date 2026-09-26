@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.db import models
 from .validators import FileValidator
 
@@ -45,9 +47,23 @@ class UploadFile(models.Model):
     priority = models.IntegerField("Sortowanie (1-5)", default=2)
     show_as_new = models.BooleanField("Oznacz jako nowo dodany", default=False)
 
+    @property
+    def file_extension(self):
+        return Path(self.file.name).suffix.lstrip(".").upper()
+
+    @property
+    def file_size(self):
+        if not self.file:
+            return None
+
+        try:
+            return self.file.size
+        except (FileNotFoundError, OSError):
+            return None
+
     class Meta:
-        verbose_name = "Dokument"
-        verbose_name_plural = "Dokumenty"
+            verbose_name = "Dokument"
+            verbose_name_plural = "Dokumenty"
 
     def __str__(self):
         return self.description

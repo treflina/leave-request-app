@@ -5,42 +5,57 @@ app_name = "requests_app"
 
 urlpatterns = [
     path(
-        "sendrequest/",
+        "wniosek/",
         views.RequestFormView.as_view(),
         name="request",
     ),
     path(
-        "changerequest/<int:pk>/",
+        "zmienwniosek/<int:pk>/",
         views.RequestChangeView.as_view(),
         name="changerequest",
     ),
     path(
-        "user-requests/",
+        "wnioskipracownika/",
         views.UserRequestsListView.as_view(),
         name="user_requests",
     ),
     path(
-        "allrequests/",
+        "wnioskipracownika/urlop/",
+        views.UserHolidayRequestsListView.as_view(),
+        name="user_holiday_requests",
+    ),
+    path(
+        "wnioskipracownika/dniwolne/",
+        views.UserOtherRequestsListView.as_view(),
+        name="user_other_requests",
+    ),
+    path(
+        "wnioski/",
         views.RequestsListView.as_view(),
         name="allrequests",
     ),
     path(
-        "hrallrequests/",
+        "wnioski-do-zaakceptowania/",
+        views.RequestsToAcceptListView.as_view(),
+        name="requests_to_accept",
+    ),
+    path(
+        "hrwnioski/",
         views.HRAllRequestsListView.as_view(),
         name="hrallrequests",
     ),
     path(
-        "request-reject/<int:pk>/",
+        "wniosek-odrzuc/<int:pk>/",
         views.reject_request,
         name="reject_request",
     ),
     path(
-        "request-accept/<int:pk>/",
+        "wniosek-zaakceptuj/<int:pk>/",
         views.accept_request,
         name="accept_request",
     ),
     path(
-        "request-delete/<int:pk>/",
+        "wniosek-usun/<int:pk>/",
         views.delete_request,
         name="delete_request",
     ),

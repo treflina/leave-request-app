@@ -1,182 +1,375 @@
 {% extends "base.html" %}
-{% load  static %}
+
+{% load static %}
+
+{% block title %} - Zarządzanie pracownikami{% endblock title %}
 
 {% block content %}
-{% include 'includes/navbar.html' %}
-<section class="pagesection mt-5">
-    <div class="d-flex justify-content-center align-items-center flex-wrap mb-lg-5">
-        <h1 class="page-heading">Lista pracowników</h1>
-        <a href="{%url 'users_app:user-register'%}" role="button" class="btn ml-3 mr-1 my-2 btn-sm btn-success">Dodaj pracownika</a>
-        <a href="{%url 'sickleaves_app:add-sickleave'%}" role="button" class="btn mx-1 my-2 btn-sm btn-info">Dodaj zwolnienie lekarskie</a>
-        </div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Lp.</th>
-                    <th scope="col">Nazwisko i imię</th>
-                    <th scope="col">Stanowisko</th>
-                    <th scope="col" class="text-align-cl">K*</th>
-                    <th scope="col" class="text-align-cl ml-1 mr-1">Urlop</th>
-                    <th scope="col" class="text-align-cl">NŻ*</th>
-                    <th scope="col" class="text-align-cl">WU*</th>
-                    <th scope="col" class="text-align-cl">Etat</th>
-                    <th scope="col" class="text-align-cl">Miejsce pracy</th>
-                    <th scope="col" class="text-align-cl">Umowa do:</th>
-                    <th scope="col" class="text-align-cl">Uwagi</th>
-                    <th scope="col" class="text-align-cl">Akcja</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for employee in employees %}
-                <tr>
-                    <td data-title="Lp.">{{ forloop.counter0|add:1 }}.</td>
-                    <td data-title="Nazwisko i imię:">{{ employee.last_name}} {{employee.first_name}}</td>
-                    <td data-title="Stanowisko:">{{ employee.position|truncatechars:30 }}</td>
-                    <td data-title="Kierownik:" class="text-align-cl">{{ employee.is_manager }}</td>
-                    <td data-title="Urlop:" class="text-align-cl">{{ employee.current_leave }}</td>
-                    <td data-title="NŻ:" class="text-align-cl">{{ employee.duvet_days_count }}</td>
-                    <td data-title="Wymiar urlopu:" class="text-align-cl">{{ employee.annual_leave }}</td>
-                    <td data-title="Etat:" class="text-align-cl">{{ employee.working_hours }}</td>
-                    <td data-title="Miejsce pracy:" class="text-align-cl">{{ employee.workplace }}</td>
-                    <td data-title="Umowa do:" class="text-align-cl">{{ employee.contract_end|date:"d.m.y"}}</td>
-                    <td data-title="Uwagi:" class="text-align-cl">{{ employee.additional_info|truncatechars:10 }}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{%url 'users_app:update_employee' employee.id%}" class="btn btn-sm btn-warning" type="submit">Edytuj</a>
-                            <button type="button" class="btn btn-light btn-sm text-danger" data-toggle="modal"
-                                data-target="#deleteModal{{employee.id}}">✘</button>
-                        </div>
-                        <!-- Modal -->
-                        <div class="modal fade" id="deleteModal{{employee.id}}" tabindex="-1"
-                            aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <p class="modal-title">Ostrzeżenie</p>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Czy na pewno chcesz usunąć pracownika? <br>{{employee.first_name}}
-                                            {{employee.last_name}} <br> UWAGA! Zostaną usunięte z bazy również jego
-                                            wszystkie
-                                            wnioski oraz zwolnienia lekarskie. <br> Możliwe alternatywne rozwiązanie:
-                                            zmiana wartości ustawienia "Obecnie zatrudniony" w Edytuj. </p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
-                                        <form method="POST" action="{% url 'users_app:delete_employee' employee.id %}">
-                                            {%csrf_token%}
-                                            <button type="submit" class="btn btn-info">Tak, usuń</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
-        <p class="px-1">*K - Kierownik placówki/działu (poza jednoosobowymi), *NŻ - liczba wykorzystanych dni urlopu na żądanie, *WU - roczny wymiar urlopu</p>
-        <div class="search-info-box" style="background-color: #efefef;">
-            <p class="mb-0">Aby na początku roku dodać jednocześnie wszystkim pracownikom roczny wymiar przysługującego urlopu do bieżącej puli urlopowej (Urlop = Urlop + WU): </p>
-            <button type="button" class="btn btn-danger btn-sm m-2" data-toggle="modal"
-                data-target="#addModal">Dodaj </button>
-        </div>
-        <!-- Modal -->
-        <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <p class="modal-title">Ostrzeżenie</p>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Czy na pewno chcesz dodać wszystkim pracownikom do bieżącej puli urlopowej liczbę dni/godzin rocznego przysługującego wymiaru urlopu?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
-                        <form method="POST" action="{% url 'users_app:add_annual_leave' %}">
-                            {%csrf_token%}
-                            <button type="submit" class="btn btn-info">Tak, dodaj</button>
-                        </form>
-                    </div>
+{% include 'includes/navbar.html' %}
+
+<main
+    class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8"
+>
+    <section
+        class="mx-auto max-w-7xl space-y-5"
+        aria-labelledby="employees-heading"
+    >
+        <header
+            class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"
+        >
+            <div class="flex items-center gap-3">
+                <span
+                    class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-stone-800 shadow-sm"
+                >
+                    <svg
+                        class="h-6 w-6"
+                        aria-hidden="true"
+                        focusable="false"
+                    >
+                        <use href="{% static 'img/svg/sprite.svg' %}#user"></use>
+                    </svg>
+                </span>
+
+                <div>
+                    <h1
+                        id="employees-heading"
+                        class="text-2xl font-bold text-[#545460]"
+                    >
+                        Lista pracowników
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Zarządzaj aktualnie zatrudnionymi pracownikami.
+                    </p>
                 </div>
             </div>
-        </div>
 
-</section>
-<section class="pagesection w-100 mt-5 mb-5">
-        <h2 class="page-heading mb-lg-5">Lista byłych pracowników</h2>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th scope="col">Lp.</th>
-                    <th scope="col">Nazwisko i imię</th>
-                    <th scope="col">Stanowisko</th>
-                    <th scope="col" class="text-align-cl ml-1 mr-1">Urlop</th>
-                    <th scope="col" class="text-align-cl">Etat</th>
-                    <th scope="col" class="text-align-cl">Miejsce pracy</th>
-                    <th scope="col" class="text-align-cl">Umowa do:</th>
-                    <th scope="col" class="text-align-cl">Uwagi</th>
-                    <th scope="col" class="text-align-cl">Akcja</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for exemployee in exemployees %}
-                <tr>
-                    <td data-title="Lp.">{{ forloop.counter0|add:1 }}.</td>
-                    <td data-title="Nazwisko i imię:">{{ exemployee.last_name}} {{exemployee.first_name}}</td>
-                    <td data-title="Stanowisko:">{{ exemployee.position|truncatechars:30 }}</td>
-                    <td data-title="Urlop:" class="text-align-cl">{{ exemployee.current_leave }}</td>
-                    <td data-title="Etat:" class="text-align-cl">{{ exemployee.working_hours }}</td>
-                    <td data-title="Miejsce pracy:" class="text-align-cl">{{ exemployee.workplace }}</td>
-                    <td data-title="Umowa do:" class="text-align-cl">{{ exemployee.contract_end|date:"d.m.y"}}</td>
-                    <td data-title="Uwagi:" class="text-align-cl">{{ exemployee.additional_info|truncatechars:30 }}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{%url 'users_app:update_employee' exemployee.id%}" class="btn btn-sm btn-warning" type="submit">Edytuj</a>
-                            <button type="button" class="btn btn-light text-danger btn-sm" data-toggle="modal"
-                                data-target="#deleteModal{{exemployee.id}}">✘</button>
-                        </div>
-                        <!-- Modal -->
-                        <div class="modal fade" id="deleteModal{{exemployee.id}}" tabindex="-1"
-                            aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <p class="modal-title">Ostrzeżenie</p>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
+            <div class="flex flex-wrap gap-2">
+                <a
+                    href="{% url 'users_app:user-register' %}"
+                    class="btn btn-primary"
+                >
+                    Dodaj pracownika
+                </a>
+                <a
+                    href="{% url 'users_app:former-employees' %}"
+                    class="btn btn-tertiary"
+                >
+                    Byli pracownicy
+                    <span
+                            class="ml-1 transition-transform duration-150 group-hover:translate-x-0.5"
+                            aria-hidden="true"
+                        >
+                            &rarr;
+                    </span>
+                </a>
+            </div>
+        </header>
+
+        <div
+            class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80"
+        >
+            <div class="overflow-x-auto">
+                <table
+                    class="responsive-table min-w-full divide-y divide-slate-200 text-left text-sm text-slate-700"
+                >
+                    <thead
+                        class="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-[#545460]"
+                    >
+                        <tr>
+                            <th scope="col" class="px-4 py-3">
+                                Lp.
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Nazwisko i imię
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Stanowisko
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                K*
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Urlop
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                NŻ*
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                WU*
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Etat
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Miejsce pracy
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Umowa do
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                Uwagi
+                            </th>
+
+                            <th scope="col" class="px-4 py-3">
+                                <span class="sr-only">Akcje</span>
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for employee in employees %}
+                            <tr class="transition-colors hover:bg-slate-50/40">
+                                <td
+                                    data-title="Lp."
+                                    class="px-4 py-3.5 font-medium text-slate-500"
+                                >
+                                    {{ forloop.counter }}.
+                                </td>
+
+                                <td
+                                    data-title="Nazwisko i imię"
+                                    class="px-4 py-3.5 font-semibold text-slate-900"
+                                >
+                                    {{ employee.last_name }}
+                                    {{ employee.first_name }}
+                                </td>
+
+                                <td
+                                    data-title="Stanowisko"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.position|default:"-" }}
+                                </td>
+
+                                <td
+                                    data-title="Kierownik"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.is_manager }}
+                                </td>
+
+                                <td
+                                    data-title="Urlop"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.current_leave }}
+                                </td>
+
+                                <td
+                                    data-title="NŻ"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.duvet_days_count }}
+                                </td>
+
+                                <td
+                                    data-title="Wymiar urlopu"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.annual_leave }}
+                                </td>
+
+                                <td
+                                    data-title="Etat"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.working_hours }}
+                                </td>
+
+                                <td
+                                    data-title="Miejsce pracy"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.workplace|default:"-" }}
+                                </td>
+
+                                <td
+                                    data-title="Umowa do"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.contract_end|date:"d.m.y"|default:"-" }}
+                                </td>
+
+                                <td
+                                    data-title="Uwagi"
+                                    class="px-4 py-3.5"
+                                >
+                                    {{ employee.additional_info|default:"-" }}
+                                </td>
+
+                                <td
+                                    data-title="Akcje"
+                                    class="px-4 py-3.5"
+                                >
+                                    <div class="flex flex-nowrap gap-2">
+                                        <a
+                                            href="{% url 'users_app:update_employee' employee.id %}"
+                                            class="btn-sm bg-amber-50  hover:bg-amber-100 shadow-sm"
+                                        >
+                                            Edytuj
+                                        </a>
+
+                                        <button
+                                            type="button"
+                                            class="btn-sm bg-slate-100 hover:bg-rose-100 shadow-sm"
+                                            onclick="document.getElementById('deleteModal{{ employee.id }}').showModal()"
+                                        >
+                                            Usuń
                                         </button>
                                     </div>
-                                    <div class="modal-body">
-                                        <p>Czy na pewno chcesz usunąć pracownika? <br>{{exemployee.first_name}}
-                                            {{exemployee.last_name}} <br> UWAGA! Zostaną usunięte z bazy również jego
-                                            wszystkie
-                                            wnioski oraz zwolnienia lekarskie. </p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-light" data-dismiss="modal">Wróć</button>
-                                        <form method="POST" action="{% url 'users_app:delete_employee' exemployee.id %}">
-                                            {%csrf_token%}
-                                            <button type="submit" class="btn btn-info">Tak, usuń</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
 
-</section>
+                                    <dialog
+                                        id="deleteModal{{ employee.id }}"
+                                        aria-labelledby="deleteModalLabel{{ employee.id }}"
+                                        class="w-full max-w-md rounded-xl border-0 p-0 shadow-xl backdrop:bg-slate-900/40"
+                                    >
+                                        <div class="p-6">
+                                            <h2
+                                                id="deleteModalLabel{{ employee.id }}"
+                                                class="text-lg font-bold text-[#545460]"
+                                            >
+                                                Usunąć pracownika?
+                                            </h2>
 
+                                            <p class="mt-3 text-sm text-slate-600">
+                                                {{ employee.first_name }}
+                                                {{ employee.last_name }}
+                                                oraz wszystkie jego wnioski i
+                                                zwolnienia zostaną usunięte.
+                                            </p>
+
+                                            <div class="mt-6 flex justify-end gap-3">
+                                                <button
+                                                    type="button"
+                                                    class="btn border-slate-300  text-slate-700"
+                                                    onclick="this.closest('dialog').close()"
+                                                >
+                                                    Wróć
+                                                </button>
+
+                                                <form
+                                                    method="post"
+                                                    action="{% url 'users_app:delete_employee' employee.id %}"
+                                                >
+                                                    {% csrf_token %}
+
+                                                    <button
+                                                        type="submit"
+                                                        class="btn bg-rose-700 text-white hover:bg-rose-800"
+                                                    >
+                                                        Tak, usuń
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </dialog>
+                                </td>
+                            </tr>
+
+                        {% empty %}
+                            <tr>
+                                <td
+                                    colspan="12"
+                                    class="px-4 py-12 text-center text-slate-500"
+                                >
+                                    Brak aktualnie zatrudnionych pracowników.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <footer
+                class="border-t border-slate-100 bg-slate-50/70 px-5 py-3 text-xs text-slate-600"
+            >
+                <span class="font-bold">K</span> - kierownik;
+                <span class="font-bold">NŻ</span> - wykorzystane dni urlopu na żądanie;
+                <span class="font-bold">WU</span> - roczny wymiar urlopu.
+            </footer>
+        </div>
+
+        <section
+            class="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center sm:justify-between"
+            aria-labelledby="annual-leave-heading"
+        >
+            <div>
+                <h2
+                    id="annual-leave-heading"
+                    class="font-semibold text-amber-900"
+                >
+                    Roczny wymiar urlopu
+                </h2>
+
+                <p class="mt-1 text-sm text-amber-800">
+                    Dodaj wszystkim pracownikom roczny wymiar urlopu do bieżącej puli.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="btn bg-rose-700 text-white hover:bg-rose-800"
+                onclick="document.getElementById('addAnnualLeaveModal').showModal()"
+            >
+                Dodaj
+            </button>
+        </section>
+
+        <dialog
+            id="addAnnualLeaveModal"
+            aria-labelledby="addAnnualLeaveLabel"
+            class="w-full max-w-md rounded-xl border-0 p-0 shadow-xl backdrop:bg-slate-900/40"
+        >
+            <div class="p-6">
+                <h2
+                    id="addAnnualLeaveLabel"
+                    class="text-lg font-bold text-[#545460]"
+                >
+                    Dodać roczny wymiar urlopu?
+                </h2>
+
+                <p class="mt-3 text-sm text-slate-600">
+                    Ta operacja doda wszystkim pracownikom liczbę dni lub godzin
+                    rocznego wymiaru urlopu.
+                </p>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button
+                        type="button"
+                        class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700"
+                        onclick="this.closest('dialog').close()"
+                    >
+                        Wróć
+                    </button>
+
+                    <form
+                        method="post"
+                        action="{% url 'users_app:add_annual_leave' %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="rounded-lg bg-[#1f7a35] px-3 py-2 text-sm font-semibold text-white hover:bg-[#17612a]"
+                        >
+                            Tak, dodaj
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </dialog>
+    </section>
+</main>
 {% endblock content %}

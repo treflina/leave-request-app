@@ -1,45 +1,73 @@
 {% extends "base.html" %}
-{% load  static %}
-{% block title %}- zmień zwolnienie{% endblock title %}
-{% block content %}
-{% include 'includes/navbar.html'%}
-{% load crispy_forms_tags %}
+{% load static %}
 
-<div class="container mt-5">
-    <h1 class="page-heading mb-5">Popraw zwolnienie lekarskie</h1>
-    <form method="POST">{% csrf_token%}
-        <div class="row">
-            <div class="col-lg-6">
-                {{ form.employee|as_crispy_field }}
+{% block title %} - Popraw zwolnienie{% endblock title %}
+
+{% block content %}
+{% include 'includes/navbar.html' %}
+
+<main class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl space-y-5">
+        <header class="flex items-start gap-3">
+            <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-stone-800 shadow-sm">
+                <svg class="h-6 w-6 shrink-0" aria-hidden="true" focusable="false">
+                    <use href="{% static 'img/svg/sprite.svg' %}#pencil"></use>
+                </svg>
+            </span>
+            <div>
+                <h1 class="text-2xl font-bold text-[#545460]">Popraw zwolnienie lekarskie</h1>
+                <p class="mt-1 text-sm text-slate-500">Zaktualizuj dane zarejestrowanego zwolnienia.</p>
             </div>
-            <div class="col-lg-6">
-                {{ form.leave_type|as_crispy_field }}
+        </header>
+
+        <form method="post" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="m-5 rounded-lg border border-rose-800 bg-rose-800 px-4 py-3 text-sm text-white" role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>{% endif %}
+            <div class="grid gap-5 p-5 sm:grid-cols-2 sm:p-7">
+                <div>
+                    <label for="id_employee" class="block text-sm font-semibold text-slate-700">Osoba <span class="text-rose-700">*</span></label>
+                    <select name="employee" id="id_employee" required class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.employee.errors %} aria-invalid="true" aria-describedby="employee-errors"{% endif %}>{% for value, label in form.employee.field.choices %}<option value="{{ value }}"{% if form.employee.value|stringformat:'s' == value|stringformat:'s' %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+                    {% if form.employee.errors %}<p id="employee-errors" class="mt-1 text-sm text-rose-700">{{ form.employee.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_leave_type" class="block text-sm font-semibold text-slate-700">Rodzaj <span class="text-rose-700">*</span></label>
+                    <select name="leave_type" id="id_leave_type" required class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.leave_type.errors %} aria-invalid="true" aria-describedby="leave-type-errors"{% endif %}>{% for value, label in form.leave_type.field.choices %}<option value="{{ value }}"{% if form.leave_type.value == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+                    {% if form.leave_type.errors %}<p id="leave-type-errors" class="mt-1 text-sm text-rose-700">{{ form.leave_type.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_issue_date" class="block text-sm font-semibold text-slate-700">Data wystawienia</label>
+                    <input type="date" name="issue_date" id="id_issue_date" value="{{ form.issue_date.value|date:'Y-m-d'|default:'' }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.issue_date.errors %} aria-invalid="true" aria-describedby="issue-date-errors"{% endif %}>
+                    {% if form.issue_date.errors %}<p id="issue-date-errors" class="mt-1 text-sm text-rose-700">{{ form.issue_date.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_doc_number" class="block text-sm font-semibold text-slate-700">Numer dokumentu</label>
+                    <input type="text" name="doc_number" id="id_doc_number" value="{{ form.doc_number.value|default:'' }}" maxlength="20" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.doc_number.errors %} aria-invalid="true" aria-describedby="doc-number-errors"{% endif %}>
+                    {% if form.doc_number.errors %}<p id="doc-number-errors" class="mt-1 text-sm text-rose-700">{{ form.doc_number.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_start_date" class="block text-sm font-semibold text-slate-700">Data od <span class="text-rose-700">*</span></label>
+                    <input type="date" name="start_date" id="id_start_date" required value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.start_date.errors %} aria-invalid="true" aria-describedby="start-date-errors"{% endif %}>
+                    {% if form.start_date.errors %}<p id="start-date-errors" class="mt-1 text-sm text-rose-700">{{ form.start_date.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="id_end_date" class="block text-sm font-semibold text-slate-700">Data do <span class="text-rose-700">*</span></label>
+                    <input type="date" name="end_date" id="id_end_date" required value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.end_date.errors %} aria-invalid="true" aria-describedby="end-date-errors"{% endif %}>
+                    {% if form.end_date.errors %}<p id="end-date-errors" class="mt-1 text-sm text-rose-700">{{ form.end_date.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div class="sm:col-span-2">
+                    <label for="id_additional_info" class="block text-sm font-semibold text-slate-700">Uwagi</label>
+                    <textarea name="additional_info" id="id_additional_info" rows="3" maxlength="50" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.additional_info.errors %} aria-invalid="true" aria-describedby="additional-info-errors"{% endif %}>{{ form.additional_info.value|default:'' }}</textarea>
+                    {% if form.additional_info.errors %}<p id="additional-info-errors" class="mt-1 text-sm text-rose-700">{{ form.additional_info.errors|join:", " }}</p>{% endif %}
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6">
-                {{ form.issue_date|as_crispy_field }}
-            </div>
-            <div class="col-lg-6">
-                {{ form.doc_number|as_crispy_field }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6">
-                {{ form.start_date|as_crispy_field }}
-            </div>
-            <div class="col-lg-6">
-                {{ form.end_date|as_crispy_field }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{form.additional_info|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-secondary" type = "submit">Popraw</button>
-        </div>
-    </form>
-</div>
+            <footer class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
+                <a href="{% url 'sickleaves_app:sickleaves' %}"
+                class="btn btn-secondary">Anuluj</a>
+                <button type="submit"
+                class="btn btn-primary">Zapisz zmiany</button>
+            </footer>
+        </form>
+        <p class="text-xs text-slate-500"><span class="font-bold text-rose-700">*</span> Pole wymagane.</p>
+    </div>
+</main>
 {% endblock content %}

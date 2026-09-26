@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load filter_tags %}
+{% load static %}
+
+{% block title %} - Wnioski do zaopiniowania{% endblock title %}
+
+{% block content %}
+
+{% include "includes/navbar.html" %}
+
+<main class="min-h-screen bg-slate-50 px-4 py-5 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl">
+
+        <section
+            aria-labelledby="requests-to-accept-heading"
+            hx-on::after-swap="
+                if (event.detail.target.id === 'user-requests-table')
+                    document.getElementById('requests-to-accept-heading').focus()
+            "
+        >
+        <div
+            class="overflow-hidden rounded-2xl bg-white
+                shadow-sm ring-1 ring-slate-200/80"
+            >
+            <header
+                class="border-b border-slate-200 bg-slate-50/60
+                    px-5 py-5 sm:px-6"
+            >
+                <div
+                    class="flex flex-col gap-4
+                        sm:flex-row sm:items-center
+                        sm:justify-between"
+                >
+                    <div class="flex items-start gap-3">
+                        <h1
+                            id="requests-to-accept-heading"
+                            tabindex="-1"
+                            class="text-lg font-semibold text-slate-800
+                                focus:outline-none
+                                focus-visible:rounded
+                                focus-visible:ring-2
+                                focus-visible:ring-green-700
+                                focus-visible:ring-offset-4"
+                        >
+                            Wnioski do zaopiniowania
+                        </h1>
+                          {% if requests_list %}
+                          <span class=" inline-flex min-h-7 min-w-7
+                                        items-center justify-center
+                                        rounded-full bg-amber-700
+                                        px-2 py-1 text-sm font-bold
+                                        leading-none text-white
+                                        shadow-sm"
+                            aria-label="{{ requests_list }} wniosków"
+                        >
+                            {{ requests_list }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    <a
+                        href="{% url 'requests_app:allrequests' %}"
+                        class="btn btn-tertiary w-full shrink-0
+                            sm:w-auto"
+                    >
+                        Zobacz wszystkie wnioski
+                        <span
+                            class="ml-1"
+                            aria-hidden="true"
+                        >
+                            &rarr;
+                        </span>
+                    </a>
+                </div>
+            </header>
+            {% include "requests/partials/requests_to_accept_list.html" %}
+        </div>
+        </section>
+    </div>
+</main>
+{% endblock content %}

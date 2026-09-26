@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %} - Wiadomość{% endblock title %}
+
+{% block content %}
+{% include 'includes/navbar.html' %}
+
+<div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10"> <header class="mb-6 sm:mb-8"> <h1 class="text-2xl font-bold tracking-tight text-slate-900"> {% if object %} Edytuj wiadomość {% else %} Nowa wiadomość {% endif %} </h1>
+    <p class="mt-1 text-sm text-slate-600">
+        {% if object %}
+            Edytuj treść wiadomości i jej odbiorców.
+        {% else %}
+            Utwórz wiadomość i wybierz pracowników, którzy ją otrzymają.
+        {% endif %}
+    </p>
+</header>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="space-y-6">
+        <section
+            aria-labelledby="message-details-heading"
+            class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
+        >
+            <h2
+                id="message-details-heading"
+                class="text-base font-semibold text-slate-900"
+            >
+                Treść wiadomości
+            </h2>
+
+            <div class="mt-5 space-y-6">
+                <div>
+                    <label
+                        for="{{ form.msg_title.id_for_label }}"
+                        class="mb-2 block text-sm font-medium text-slate-700"
+                    >
+                        Tytuł wiadomości
+                    </label>
+
+                    {{ form.msg_title }}
+
+                    {% if form.msg_title.errors %}
+                        <p class="mt-1 text-sm text-rose-700">
+                            {{ form.msg_title.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label
+                        for="{{ form.msg_content.id_for_label }}"
+                        class="mb-2 block text-sm font-medium text-slate-700"
+                    >
+                        Treść wiadomości
+                    </label>
+
+                    {{ form.msg_content }}
+
+                    {% if form.msg_content.errors %}
+                        <p class="mt-1 text-sm text-rose-700">
+                            {{ form.msg_content.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <section
+            aria-labelledby="employees-heading"
+            class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
+            <div class="border-b border-slate-200 px-5 py-5 sm:px-6">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                        <h2
+                            id="employees-heading"
+                            class="text-base font-semibold text-slate-900"
+                        >
+                            Odbiorcy wiadomości
+                        </h2>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Wybierz pracowników, którzy otrzymają wiadomość.
+                        </p>
+                    </div>
+
+                    <p
+                        class="text-sm text-slate-500"
+                        aria-live="polite"
+                    >
+                        Wybrano:
+                        <span
+                            id="selected-count"
+                            class="font-semibold text-slate-700"
+                        >
+                            0
+                        </span>
+                        z
+                        <span
+                            id="total-count"
+                            data-result-count
+                            class="font-semibold text-slate-700"
+                        >
+                            {{ form.employees|length }}
+                        </span>
+                    </p>
+                </div>
+
+                <div class="mt-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <div class="relative w-full lg:max-w-xl">
+                        <label
+                            for="employee-search"
+                            class="sr-only"
+                        >
+                            Szukaj pracownika
+                        </label>
+
+                        <input
+                            type="search"
+                            id="employee-search"
+                            data-employee-search
+                            placeholder="Szukaj pracownika..."
+                            autocomplete="off"
+                            class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 pl-10 text-sm text-slate-900 placeholder:text-slate-400 focus:border-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                            aria-controls="employee-list"
+                            aria-describedby="employee-search-status"
+                        >
+
+                        <svg
+                            class="pointer-events-none absolute left-3 top-3 h-5 w-5 text-slate-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
+                            />
+                        </svg>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <button
+                            type="button"
+                            id="select-all"
+                            class="text-sm font-medium text-green-700 hover:text-green-800 focus:outline-none
+                            focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                        >
+                            Zaznacz wszystkich
+                        </button>
+
+                        <button
+                            type="button"
+                            id="clear-all"
+                            class="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none
+                            focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                        >
+                            Wyczyść
+                        </button>
+                    </div>
+                </div>
+
+                <p
+                    id="employee-search-status"
+                    data-search-status
+                    class="mt-2 min-h-4 text-xs text-slate-500"
+                    aria-live="polite"
+                ></p>
+            </div>
+
+            <div
+                id="employee-list"
+                class="grid grid-cols-1 gap-px bg-slate-100 sm:grid-cols-2 lg:grid-cols-3"
+            >
+                {% for checkbox in form.employees %}
+                    <label
+                        data-employee-row
+                        data-name="{{ checkbox.choice_label|lower }}"
+                        class="employee-row flex cursor-pointer items-center gap-3 bg-white px-5 py-3.5 transition-colors hover:bg-slate-50 has-[:checked]:bg-green-50 sm:px-6"
+                    >
+                        {{ checkbox.tag }}
+
+                        <span class="min-w-0 truncate text-sm font-medium text-slate-800">
+                            {{ checkbox.choice_label }}
+                        </span>
+                    </label>
+                {% empty %}
+                    <div class="col-span-full bg-white px-6 py-12 text-center">
+                        <p class="text-sm text-slate-500">
+                            Brak aktywnych pracowników.
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <a
+            href="{% url 'inbox_app:message_list' %}"
+            class="btn btn-tertiary w-full sm:w-auto"
+        >
+            Anuluj
+        </a>
+
+        <button
+            type="submit"
+            class="btn btn-primary w-full sm:w-auto"
+        >
+            {% if object %}
+                Zapisz zmiany
+            {% else %}
+                Wyślij wiadomość
+            {% endif %}
+        </button>
+    </div>
+</form>
+</div>
+{% endblock content %}
+{% block extra_js %}
+<script src="{% static 'js/msg-employee-search.js' %}" defer></script>
+<script src="{% static 'js/msg-form.js' %}" defer></script>
+{% endblock extra_js %}

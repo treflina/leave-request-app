@@ -1,82 +1,335 @@
 {% extends "base.html" %}
-{% load  static %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block title %} - Wnioski pracowników (KADRY){% endblock title %}
 
 {% block content %}
-{% include 'includes/navbar.html'%}
-<main>
-    <section class="pagesection mt-5" id="holiday">
-            <div>
-                <h1 class="pagesection__title">Wnioski pracowników</h1>
-                <form class="form-search filter-dropdown-form search-info-box mt-4 mb-2 py-1" method="get">
-                    <div class="search-box mx-1">
-                        <label class="sr-only" for="id_other_fields">{{ filterset.form.other_fields.label }}</label>
-                        {{ filterset.form.other_fields }}
+
+{% include 'includes/navbar.html' %}
+
+<main class="min-h-screen bg-slate-100/70 py-6 px-4 sm:px-6 lg:px-8 font-['Signika_Negative',sans-serif]">
+<div class="max-w-7xl mx-auto space-y-6">
+    <section id="holiday" class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h1 class="text-2xl font-bold text-[#545460] flex items-center gap-2">
+                <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-stone-800 shadow-sm">
+                    <svg aria-hidden="true"
+                        class="h-7 w-7 text-[#545460]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24">
+
+                        <path stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                </span>
+                Wnioski pracowników (KADRY)
+            </h1>
+        </div>
+        <div class="rounded-2xl bg-white p-4 sm:p-5
+                    shadow-sm ring-1 ring-slate-200/80">
+
+            <form id="filter-form"
+                  class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-5"
+                  hx-get="{% url 'requests_app:hrallrequests' %}"
+                  hx-target=".table-container"
+                  hx-swap="outerHTML"
+                  hx-indicator="#table-progress"
+                  hx-include="[name='other_fields'], [name='dropdown_field'], [name='year'], [name='start_date'], [name='end_date']"
+                  x-data
+                  x-on:submit.prevent="$dispatch('clear-pagination-and-sort')">
+                <div>
+                    <label for="id_other_fields"
+                           class="mb-1.5 block text-xs font-semibold
+                                  uppercase tracking-wider text-slate-600">
+                        Wyszukaj
+                    </label>
+
+                    <div class="relative">
+
+                        <input type="search"
+                               name="other_fields"
+                               id="id_other_fields"
+                               value="{{ request.GET.other_fields|default:'' }}"
+                               placeholder="Nazwisko, imię ..."
+                               class="w-full rounded-xl border border-slate-300
+                                      bg-slate-50/50
+                                      px-3.5 py-2 pl-9
+                                      text-sm text-slate-800
+                                      placeholder-slate-400
+                                      focus:border-[#28a745]
+                                      focus:bg-white
+                                      focus:outline-none
+                                      focus:ring-2
+                                      focus:ring-[#28a745]/20
+                                      transition-colors"
+                               hx-get="{% url 'requests_app:hrallrequests' %}"
+                               hx-trigger="keyup changed delay:400ms, search"
+                               hx-target=".table-container"
+                               hx-swap="outerHTML"
+                               hx-indicator="#table-progress"
+                               hx-include="[name='other_fields'], [name='dropdown_field'], [name='year'], [name='start_date'], [name='end_date']"
+                               x-on:htmx:before-request="$dispatch('clear-pagination-and-sort')">
+
+                        <svg aria-hidden="true"
+                             class="absolute left-3 top-2.5 h-4 w-4 text-slate-400"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+
+                            <path stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                            </path>
+
+                        </svg>
+
                     </div>
-                    <div class="input-box search-box">
-                        <label class="sr-only" for="id_dropdown_field">{{ filterset.form.dropdown_field.label }}</label>
-                        {{ filterset.form.dropdown_field }}
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <label class="mb-0 pr-1 pl-2" for="id_start_date">{{ filterset.form.start_date.label }}</label>
-                        {{ filterset.form.start_date }}
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <label class="mb-0 pr-1 pl-2" for="id_end_date">{{ filterset.form.end_date.label }}</label>
-                        {{ filterset.form.end_date }}
-                    </div>
-                    <button class="btn btn-violet ml-1 mr-2 my-1" type="submit">Szukaj</button>
-                </form>
+
+                </div>
+                <div>
+                    <label for="id_start_date"
+                           class="mb-1.5 block text-xs font-semibold
+                                  uppercase tracking-wider text-slate-600">
+                        Data od
+                    </label>
+                    <input type="date"
+                           name="start_date"
+                           id="id_start_date"
+                           value="{{ request.GET.start_date|default:'' }}"
+                           class="w-full rounded-xl border border-slate-300
+                                  bg-slate-50/50
+                                  px-3.5 py-2
+                                  text-sm text-slate-800
+                                  focus:border-[#28a745]
+                                  focus:bg-white
+                                  focus:outline-none
+                                  focus:ring-2
+                                  focus:ring-[#28a745]/20
+                                  transition-colors"
+                           hx-get="{% url 'requests_app:hrallrequests' %}"
+                           hx-trigger="change"
+                           hx-target=".table-container"
+                           hx-swap="outerHTML"
+                           hx-indicator="#table-progress"
+                           hx-include="[name='other_fields'], [name='dropdown_field'], [name='year'], [name='start_date'], [name='end_date']"
+                           x-on:htmx:before-request="$dispatch('clear-pagination-and-sort')">
+
+                </div>
+                <div>
+                    <label for="id_end_date"
+                           class="mb-1.5 block text-xs font-semibold
+                                  uppercase tracking-wider text-slate-600">
+                        Data do
+                    </label>
+                    <input type="date"
+                           name="end_date"
+                           id="id_end_date"
+                           value="{{ request.GET.end_date|default:'' }}"
+                           class="w-full rounded-xl border border-slate-300
+                                  bg-slate-50/50
+                                  px-3.5 py-2
+                                  text-sm text-slate-800
+                                  focus:border-[#28a745]
+                                  focus:bg-white
+                                  focus:outline-none
+                                  focus:ring-2
+                                  focus:ring-[#28a745]/20
+                                  transition-colors"
+                           hx-get="{% url 'requests_app:hrallrequests' %}"
+                           hx-trigger="change"
+                           hx-target=".table-container"
+                           hx-swap="outerHTML"
+                           hx-indicator="#table-progress"
+                           hx-include="[name='other_fields'], [name='dropdown_field'], [name='year'], [name='start_date'], [name='end_date']"
+                           x-on:htmx:before-request="$dispatch('clear-pagination-and-sort')">
+
+                </div>
+                <div>
+                    <label for="id_dropdown_field"
+                           class="mb-1.5 block text-xs font-semibold
+                                  uppercase tracking-wider text-slate-600">
+                        Rodzaj wolnego
+                    </label>
+                    <select name="dropdown_field"
+                            id="id_dropdown_field"
+                            class="w-full rounded-xl border border-slate-300
+                                   bg-slate-50/50
+                                   px-3.5 py-2
+                                   text-sm text-slate-800
+                                   focus:border-[#28a745]
+                                   focus:bg-white
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-[#28a745]/20
+                                   transition-colors"
+                            hx-get="{% url 'requests_app:hrallrequests' %}"
+                            hx-trigger="change"
+                            hx-target=".table-container"
+                            hx-swap="outerHTML"
+                            hx-indicator="#table-progress"
+                            hx-include="[name='other_fields'], [name='dropdown_field'], [name='year'], [name='start_date'], [name='end_date']"
+                            x-on:htmx:before-request="$dispatch('clear-pagination-and-sort')">
+
+                        <option value="">
+                            Wszystkie rodzaje
+                        </option>
+
+                        <option value="W"
+                                {% if request.GET.dropdown_field == 'W' %}selected{% endif %}>
+                            Urlop wypoczynkowy (W)
+                        </option>
+
+                        <option value="WS"
+                                {% if request.GET.dropdown_field == 'WS' %}selected{% endif %}>
+                            Wolne za sobotę (WS)
+                        </option>
+
+                        <option value="WN"
+                                {% if request.GET.dropdown_field == 'WN' %}selected{% endif %}>
+                            Wolne za niedzielę/święto (WN)
+                        </option>
+
+                        <option value="DW"
+                                {% if request.GET.dropdown_field == 'DW' %}selected{% endif %}>
+                            Wolne za święto w sobotę (DW)
+                        </option>
+                    </select>
+                </div>
+                <div class="mt-auto mb-1">
+                    <a href="{% url 'requests_app:hrallrequests' %}"
+                       class="inline-flex shrink-0 items-center justify-center
+                              rounded-xl
+                              bg-[#545460]
+                              px-4 py-2
+                              text-sm font-semibold text-white
+                              shadow-sm
+                              transition-colors
+                              hover:bg-slate-700
+                              focus-visible:outline-none
+                              focus-visible:ring-2
+                              focus-visible:ring-[#28a745]
+                              focus-visible:ring-offset-2">
+                        Wyczyść
+                    </a>
+                </div>
+            </form>
+        </div>
+        <div id="table-status"
+             class="sr-only"
+             role="status"
+             aria-live="polite"
+             aria-atomic="true">
+        </div>
+        <div id="table-progress"
+             class="htmx-indicator h-1 w-full
+                    overflow-hidden rounded-full bg-slate-100"
+             aria-hidden="true">
+            <div class="h-full
+                        bg-gradient-to-r from-[#28a745] to-[#545460]
+                        animate-pulse">
             </div>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th scope="col">Lp.</th>
-                            <th scope="col">Z dnia</th>
-                            <th scope="col">Nazwisko i imię</th>
-                            <th scope="col">Okres</th>
-                            <th scope="col">Rodzaj</th>
-                            <th scope="col">L.&nbsp;dni<span class="text-danger">*</span></th>
-                            <th scope="col">Zastępuje</th>
-                            <th scope="col">Status</th>
-                            <th scope="col"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="myTable" id="myTable">
-                        {% for request in requests_holiday %}
-                        <tr>
-                            <td data-title="Lp.">{{ forloop.counter0|add:page_obj.start_index }}.</td>
-                            <td data-title="Z dnia:">{{request.created|date:"d.m.y"}}</td>
-                            <td data-title="Nazwisko i imię:">{{request.author.last_name}}
-                                {{request.author.first_name}} {{request.author.position_addinfo}}
-                            </td>
-                            <td data-title="Okres:">{{request.start_date|date:"d.m.y"}} {% if request.start_date != request.end_date  %} - {{request.end_date|date:"d.m.y"}}{% endif %}
-                            </td>
-                            <td data-title="Rodzaj:">{{request.leave_type}}{% if request.work_date %} za {{request.work_date|date:"d.m.y"}}{% endif %}{% if request.duvet_day %} (nż<span class="text-danger">**</span>){% endif %}</td>
-                            <td data-title="L. dni:" class="text-align-cl {% if request.days <= 0 %} small-width-hide {% endif %}">{% if request.days > 0 %}{{request.days}} {% endif %}</td>
-                            <td data-title="Zastępuje:" class="{% if not request.substitute %} small-width-hide {% endif %}">{{request.substitute}}</td>
-                            <td data-title="Status:">
-                                {% if request.status == 'zaakceptowany' or request.status == 'odrzucony' %}
-                                {{request.status}} {{request.signed_by}}
-                                {%else%}
-                                {{request.status}}
-                                {%endif%}
-                            </td>
-                            <td><a class="text-decoration-none" href="{%url 'requests_app:changerequest' request.id%}"><span class="edit-icon">&#9998;</span></a> {%if request.attachment %}&#128449{%endif%} </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            <div><span class="text-danger">*</span> Liczba godzin w przypadku osób zatrudnionych w niepełnym wymiarze
-                czasu pracy.
-                <br>
-                <span class="text-danger">**</span> urlop na żądanie
+        </div>
+        <div class="table-scroll-wrapper"
+             x-data="{
+                 page_by: new URLSearchParams(location.search).get('page') || 1,
+                 sort_by: new URLSearchParams(location.search).get('sort') || '',
+
+                 sort(column) {
+                     if (this.sort_by === column) {
+                         this.sort_by = '-' + column;
+                     } else if (this.sort_by === '-' + column) {
+                         this.sort_by = column;
+                     } else {
+                         this.sort_by = column;
+                     }
+
+                     this.page_by = 1;
+                     this.$nextTick(() => {
+                         this.$refs.tableActions.dispatchEvent(
+                             new Event('sort-initiated', { bubbles: true })
+                         );
+                     });
+                 },
+
+                 paginate(page) {
+                     this.page_by = page;
+
+                     this.$nextTick(() => {
+                         this.$refs.tableActions.dispatchEvent(
+                             new Event('pagination-initiated', { bubbles: true })
+                         );
+                     });
+                 },
+
+                 resetTableState() {
+                     this.page_by = 1;
+                     this.sort_by = '';
+                 }
+             }"
+             @clear-pagination-and-sort.window="resetTableState()">
+            <div id="table-actions"
+                  x-ref="tableActions"
+                  hx-get="{% url 'requests_app:hrallrequests' %}"
+                  hx-target=".table-container"
+                  hx-trigger="sort-initiated, pagination-initiated"
+                  hx-swap="outerHTML"
+                  hx-push-url="true"
+                  hx-include="#table-actions-sort, #table-actions-page, [name='other_fields'], [name='dropdown_field'], [name='year'], [name='start_date'], [name='end_date']"
+                  hx-indicator="#table-progress">
+
+                <input type="hidden"
+                       id="table-actions-sort"
+                       name="sort"
+                       x-model="sort_by">
+
+                <input type="hidden"
+                       id="table-actions-page"
+                       name="page"
+                       x-model="page_by">
+
+                {% render_table table %}
+
             </div>
-                {% if is_paginated %}
-            {% include 'includes/pagination.html' %}
-        {% endif %}
+        </div>
+        <div class="rounded-xl border border-slate-200/80
+                    bg-white/70 p-4
+                    text-xs text-slate-600
+                    space-y-1 shadow-sm">
+            <p>
+                <span class="font-bold text-rose-600"
+                      aria-hidden="true">*</span>
+                Liczba godzin w przypadku osób zatrudnionych
+                w niepełnym wymiarze czasu pracy.
+            </p>
+
+            <p>
+                <span class="font-bold text-slate-800"
+                      aria-hidden="true">**</span>
+                <strong>W</strong> - urlop wypoczynkowy,
+                <strong>WS/WN</strong> - wolne za pracę
+                w sobotę/niedzielę,
+                <strong>DW</strong> - wolne za święto
+                przypadające w sobotę.
+            </p>
+
+            <p>
+                <span class="font-bold text-amber-600"
+                      aria-hidden="true">***</span>
+                <strong>nż</strong> - urlop na żądanie.
+            </p>
+
+        </div>
+
     </section>
+
+</div>
+
 </main>
+
 {% endblock content %}
-{% block extra_js %}
-<script src="{% static 'js/forms-dropdown.js' %}"></script>
-{% endblock extra_js %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static filter_tags %}
+
+{% block content %}
+
+{% include 'includes/navbar.html' %}
+
+<main class="min-h-screen bg-slate-100/70 px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-6xl">
+        <section
+            id="user-requests-holiday"
+            aria-labelledby="user-requests-heading"
+            hx-on::after-swap="
+                if (event.detail.target.id === 'user-requests-list')
+                    document.getElementById('user-requests-heading').focus()
+            "
+        >
+            <header
+                class="mb-5 flex flex-col gap-4
+                    sm:flex-row sm:items-start sm:justify-between"
+            >
+                <div class="flex items-start gap-3">
+                    <span
+                        class="inline-flex h-11 w-11 shrink-0 items-center justify-center
+                            rounded-xl bg-white text-slate-700 shadow-sm"
+                        aria-hidden="true"
+                    >
+                        <svg
+                            class="h-6 w-6"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <use href="{% static 'img/svg/sprite.svg' %}#document"></use>
+                        </svg>
+                    </span>
+
+                    <div class="min-w-0">
+                        <h1
+                            id="user-requests-heading"
+                            tabindex="-1"
+                            class="text-2xl font-bold text-[#545460]
+                                focus:outline-none
+                                focus-visible:rounded
+                                focus-visible:ring-2
+                                focus-visible:ring-green-700
+                                focus-visible:ring-offset-4"
+                        >
+                            Twoje wnioski urlopowe
+                        </h1>
+
+                        <p class="mt-1 text-sm text-slate-500">
+                            Historia złożonych wniosków urlopowych
+                        </p>
+                    </div>
+                </div>
+
+                <a
+                    href="{% url 'requests_app:user_other_requests' %}"
+                    class="group btn btn-tertiary shrink-0 sm:w-auto"
+                >
+                    Pozostałe wnioski (WS, WN, DW)
+                    <span
+                                    class="transition-transform duration-150 group-hover:translate-x-0.5 font-bold ml-1"
+                                    aria-hidden="true"
+                                >
+                                    →
+                                </span>
+                </a>
+            </header>
+
+            {% include "requests/partials/user_holiday_requests_table.html" %}
+        </section>
+    </div>
+</main>
+
+{% endblock content %}

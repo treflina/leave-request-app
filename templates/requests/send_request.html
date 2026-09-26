@@ -1,125 +1,113 @@
 {% extends "base.html" %}
-{% load  static %}
+{% load static %}
+
+{% block title %} - Złóż wniosek{% endblock title %}
 
 {% block content %}
-{% include 'includes/navbar.html'%}
-{% load crispy_forms_tags %}
+{% include 'includes/navbar.html' %}
 
-<div class="container p-3">
-    {% for error in form.non_field_errors %}
-    <div class="alert alert-danger" role="alert">
-        {{ error }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-    </div>
-    {% endfor %}
-    {% for message in messages %}
-    <div class="alert {{ message.tags }}" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-    <h1 class="page-heading mt-3 mb-5"> Wniosek o udzielenie urlopu lub dnia wolnego</h1>
-    <form id="send-request-form" action="" method="POST" autocomplete="off">{%csrf_token%}
-        <div class="form-group row">
-            <label for="person" class="col-lg-2 col-md-3 col-form-label font-weight-bold pt-0 pb-2">Imię i nazwisko:</label>
-            <div class="col">
-                <input type="text" readonly="readonly" tabindex="-1" onfocus="this.blur()" class="form-control-plaintext py-0" id="person" value="{{request.user.get_full_name}}">
-            </div>
+<main class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl space-y-5">
+        {% if form.non_field_errors %}
+        <div class="rounded-xl border border-rose-800 bg-rose-800 px-4 py-3 text-sm text-white" role="alert">
+            {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
         </div>
+        {% endif %}
+        {% for message in messages %}
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">{{ message }}</div>
+        {% endfor %}
 
-        <div class="form-group row">
-            <label for="position" class="col-lg-2 col-md-3 col-form-label font-weight-bold pt-0 pb-2">Stanowisko:</label>
-            <div class="col">
-                <input type="text" readonly="readonly" tabindex="-1" onfocus="this.blur()" class="form-control-plaintext py-0" id="position" value="{{request.user.position}}">
+        <header class="flex items-start gap-3">
+            <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-100 text-[#28a745]">
+                <svg class="h-6 w-6" aria-hidden="true" focusable="false">
+                    <use href="{% static 'img/svg/sprite.svg' %}#plus"></use>
+                </svg>
+            </span>
+            <div>
+                <h1 class="text-2xl font-bold text-[#545460]">Wniosek o urlop lub dzień wolny</h1>
+                <p class="mt-1 text-sm text-slate-500">Uzupełnij dane i wyślij wniosek do osoby zatwierdzającej.</p>
             </div>
-        </div>
-        <div class="row" role="radiogroup" aria-labelledby="goal">
-            <div class="col-lg-2 col-md-3">
-                <p class="font-weight-bold pb-2 mb-0" id="goal">Proszę o:</p>
+        </header>
+
+        <form id="send-request-form"
+            method="post" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
+            {% csrf_token %}
+            <div class="space-y-6 p-5 sm:p-7">
+            <p class="text-sm text-slate-600"><span class="font-bold text-rose-700" aria-hidden="true">*</span> Pole wymagane.</p>
+            <p id="request-form-status" class="sr-only" role="status" aria-live="polite"></p>
+                <section aria-labelledby="employee-details-heading">
+                    <h2 id="employee-details-heading" class="text-sm font-bold uppercase tracking-wider text-[#545460]">Dane pracownika</h2>
+                    <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+                        <div class="rounded-lg bg-slate-50 px-4 py-3"><dt class="text-xs font-semibold uppercase tracking-wider text-slate-500">Imię i nazwisko</dt><dd class="mt-1 font-semibold text-slate-800">{{ request.user.get_full_name }}</dd></div>
+                        <div class="rounded-lg bg-slate-50 px-4 py-3"><dt class="text-xs font-semibold uppercase tracking-wider text-slate-500">Stanowisko</dt><dd class="mt-1 font-semibold text-slate-800">{{ request.user.position }}</dd></div>
+                    </dl>
+                </section>
+
+                <fieldset class="border-t border-slate-100 pt-6">
+                    <legend class="text-sm font-bold uppercase tracking-wider text-[#545460]">Proszę o</legend>
+                    {% if form.leave_type.errors %}<p id="leave-type-errors" class="mt-2 text-sm text-rose-700" role="alert">{{ form.leave_type.errors|join:", " }}</p>{% endif %}
+                    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                        {% for value, label in form.leave_type.field.choices %}
+                        <label class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-[#28a745] has-[:checked]:border-[#28a745] has-[:checked]:bg-emerald-50/60">
+                            <input class="mt-0.5 h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]" type="radio" name="leave_type" id="id_leave_type_{{ forloop.counter0 }}" value="{{ value }}" {% if form.leave_type.value == value or form.leave_type.value is None and value == 'W' %}checked{% endif %}{% if form.leave_type.errors %} aria-invalid="true" aria-describedby="leave-type-errors"{% endif %}>
+                            <span class="text-sm font-medium text-slate-800">{{ label }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+
+                <section class="box_ws{% if form.leave_type.value != 'WS' and form.leave_type.value != 'WN' %} hidden hide{% endif %} rounded-lg border border-amber-200 bg-amber-50/60 p-4" aria-labelledby="work-date-heading"{% if form.leave_type.value != 'WS' and form.leave_type.value != 'WN' %} hidden style="display: none;"{% endif %}>
+                    <h2 id="work-date-heading" class="text-sm font-semibold text-amber-900">Data pracy</h2>
+                    <label for="id_work_date" class="mt-3 block text-sm font-medium text-slate-700">Praca miała miejsce w dniu <span class="text-rose-600">*</span></label>
+                    <input type="date" name="work_date" id="id_work_date" value="{{ form.work_date.value|date:'Y-m-d'|default:'' }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:outline-none focus:ring-2 focus:ring-[#28a745]/20 sm:max-w-xs"{% if form.leave_type.value != 'WS' and form.leave_type.value != 'WN' %} disabled{% endif %} {% if form.work_date.errors %}aria-invalid="true" aria-describedby="work-date-errors"{% endif %}>
+                    {% if form.work_date.errors %}<p id="work-date-errors" class="mt-1 text-sm text-rose-700">{{ form.work_date.errors|join:", " }}</p>{% endif %}
+                </section>
+
+                <section class="grid gap-5 border-t border-slate-100 pt-6 sm:grid-cols-2" aria-labelledby="period-heading">
+                    <h2 id="period-heading" class="sr-only">Okres wolnego</h2>
+                    <div>
+                        <label for="id_start_date" class="block text-sm font-semibold text-slate-700">Data od <span class="text-rose-600">*</span></label>
+                        <input type="date" name="start_date" id="id_start_date" value="{{ form.start_date.value|date:'Y-m-d'|default:'' }}" required class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20" {% if form.start_date.errors %}aria-invalid="true" aria-describedby="start-date-errors"{% endif %}>
+                        {% if form.start_date.errors %}<p id="start-date-errors" class="mt-1 text-sm text-rose-700">{{ form.start_date.errors|join:", " }}</p>{% endif %}
+                    </div>
+                    <div>
+                        <label for="id_end_date" class="block text-sm font-semibold text-slate-700">Data do</label>
+                        <input type="date" name="end_date" id="id_end_date" value="{{ form.end_date.value|date:'Y-m-d'|default:'' }}" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20" {% if form.end_date.errors %}aria-invalid="true" aria-describedby="end-date-errors"{% endif %}>
+                        {% if form.end_date.errors %}<p id="end-date-errors" class="mt-1 text-sm text-rose-700">{{ form.end_date.errors|join:", " }}</p>{% endif %}
+                    </div>
+                </section>
+
+                <section class="box_w {% if form.leave_type.value and form.leave_type.value != 'W' %}hidden hide{% else %}grid{% endif %} gap-5 border-t border-slate-100 pt-6 sm:grid-cols-2" aria-labelledby="holiday-details-heading"{% if form.leave_type.value and form.leave_type.value != 'W' %} hidden style="display: none;"{% endif %}>
+                    <h2 id="holiday-details-heading" class="sr-only">Szczegóły urlopu</h2>
+                    <div>
+                        <label for="id_days" class="block text-sm font-semibold text-slate-700">Wymiar <span class="text-rose-600">*</span></label>
+                        <div class="mt-1 flex items-center gap-3"><input type="number" name="days" id="id_days" min="0" value="{{ form.days.value|default:'' }}" class="w-28 rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"{% if form.leave_type.value and form.leave_type.value != 'W' %} disabled{% endif %} {% if form.days.errors %}aria-invalid="true" aria-describedby="days-errors"{% endif %}><span class="text-sm text-slate-600">{% if part %}godzin{% else %}dni roboczych{% endif %}</span></div>
+                        {% if form.days.errors %}<p id="days-errors" class="mt-1 text-sm text-rose-700">{{ form.days.errors|join:", " }}</p>{% endif %}
+                    </div>
+                    <fieldset><legend class="text-sm font-semibold text-slate-700">Urlop na żądanie</legend><div class="mt-2 flex gap-4"><label class="inline-flex items-center gap-2 text-sm text-slate-700"><input type="radio" name="duvet_day" value="false" {% if form.duvet_day.value == False or form.duvet_day.value == 'false' %}checked{% endif %}{% if form.leave_type.value and form.leave_type.value != 'W' %} disabled{% endif %}{% if form.duvet_day.errors %} aria-invalid="true" aria-describedby="duvet-day-errors"{% endif %} class="h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]">NIE</label><label class="inline-flex items-center gap-2 text-sm text-slate-700"><input type="radio" name="duvet_day" value="true" {% if form.duvet_day.value == True or form.duvet_day.value == 'true' %}checked{% endif %}{% if form.leave_type.value and form.leave_type.value != 'W' %} disabled{% endif %}{% if form.duvet_day.errors %} aria-invalid="true" aria-describedby="duvet-day-errors"{% endif %} class="h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]">TAK</label></div>{% if form.duvet_day.errors %}<p id="duvet-day-errors" class="mt-1 text-sm text-rose-700" role="alert">{{ form.duvet_day.errors|join:", " }}</p>{% endif %}</fieldset>
+                </section>
+
+                <section class="grid gap-5 border-t border-slate-100 pt-6 sm:grid-cols-2">
+                    <div><label for="id_substitute" class="block text-sm font-semibold text-slate-700">Zastępstwo</label><input type="text" name="substitute" id="id_substitute" value="{{ form.substitute.value|default:'' }}" placeholder="Proszę wpisać osobę (jeśli dotyczy)" class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 placeholder-slate-400 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20"></div>
+                    <div><label for="id_send_to_person" class="block text-sm font-semibold text-slate-700">Wyślij do <span class="text-rose-600">*</span></label><select name="send_to_person" id="id_send_to_person" required class="mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#28a745]/20" {% if form.send_to_person.errors %}aria-invalid="true" aria-describedby="send-to-errors"{% endif %}><option value="">Wybierz osobę</option>{% for value, label in form.send_to_person.field.choices %}{% if value %}<option value="{{ value }}" {% if form.send_to_person.value|stringformat:'s' == value|stringformat:'s' %}selected{% endif %}>{{ label }}</option>{% endif %}{% endfor %}</select>{% if form.send_to_person.errors %}<p id="send-to-errors" class="mt-1 text-sm text-rose-700">{{ form.send_to_person.errors|join:", " }}</p>{% endif %}</div>
+                </section>
             </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input active" type="radio" name="leave_type" id="id_leave_type_0" value="W" {% if form.leave_type.value == 'W' or form.leave_type.value is None %}checked{% endif %}>
-                    <label class="form-check-label" for="id_leave_type_0"> Urlop wypoczynkowy (W) </label>
-                </div>
-                <div class="form-check">
-                    <div class="row">
-                        <div class="col">
-                            <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_1" value="WS" {% if form.leave_type.value == 'WS' %}checked{% endif %}>
-                            <label class="form-check-label" for="id_leave_type_1"> Wolne za pracę w wolną sobotę
-                                (WS)<span class="text-danger">*</span> </label>
+            <footer class="flex justify-end border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:px-7">
+                <button id="send-request-button"
+                    type="submit"
+                    class="btn btn-primary">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-4 w-4" aria-hidden="true" focusable="false">
+                            <use href="{% static 'img/svg/sprite.svg' %}#check"></use>
+                            </svg> Złóż wniosek
                         </div>
-                    </div>
-                </div>
-                <div class="form-check ">
-                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_2" value="WN" {% if form.leave_type.value == 'WN' %}checked{% endif %}>
-                    <label class="form-check-label" for="id_leave_type_2"> Wolne za pracę w niedzielę/święto
-                        (WN)<span class="text-danger">*</span> </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_3" value="DW" {% if form.leave_type.value == 'DW' %}checked{% endif %}>
-                    <label class="form-check-label " for="id_leave_type_3"> Wolne za święto przypadające w wolną sobotę
-                        (DW) </label>
-                </div>
-                <div class="row box_ws hide pt-1">
-                    <label for="id_work_date" class="col-form-label ml-3 mr-1"><span class="text-danger">*</span> Praca miała miejsce w dniu:</label>
-                    <div class="ml-3" style="min-width:210px;">
-                        {{form.work_date|as_crispy_field}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group row mt-2 mb-0">
-            <label for="id_start_date" class="col-lg-2 col-md-3 col-form-label font-weight-bold pb-2 mb-2">W okresie:</label>
-            <div class="d-flex align-items-baseline input-group col-lg-6 col-md-9" id="d">
-                <div class="flex-grow-1">
-                {{form.start_date|as_crispy_field}}
-                </div>
-                <div class="d-flex flex-nowrap align-items-baseline flex-grow-1">
-                    <label for="id_end_date" class="input-group-addon ml-2 mr-2">do</label>
-                    <div class="flex-grow-1">
-                    {{form.end_date|as_crispy_field}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group row box_w mb-0 pt-md-2">
-            <label for="id_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2">W wymiarze:</label>
-            <div class="col-3 col-md-2" style="margin-right:-15px;">
-                {{form.days|as_crispy_field}}
-            </div>
-            <div class="col">
-                <p class="col-form-label">{%if part%}godzin{%else%}dni roboczych{%endif%}</p>
-            </div>
-           <p class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-1">Na żądanie:</p>
-            <div class="col col-lg-2 col-md-2 col-sm-2 mb-0">
-                {{form.duvet_day|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group row mb-0">
-            <label for="id_substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2">Zastępstwo:</label>
-            <div class="col">
-                {{form.substitute|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group row pt-md-2">
-            <label for="id_send_to_person" class="col-lg-2 col-md-3 col-form-label font-weight-bold mb-2 ">Wyślij do:</label>
-            <div class="col">
-                {{form.send_to_person|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group row">
-            <div class="col">
-                <button id="send-request-button" type="submit" class="btn btn-info btn-md float-right mt-1 mr-auto">Złóż wniosek</button>
-            </div>
-        </div>
-    </form>
-</div>
+                </button>
+            </footer>
+        </form>
+    </div>
+</main>
 {% endblock content %}
+
 {% block extra_js %}
-    <script src="{% static 'js/fillin-request.js' %}"></script>
+<script src="{% static 'js/fillin-request.js' %}?v=3"></script>
 {% endblock extra_js %}

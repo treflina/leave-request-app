@@ -1,26 +1,182 @@
-{% extends 'base_login.html'%}
+{% extends 'base_login.html' %}
 {% load static %}
+
 {% block content %}
-<main>
-    <div class="login mt-5">
-        <form method="post">{%csrf_token%}
-            <div>
-                {% for error in form.non_field_errors %}
-                <p class="text-danger">{{error}}</p>
-                {% endfor %}
-            </div>
-            <div class="login-form">
-                <p class="login-input"><i class="fas fa-user"></i>{{form.username}}</p>
-                <p class="login-input"><i class="fa fa-lock"></i>{{form.password}}</p>
-                <div class="buttons">
-                    <button type="submit">Zaloguj się</button>
+<main
+    class="!my-0 !flex !min-h-screen !h-auto !w-full !flex-nowrap !flex-col
+        !items-center !justify-center gap-10 px-6 py-10
+        md:!flex-row md:gap-12"
+>
+    <section
+        class="w-full max-w-xs border-b-2 border-white/80 pb-10
+            md:border-b-0 md:border-r-2 md:pb-0 md:pr-12"
+        aria-labelledby="login-heading"
+    >
+        <form
+            method="post"
+            class="w-full"
+            aria-labelledby="login-heading"
+        >
+            {% csrf_token %}
+
+            <h1
+                id="login-heading"
+                class="mb-6 text-center text-2xl font-bold text-white"
+            >
+                Zaloguj się
+            </h1>
+
+            {% if form.non_field_errors %}
+                <div
+                    class="mb-4 rounded-md bg-[#8b1e1e] px-3 py-2
+                        text-sm text-white"
+                    role="alert"
+                >
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
                 </div>
-                <a class="password-link" href="{%url 'reset_password' %}">Zapomniane hasło?</a>
+            {% endif %}
+
+            <div class="space-y-4">
+                <div>
+                    <label
+                        for="id_username"
+                        class="mb-1 block text-sm font-semibold text-white"
+                    >
+                        Nazwa użytkownika
+                    </label>
+
+                    <div
+                        class="flex overflow-hidden rounded-md bg-white shadow-sm
+                            ring-1 ring-black/10
+                            focus-within:outline
+                            focus-within:outline-3
+                            focus-within:outline-offset-2
+                            focus-within:outline-[#1f7a35]"
+                    >
+                    <span class="flex items-center justify-center px-2">
+                        <svg
+                            class="mt-0.5 h-6 w-6 shrink-0 text-black"
+                            aria-hidden="true"
+                        >
+                            <use href="{% static 'img/svg/sprite.svg' %}#person"></use>
+                        </svg>
+                    </span>
+
+                        <input
+                            type="text"
+                            name="username"
+                            id="id_username"
+                            value="{{ form.username.value|default:'' }}"
+                            autocomplete="username"
+                            required
+                            class="min-w-0 flex-1 border-0 bg-white px-3 py-3
+                                text-slate-900 outline-none"
+                            {% if form.username.errors %}
+                                aria-invalid="true"
+                                aria-describedby="username-errors"
+                            {% endif %}
+                        >
+                    </div>
+
+                    {% if form.username.errors %}
+                        <p
+                            id="username-errors"
+                            role="alert"
+                            class="mt-1 rounded bg-[#8b1e1e] px-2 py-1
+                                text-sm text-white"
+                        >
+                            {{ form.username.errors|join:", " }}
+                        </p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label
+                        for="id_password"
+                        class="mb-1 block text-sm font-semibold text-white"
+                    >
+                        Hasło
+                    </label>
+
+                    <div
+                        class="flex overflow-hidden rounded-md bg-white shadow-sm
+                            ring-1 ring-black/10
+                            focus-within:outline
+                            focus-within:outline-3
+                            focus-within:outline-offset-2
+                            focus-within:outline-[#1f7a35]"
+                    >
+                        <span class="flex items-center justify-center px-2">
+                            <svg
+                                class="mt-0.5 h-5 w-5 shrink-0 text-black"
+                                aria-hidden="true"
+                            >
+                                <use href="{% static 'img/svg/sprite.svg' %}#lock"></use>
+                            </svg>
+                        </span>
+
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            autocomplete="current-password"
+                            required
+                            class="min-w-0 flex-1 border-0 bg-white px-3 py-3
+                                text-slate-900 outline-none"
+                            {% if form.password.errors %}
+                                aria-invalid="true"
+                                aria-describedby="password-errors"
+                            {% endif %}
+                        >
+                    </div>
+
+                    {% if form.password.errors %}
+                        <p
+                            id="password-errors"
+                            role="alert"
+                            class="mt-1 rounded bg-[#8b1e1e] px-2 py-1
+                                text-sm text-white"
+                        >
+                            {{ form.password.errors|join:", " }}
+                        </p>
+                    {% endif %}
+                </div>
+                <button
+                    type="submit"
+                    class="btn btn-primary w-full"
+                >
+                    Zaloguj się
+                </button>
+                <a
+                    href="{% url 'reset_password' %}"
+                    class="inline-block text-base font-semibold text-white
+                        underline underline-offset-4
+                        hover:text-green-100
+                        focus-visible:outline
+                        focus-visible:outline-3
+                        focus-visible:outline-offset-3
+                        focus-visible:outline-white"
+                >
+                    Nie pamiętasz hasła?
+                </a>
             </div>
         </form>
-    </div>
-    <div class="logo app-logo">
-        <a href="https://mbp.opole.pl/"><img src="{% static 'img/mbp_logo.png' %}" alt="logo"></a>
-    </div>
+    </section>
+    <a
+        href="https://mbp.opole.pl/"
+        class="block rounded-md
+            focus-visible:outline
+            focus-visible:outline-3
+            focus-visible:outline-offset-4
+            focus-visible:outline-white"
+    >
+        <img
+            src="{% static 'img/logo_white.png' %}"
+            alt="Miejska Biblioteka Publiczna w Opolu"
+            class="h-auto w-52 max-w-full"
+        >
+    </a>
 </main>
-{%endblock content%}
+{% endblock content %}

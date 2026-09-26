@@ -84,7 +84,7 @@ class LoginUser(FormView):
 
 
 class LogoutView(View):
-    def get(self, request, *args, **kargs):
+    def post(self, request, *args, **kwargs):
         logout(request)
         return HttpResponseRedirect(reverse("users_app:user-login"))
 
@@ -211,9 +211,7 @@ class AllEmployeesList(StaffAndDirectorPermissionMixin, ListView):
 
 
 class AdminEmployeesList(StaffAndDirectorPermissionMixin, ListView):
-    """Employees listing view for HR with information about how many days off
-    they are entitled to, how many duvet days have been taken in the
-    current year. This view contains also a list of ex-employees"""
+    """Active employee management list for HR."""
 
     template_name = "users/admin_all_employees.html"
     model = User
@@ -244,11 +242,19 @@ class AdminEmployeesList(StaffAndDirectorPermissionMixin, ListView):
             ).count()
         context["employees"] = employees
 
-        exemployees = User.objects.filter(is_active=False).order_by(
-            "last_name", "first_name"
-        )
-        context["exemployees"] = exemployees
         return context
+
+
+class FormerEmployeesList(StaffAndDirectorPermissionMixin, ListView):
+    """Former employee management list for HR."""
+
+    template_name = "users/former_employees.html"
+    model = User
+    context_object_name = "employees"
+    login_url = reverse_lazy("users_app:user-login")
+
+    def get_queryset(self):
+        return User.objects.filter(is_active=False).order_by("last_name", "first_name")
 
 
 class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
@@ -285,6 +291,27 @@ class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
         context["form"].fields["manager"].queryset = User.objects.filter(
             ~Q(role="P") & Q(is_active=True)
         ).order_by("last_name")
+        for field in context["form"].fields.values():
+            if field.widget.input_type == "checkbox":
+                field.widget.attrs["class"] = (
+                    "h-4 w-4 rounded border-slate-300 text-[#28a745] "
+                    "focus:ring-[#28a745]"
+                )
+            else:
+                field.widget.attrs["class"] = (
+                    "mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 "
+                    "px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] "
+                    "focus:bg-white focus:outline-none focus:ring-2 "
+                    "focus:ring-[#28a745]/20"
+                )
+        for field_name, errors in context["form"].errors.items():
+            if field_name in context["form"].fields and errors:
+                context["form"].fields[field_name].widget.attrs.update(
+                    {
+                        "aria-invalid": "true",
+                        "aria-describedby": f"id_{field_name}-errors",
+                    }
+                )
         return context
 
 

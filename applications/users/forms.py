@@ -63,6 +63,19 @@ class UserRegisterForm(forms.ModelForm):
             required=False,
             label="Przełożony",
         )
+        for field in self.fields.values():
+            if field.widget.input_type == "checkbox":
+                field.widget.attrs["class"] = (
+                    "h-4 w-4 rounded border-slate-300 text-[#28a745] "
+                    "focus:ring-[#28a745]"
+                )
+            else:
+                field.widget.attrs["class"] = (
+                    "mt-1 w-full rounded-lg border border-slate-300 bg-slate-50/50 "
+                    "px-3 py-2 text-sm text-slate-800 focus:border-[#28a745] "
+                    "focus:bg-white focus:outline-none focus:ring-2 "
+                    "focus:ring-[#28a745]/20"
+                )
 
 
 class LoginForm(forms.Form):
@@ -128,3 +141,12 @@ class UpdatePasswordForm(forms.Form):
             }
         ),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = (
+                "mt-1 w-full rounded-lg border border-slate-300 bg-white "
+                "px-3 py-2 text-sm text-slate-900 focus:border-[#28a745] "
+                "focus:outline-none focus:ring-2 focus:ring-[#28a745]/30"
+            )

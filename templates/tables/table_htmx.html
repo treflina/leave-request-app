@@ -1,0 +1,361 @@
+{% load django_tables2 %}
+{% load i18n %}
+
+<div class="table-container overflow-hidden rounded-xl
+            bg-white shadow-sm ring-1 ring-slate-200/80">
+
+    <div class="overflow-x-auto">
+
+        <table {% render_attrs table.attrs %}
+               tabindex="-1"
+               class="min-w-full divide-y divide-slate-200
+                      text-left text-sm text-slate-700">
+
+            <caption class="sr-only">
+                Lista wniosków pracowników.
+            </caption>
+
+            <thead {{ table.attrs.thead.as_html }}
+                   class="bg-slate-50 text-[#545460]">
+
+                <tr>
+
+                    {% for column in table.columns %}
+
+                        <th scope="col"
+                            {{ column.attrs.th.as_html }}
+                            {% if column.orderable %}
+                                :aria-sort="
+                                    sort_by === '{{ column.order_by_alias }}'
+                                        ? 'ascending'
+                                        : (
+                                            sort_by === '-{{ column.order_by_alias }}'
+                                                ? 'descending'
+                                                : 'none'
+                                        )
+                                "
+                            {% endif %}
+                            class="px-4 py-3.5
+                                   text-left text-xs font-semibold
+                                   uppercase tracking-wider whitespace-nowrap">
+
+                            {% if column.orderable %}
+
+                            <button type="button"
+        @click="sort('{{ column.order_by_alias }}')"
+        aria-label="Sortuj według {{ column.header }}"
+        class="block w-fit min-h-6 min-w-6
+               m-0 p-0
+               text-left text-xs font-semibold
+               uppercase tracking-wider leading-5
+               text-[#545460]
+               transition-colors
+               hover:text-[#28a745]
+               focus-visible:outline-none
+               focus-visible:ring-2
+               focus-visible:ring-[#28a745]
+               focus-visible:ring-offset-2">
+
+    <span>
+        {{ column.header }}
+    </span>
+
+    <span class="inline-flex w-2 flex-col items-center justify-center leading-none"
+          aria-hidden="true">
+
+        <span class="block h-1.5 text-[6px] leading-[6px]"
+              :class="
+                  sort_by === '{{ column.order_by_alias }}'
+                      ? 'font-bold text-[#28a745] opacity-100'
+                      : 'opacity-25'
+              ">
+            ▲
+        </span>
+
+        <span class="block h-1.5 text-[6px] leading-[6px]"
+              :class="
+                  sort_by === '-{{ column.order_by_alias }}'
+                      ? 'font-bold text-[#28a745] opacity-100'
+                      : 'opacity-25'
+              ">
+            ▼
+        </span>
+
+    </span>
+
+</button>
+
+                            {% else %}
+
+                                <span class="block text-left text-xs font-semibold
+                                             uppercase tracking-wider leading-5">
+
+                                    {{ column.header }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </th>
+
+                    {% endfor %}
+
+                </tr>
+
+            </thead>
+
+
+            <tbody {{ table.attrs.tbody.as_html }}
+                   class="divide-y divide-slate-100 bg-white">
+
+                {% for row in table.paginated_rows %}
+
+                    {% with row_number=table.page.start_index|add:forloop.counter0 %}
+
+                        <tr {{ row.attrs.as_html }}
+                            class="transition-colors hover:bg-emerald-50/40">
+
+                            {% for column, cell in row.items %}
+
+                                <td {{ column.attrs.td.as_html }}
+                                    data-title="{{ column.header }}"
+                                    class="px-4 py-3.5
+                                           align-middle
+                                           text-sm text-slate-700">
+
+                                    {% if column.name == "row_number" %}
+
+                                        {{ row_number }}.
+
+                                    {% else %}
+
+                                        {% if column.localize == None %}
+
+                                            {{ cell }}
+
+                                        {% else %}
+
+                                            {% if column.localize %}
+
+                                                {{ cell|localize }}
+
+                                            {% else %}
+
+                                                {{ cell|unlocalize }}
+
+                                            {% endif %}
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+                                </td>
+
+                            {% endfor %}
+
+                        </tr>
+                    {% endwith %}
+                {% empty %}
+                    {% if table.empty_text %}
+                        <tr>
+
+                            <td colspan="{{ table.columns|length }}"
+                                class="px-6 py-12
+                                       text-center
+                                       text-sm text-slate-500
+                                       bg-slate-50/50">
+
+                                <div class="flex flex-col items-center
+                                            justify-center gap-2">
+
+                                    <svg aria-hidden="true"
+                                         class="h-8 w-8 text-slate-400"
+                                         fill="none"
+                                         stroke="currentColor"
+                                         viewBox="0 0 24 24">
+
+                                        <path stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              stroke-width="1.5"
+                                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707v10A2 2 0 0116 21H7a2 2 0 01-2-2V5">
+                                        </path>
+
+                                    </svg>
+
+                                    <span>
+                                        {{ table.empty_text }}
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+            {% if table.has_footer %}
+                <tfoot {{ table.attrs.tfoot.as_html }}
+                       class="bg-slate-50
+                              font-semibold text-slate-700">
+                    <tr>
+                        {% for column in table.columns %}
+                            <td {{ column.attrs.tf.as_html }}
+                                class="px-4 py-3 align-middle">
+                                {{ column.footer }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                </tfoot>
+            {% endif %}
+        </table>
+    </div>
+    {% if table.page and table.paginator.num_pages > 1 %}
+        <div class="flex flex-col sm:flex-row
+                    items-center justify-between gap-3
+                    border-t border-slate-100
+                    bg-slate-50/70
+                    px-4 py-3 sm:px-6">
+
+            <div class="text-xs text-slate-500">
+
+                Strona
+
+                <span class="font-semibold text-slate-700">
+                    {{ table.page.number }}
+                </span>
+
+                z
+
+                <span class="font-semibold text-slate-700">
+                    {{ table.paginator.num_pages }}
+                </span>
+
+                (łącznie:
+
+                <span class="font-semibold text-slate-700">
+                    {{ table.paginator.count }}
+                </span>
+
+                wniosków)
+
+            </div>
+
+
+            <nav aria-label="Paginacja"
+                 class="inline-flex items-center gap-1">
+
+                {% if table.page.has_previous %}
+
+                    <button type="button"
+                            @click="paginate({{ table.page.previous_page_number }})"
+                            aria-label="Poprzednia strona"
+                            class="inline-flex min-h-6
+                                   items-center justify-center
+                                   rounded-lg
+                                   border border-slate-200
+                                   bg-white
+                                   px-2.5 py-1.5
+                                   text-xs font-medium
+                                   text-slate-600
+                                   shadow-sm
+                                   transition-colors
+                                   hover:bg-slate-100
+                                   hover:text-slate-900
+                                   focus-visible:outline-none
+                                   focus-visible:ring-2
+                                   focus-visible:ring-[#28a745]
+                                   focus-visible:ring-offset-2">
+                        &laquo; Poprzednia
+                    </button>
+                {% endif %}
+                {% if table.page.has_previous or table.page.has_next %}
+                    <div class="inline-flex items-center gap-1">
+                        {% for p in table.page|table_page_range:table.paginator %}
+                            {% if p == table.page.number %}
+                                <span aria-current="page"
+                                      class="inline-flex h-8 w-8
+                                             items-center justify-center
+                                             rounded-lg
+                                             bg-[#28a745]
+                                             text-xs font-bold text-white
+                                             shadow-sm">
+
+                                    {{ p }}
+
+                                </span>
+
+                            {% elif p == '...' %}
+
+                                <span aria-hidden="true"
+                                      class="inline-flex h-8 w-8
+                                             items-center justify-center
+                                             text-xs text-slate-400">
+
+                                    …
+
+                                </span>
+
+                            {% else %}
+
+                                <button type="button"
+                                        @click="paginate({{ p }})"
+                                        aria-label="Strona {{ p }}"
+                                        class="inline-flex h-8 w-8
+                                               items-center justify-center
+                                               rounded-lg
+                                               border border-slate-200
+                                               bg-white
+                                               text-xs font-medium
+                                               text-slate-600
+                                               shadow-sm
+                                               transition-colors
+                                               hover:bg-slate-100
+                                               hover:text-slate-900
+                                               focus-visible:outline-none
+                                               focus-visible:ring-2
+                                               focus-visible:ring-[#28a745]
+                                               focus-visible:ring-offset-2">
+
+                                    {{ p }}
+
+                                </button>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                {% if table.page.has_next %}
+
+                    <button type="button"
+                            @click="paginate({{ table.page.next_page_number }})"
+                            aria-label="Następna strona"
+                            class="inline-flex min-h-6
+                                   items-center justify-center
+                                   rounded-lg
+                                   border border-slate-200
+                                   bg-white
+                                   px-2.5 py-1.5
+                                   text-xs font-medium
+                                   text-slate-600
+                                   shadow-sm
+                                   transition-colors
+                                   hover:bg-slate-100
+                                   hover:text-slate-900
+                                   focus-visible:outline-none
+                                   focus-visible:ring-2
+                                   focus-visible:ring-[#28a745]
+                                   focus-visible:ring-offset-2">
+
+                        Następna &raquo;
+                    </button>
+                {% endif %}
+            </nav>
+        </div>
+    {% endif %}
+</div>

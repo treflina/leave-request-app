@@ -1,93 +1,216 @@
 {% extends "base.html" %}
-{% load static %}
+
+{% block title %} - Generuj raport{% endblock title %}
+
 {% block content %}
-{% include 'includes/navbar.html'%}
-{% load crispy_forms_tags %}
+    {% include "includes/navbar.html" %}
 
-<section class="pagesection my-5">
-    <div class="container">
-        <h1 class="page-heading mb-5">Zestawienie dni wolnych, urlopów wypoczynkowych, zwolnień lekarskich</h1>
-        <form method="POST">{%csrf_token%}
-            <div class="form-group">
-                {{form.person|as_crispy_field}}
-            </div>
-            <div class="form-group">
-                {{form.leave_type|as_crispy_field}}
-            </div>
-            <div class="form-group">
-                <div class="row mb-2">
-                    <div class="col-lg-6">
-                        {{form.start_date|as_crispy_field}}
-                    </div>
-                    <div class="col-lg-6">
-                        {{form.end_date|as_crispy_field}}
-                    </div>
-                </div>
-                <div class="row mt-3 align-items-end">
-                    <div class="col-lg-3 col-md-5 col-sm-6">
-                        {{form.report_format|as_crispy_field}}
-                    </div>
-                    <div class="col-lg-3 col-md-5 col-sm-6 ml-2">
-                        {{form.attachment|as_crispy_field}}
-                    </div>
-                    <div class="col-lg-3 col-md-5 col-sm-6">
-                        <button class="btn btn-info mt-2" type="submit">Generuj raport</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>
-</section>
+    <main class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8">
+        <section class="mx-auto max-w-3xl">
 
+            <header>
+                <h1 class="text-2xl font-bold text-[#545460]">
+                    Generuj raport
+                </h1>
+
+                <p class="mt-1 text-sm text-slate-500">
+                    Zestawienie dni wolnych, urlopów i zwolnień.
+                </p>
+            </header>
+
+            <form
+                method="post"
+                class="mt-5 rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 sm:p-7"
+            >
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div
+                        class="mb-5 rounded-lg border border-rose-800 bg-rose-800 px-4 py-3 text-sm text-white"
+                        role="alert"
+                    >
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="grid gap-5 sm:grid-cols-2">
+
+                    {# Employees #}
+                    <div class="sm:col-span-2">
+                        <label
+                            for="{{ form.person.id_for_label }}"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.person.label }}
+                        </label>
+
+                        {{ form.person }}
+
+                        {% if form.person.errors %}
+                            <p
+                                id="{{ form.person.auto_id }}-error"
+                                class="mt-1 text-sm text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.person.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                        <p class="mt-1 text-xs text-slate-500">
+                            Możesz wybrać więcej niż jedną osobę.
+                        </p>
+                    </div>
+                    {# Leave type #}
+                    <div>
+                        <label
+                            for="{{ form.leave_type.id_for_label }}"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.leave_type.label }}
+                        </label>
+                        {{ form.leave_type }}
+                        {% if form.leave_type.errors %}
+                            <p
+                                id="{{ form.leave_type.auto_id }}-error"
+                                class="mt-1 text-sm text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.leave_type.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    {# Attachment #}
+                    <fieldset>
+                        <legend class="block text-sm font-semibold text-slate-700">
+                            {{ form.attachment.label }}
+                        </legend>
+
+                        <div class="mt-2 flex flex-wrap gap-4">
+                            {% for radio in form.attachment %}
+                                <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                                    {{ radio.tag }}
+                                    <span>{{ radio.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        {% if form.attachment.errors %}
+                            <p class="mt-1 text-sm text-rose-700" role="alert">
+                                {{ form.attachment.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </fieldset>
+
+
+
+                    {# Start date #}
+                    <div>
+                        <label
+                            for="{{ form.start_date.id_for_label }}"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.start_date.label }}
+                        </label>
+
+                        {{ form.start_date }}
+
+                        {% if form.start_date.errors %}
+                            <p
+                                id="{{ form.start_date.auto_id }}-error"
+                                class="mt-1 text-sm text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.start_date.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+
+                    {# End date #}
+                    <div>
+                        <label
+                            for="{{ form.end_date.id_for_label }}"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            {{ form.end_date.label }}
+                        </label>
+                        {{ form.end_date }}
+                        {% if form.end_date.errors %}
+                            <p
+                                id="{{ form.end_date.auto_id }}-error"
+                                class="mt-1 text-sm text-rose-700"
+                                role="alert"
+                            >
+                                {{ form.end_date.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                    </div>
+                    {# Report format #}
+                    <fieldset class="sm:col-span-2" id="report-format-fieldset">
+                        <legend class="block text-sm font-semibold text-slate-700">
+                            {{ form.report_format.label }}
+                        </legend>
+
+                        <div class="mt-2 flex flex-wrap gap-4">
+                            {% for radio in form.report_format %}
+                                <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-slate-700">
+                                    {{ radio.tag }}
+                                    <span>{{ radio.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+
+                        {% if form.report_format.errors %}
+                            <p class="mt-1 text-sm text-rose-700" role="alert">
+                                {{ form.report_format.errors|join:", " }}
+                            </p>
+                        {% endif %}
+                </fieldset>
+                </div>
+                {# Submit #}
+                <button
+                    type="submit"
+                    class="mt-6 inline-flex items-center justify-center rounded-lg bg-green-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-green-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2"
+                >
+                    Generuj raport
+                </button>
+
+            </form>
+
+        </section>
+    </main>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const leaveTypeField = document.getElementById('id_leave_type');
-    const formatInputs = Array.from(document.querySelectorAll('input[name="report_format"]'));
-
-    if (!leaveTypeField || formatInputs.length === 0) return;
-
-    function getSelectedFormat() {
-        const checked = document.querySelector('input[name="report_format"]:checked');
-        return checked ? checked.value : null;
-    }
-
-    function setSelectedFormat(value) {
-        const target = document.querySelector(
-            'input[name="report_format"][value="' + value + '"]'
+    document.addEventListener("DOMContentLoaded", function () {
+        const leaveType = document.getElementById("id_leave_type");
+        const certificateRadio = document.querySelector(
+            'input[name="report_format"][value="certificate"]'
         );
-        if (target) {
-            target.checked = true;
-        }
-    }
+        const pdfRadio = document.querySelector(
+            'input[name="report_format"][value="pdf"]'
+        );
 
-    function toggleCertificateOption() {
-        const selected = leaveTypeField.value;
-        const certificateOption = formatInputs.find((option) => option.value === 'certificate');
-        if (!certificateOption) return;
-
-        const certificateWrapper = certificateOption.closest('label') || certificateOption.parentElement;
-        const isVisible = selected === 'C';
-
-        certificateOption.disabled = !isVisible;
-        if (certificateWrapper) {
-            certificateWrapper.style.display = isVisible ? '' : 'none';
+        if (!leaveType || !certificateRadio) {
+            return;
         }
 
-        if (!isVisible && getSelectedFormat() === 'certificate') {
-            setSelectedFormat('pdf');
-        }
-    }
+        const certificateLabel = certificateRadio.closest("label");
 
-    leaveTypeField.addEventListener('change', toggleCertificateOption);
-    formatInputs.forEach(function (input) {
-        input.addEventListener('change', function () {
-            if (leaveTypeField.value !== 'C' && getSelectedFormat() === 'certificate') {
-                setSelectedFormat('pdf');
+        if (!certificateLabel) {
+            return;
+        }
+
+        function updateReportFormat() {
+            const isSickLeave = leaveType.value === "C";
+
+            certificateLabel.style.display = isSickLeave ? "" : "none";
+
+            if (!isSickLeave && pdfRadio) {
+                pdfRadio.checked = true;
             }
-        });
-    });
+        }
 
-    toggleCertificateOption();
-});
+        leaveType.addEventListener("change", updateReportFormat);
+        updateReportFormat();
+    });
 </script>
-{% endblock content%}
+
+{% endblock content %}

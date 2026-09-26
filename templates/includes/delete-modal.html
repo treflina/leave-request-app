@@ -1,32 +1,51 @@
-<div class="modal fade" id="deleteModal{{leave_request.id}}" tabindex="-1" aria-labelledby="deleteModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <p class="modal-title">
-                    Ostrzeżenie
-                </p>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+<dialog
+    id="deleteModal{{ leave_request.id }}"
+    aria-labelledby="deleteModalLabel{{ leave_request.id }}"
+    aria-describedby="deleteModalDescription{{ leave_request.id }}"
+    class="w-full max-w-md rounded-xl border-0 p-0 shadow-xl
+           backdrop:bg-slate-900/40"
+>
+    <div class="p-6">
+        <h2
+            id="deleteModalLabel{{ leave_request.id }}"
+            class="text-lg font-semibold text-slate-800"
+        >
+            Wycofać wniosek?
+        </h2>
+        <p
+            id="deleteModalDescription{{ leave_request.id }}"
+            class="mt-3 text-sm leading-6 text-slate-600"
+        >
+            Od
+            <time datetime="{{ leave_request.start_date|date:'Y-m-d' }}">
+                {{ leave_request.start_date|date:"d.m.Y" }}
+            </time>
+            do
+            <time datetime="{{ leave_request.end_date|date:'Y-m-d' }}">
+                {{ leave_request.end_date|date:"d.m.Y" }}
+            </time>
+        </p>
+        <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+            <button
+                type="button"
+                class="btn btn-secondary w-full sm:w-auto"
+                onclick="this.closest('dialog').close()"
+            >
+                Wróć
+            </button>
+            <form
+                method="post"
+                action="{% url 'requests_app:delete_request' leave_request.id %}"
+            >
+                {% csrf_token %}
+                <button
+                    type="submit"
+                    class="btn btn-danger w-full sm:w-auto"
+                >
+                    Tak, wycofuję
                 </button>
-            </div>
-            <div class="modal-body">
-                <p>
-                    Czy na pewno chcesz wycofać wniosek <br />
-                    od {{leave_request.start_date|date:"d.m.y"}}
-                    do {{leave_request.end_date|date:"d.m.y"}}?
-                </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-dismiss="modal">
-                    Wróć</button>
-                <form method="POST" action="{% url 'requests_app:delete_request' leave_request.id %}">
-                    {%csrf_token%}
-                    <button type="submit" class="btn btn-info">
-                        Tak, wycofuję.
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
+
     </div>
-</div>
+</dialog>

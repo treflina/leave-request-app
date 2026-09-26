@@ -1,62 +1,72 @@
 {% extends "base.html" %}
-{% load  static crispy_forms_tags %}
-{% block title %}- dodaj zwolnienie{% endblock title %}
-{% block content %}
-{%include 'includes/navbar.html'%}
+{% load static %}
+{% block title %} - Dodaj zwolnienie{% endblock title %}
 
-<div class="container mt-5">
-    <h1 class="page-heading">Dodaj zwolnienie lekarskie</h1>
-    <p>Jeżeli okres zwolnienia lekarskiego pokrywa się z okresem urlopu wypoczynkowego,
-        proszę skorygować bieżący urlop pracownika (panel admin).</p>
-    <form method="POST">{% csrf_token %}
-        <div class="row">
-            <div class="col-lg-6">
-                {{ form.employee|as_crispy_field }}
+{% block content %}
+{% include 'includes/navbar.html' %}
+
+<main class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl space-y-5">
+        <header class="flex items-start gap-3">
+            <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-green-100 text-[#28a745]">
+                <svg class="h-6 w-6">
+                    <use href="{% static 'img/svg/sprite.svg' %}#plus"></use>
+                </svg>
+            </span>
+            <div>
+                <h1 class="text-2xl font-bold text-[#545460]">Dodaj zwolnienie lekarskie</h1>
+                <p class="mt-1 text-sm text-slate-500">Zarejestruj nowe zwolnienie pracownika.</p>
             </div>
-            <div class="col-lg-6">
-                {{ form.leave_type|as_crispy_field }}
-            </div>
+        </header>
+        <div class="rounded-xl border border-amber-800 bg-amber-800 px-4 py-3 text-sm text-white" role="note">
+            <p>Jeżeli okres zwolnienia pokrywa się z urlopem wypoczynkowym, skoryguj bieżący urlop pracownika w panelu administracyjnym.</p>
         </div>
-        <div class="row">
-            <div class="col-lg-6">
-                {{ form.issue_date|as_crispy_field }}
+        <form method="post" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="m-5 rounded-lg border border-rose-800 bg-rose-800 px-4 py-3 text-sm text-white" role="alert">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
             </div>
-            <div class="col-lg-6">
-                {{ form.doc_number|as_crispy_field }}
+            {% endif %}
+            <div class="space-y-6 p-5 sm:p-7"><p class="text-sm text-slate-600"><span class="font-bold text-rose-700" aria-hidden="true">*</span> Pole wymagane.</p>
+                <section aria-labelledby="sickleave-details-heading">
+                    <h2 id="sickleave-details-heading" class="border-b border-slate-200 pb-2 text-sm font-bold uppercase tracking-wider text-[#545460]">Dane zwolnienia</h2>
+                    <div class="mt-3 grid gap-5 sm:grid-cols-2">
+                        {% for field in form.visible_fields %}
+                        {% if field.name == 'employee' or field.name == 'leave_type' or field.name == 'issue_date' or field.name == 'doc_number' or field.name == 'start_date' or field.name == 'end_date' or field.name == 'additional_info' %}
+                        <div{% if field.name == 'additional_info' %} class="sm:col-span-2"{% endif %}><label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-slate-700">{{ field.label }}
+                            {% if field.field.required %}
+                            <span class="text-rose-700">*</span>
+                            {% endif %}
+                        </label>{{ field }}
+                        {% if field.errors %}
+                        <p id="{{ field.id_for_label }}-errors" class="mt-1 text-sm text-rose-700" role="alert">{{ field.errors|join:", " }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+                <fieldset class="border-t border-slate-200 pt-6">
+                    <legend class="text-sm font-bold uppercase tracking-wider text-[#545460]">Powiadomienie</legend>
+                    <p class="mt-2 text-sm text-slate-600">Wyślij informację o nowym zwolnieniu do:</p>
+                    <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                        {% for field in form.visible_fields %}
+                        {% if field.name == 'head' or field.name == 'manager' or field.name == 'instructor' %}
+                        <label class="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50/60 p-4 text-sm font-medium text-slate-700">
+                            {{ field }}<span>{{ field.label }}</span>
+                        </label>
+                        {% if field.errors %}<p id="{{ field.id_for_label }}-errors" class="text-sm text-rose-700" role="alert">{{ field.errors|join:", " }}</p>
+                        {% endif %}
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </fieldset>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6">
-                {{ form.start_date|as_crispy_field }}
-            </div>
-            <div class="col-lg-6">
-                {{ form.end_date|as_crispy_field }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{form.additional_info|as_crispy_field}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-            </div>
-        </div>
-        <div>
-            <p>Wyślij powiadomienie o nowym zwolnieniu do:</p>
-            <div class="form-check form-check-inline">
-                {{form.head|as_crispy_field}}
-            </div>
-            <div class="form-check form-check-inline">
-                {{form.manager|as_crispy_field}}
-            </div>
-            <div class="form-check form-check-inline">
-                {{form.instructor|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group mt-4">
-            <button class="btn btn-info" type="submit">Dodaj zwolnienie</button>
-        </div>
-    </form>
-</div>
+            <footer class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
+                <a href="{% url 'sickleaves_app:sickleaves' %}" class="btn btn-secondary">Anuluj</a>
+                <button type="submit" class="btn btn-primary">Dodaj zwolnienie</button></footer>
+        </form>
+    </div>
+</main>
 {% endblock content %}

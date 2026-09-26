@@ -72,6 +72,13 @@ class Request(TimeStampedModel):
         else:
             return f"Wniosek ({self.leave_type}) {self.start_date}"
 
+    @property
+    def signed_by_short(self):
+        name_parts = self.signed_by.split(maxsplit=1)
+        if len(name_parts) == 2:
+            return f"{name_parts[0][0]}. {name_parts[1]}"
+        return self.signed_by
+
     class Meta:
         verbose_name = "Wnioski"
         verbose_name_plural = "Wnioski"

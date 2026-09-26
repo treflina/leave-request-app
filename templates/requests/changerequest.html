@@ -1,135 +1,387 @@
 {% extends "base.html" %}
-{% load  static %}
+{% load static %}
+
+{% block title %} - Zmień wniosek{% endblock title %}
 
 {% block content %}
-{% include 'includes/navbar.html'%}
-{% load crispy_forms_tags %}
+{% include 'includes/navbar.html' %}
 
-<div class="container p-3">
-    {% for message in messages %}
-    <div class="alert {{ message.tags }}" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-    <h1 class="page-heading mt-5 mb-5"> Zmiana wniosku o udzielenie urlopu / dnia wolnego</h1>
-    <form action=""  method="POST" enctype="multipart/form-data" autocomplete="off">{%csrf_token%}
-        <div class="form-group row">
-            <label for="person" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Złożony przez:</label>
-            <div class="col">
-                <input type="text" readonly class="form-control-plaintext" id="person" value="{{leave_request.author.get_full_name}} -  {{leave_request.author.position}} ">
-            </div>
+<main class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-4xl space-y-5">
+        {% for message in messages %}
+        <div
+            class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+            role="status"
+        >
+            {{ message }}
         </div>
-        <div class="row">
-            <div class="col-lg-2 col-md-3">
-                <p class="font-weight-bold ">Wnioskowano o:</p>
-            </div>
-            <div class="col">
-                <div class="form-check">
-                    <input class="form-check-input active" type="radio" name="leave_type" id="id_leave_type_0" value="W" {% if leave_request.leave_type == 'W' %} checked {% endif %}>
-                    <label class="form-check-label" for="id_leave_type_0"> Urlop wypoczynkowy (W) </label>
-                </div>
-                <div class="form-check">
-                    <div class="row">
-                        <div class="col">
-                            <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_1" value="WS" {% if leave_request.leave_type == 'WS' %} checked {% endif %}>
-                            <label class="form-check-label" for="id_leave_type_1"> Wolne za pracę w wolną sobotę
-                                (WS)<span class="text-danger">*</span> </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-check ">
-                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_2" value="WN" {% if leave_request.leave_type == 'WN' %} checked {% endif %}>
-                    <label class="form-check-label" for="id_leave_type_2"> Wolne za pracę w niedzielę/święto
-                        (WN)<span class="text-danger">*</span> </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="radio" name="leave_type" id="id_leave_type_3" value="DW" {% if leave_request.leave_type == 'DW' %} checked {% endif %}>
-                    <label class="form-check-label " for="id_leave_type_3"> Wolne za święto przypadające w wolną sobotę
-                        (DW) </label>
-                </div>
-                <div class="form-group row box_ws hide pt-1">
-                    <label class="col-lg-3 col-form-label">* Praca miała miejsce w dniu:</label>
-                    <div class="col-lg-6">
-                        {{form.work_date|as_crispy_field}}
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group row mt-2">
-            <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na okres:</label>
-            <div class="input-group col-lg-6 col-md-9" id="d">
-                {{form.start_date|as_crispy_field}}
-                <span class="input-group-addon ml-2 mr-2">do</span>
-                {{form.end_date|as_crispy_field}}</div>
-
-        </div>
-        <div class="form-group row box_w">
-            <label for="number_days" class="col-lg-2 col-md-3 col-form-label font-weight-bold">W wymiarze:</label>
-
-            <div class="col col-lg-2 col-md-2 col-sm-2">
-                {{form.days|as_crispy_field}}
-            </div>
-            <div class="col">
-                <label class="col-form-label">{%if part%}godzin{%else%}dni roboczych{%endif%}</label></div>
-            <div class="col col-lg-6">
-                <p class="text-danger">Uwaga! W przypadku zmiany liczby dni (godzin) udzielonego urlopu pamiętaj o zmianie wymiaru bieżącego urlopu pracownika.</p>
-            </div>
-            <label for="duvet-day" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Na żądanie:</label>
-            <div class="col col-lg-2 col-md-2 col-sm-2">
-                {{form.duvet_day|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="substitute" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zastępstwo:</label>
-            <div class="col">
-                {{form.substitute|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-lg-2 col-md-3 col-form-label font-weight-bold">Wysłano do:</label>
-            <div class="col">
-                {{form.send_to_person|as_crispy_field}}
-            </div>
-        </div>
-        <div class="form-group row">
-            <label for="status" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Status:</label>
-            <div class="col">
-                <input type="text" name="status" id="id_status" class="textinput textInput form-control" value="{{leave_request.status}}">
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label for="signed_by" class="col-lg-2 col-md-3 col-form-label font-weight-bold">Zaopiniowany przez:</label>
-            <div class="col">
-                <input type="text" readonly class="form-control-plaintext" id="signed_by" value="{{leave_request.signed_by}}">
-            </div>
-        </div>
-        <hr class="mt-5 mb-5">
-
-        <div class="form-group row">
-            <label for="history_change_reason" class="col-lg-3 col-md-3 col-form-label font-weight-bold">Podaj powód zmiany:</label>
-            <div class="col">
-                <input type="text" name="history_change_reason" id="id_history_change_reason" class="textinput textInput font-italic form-control" placeholder="Ostatnio: {{history_changereason}}">
-            </div>
-        </div>
-        <div>
-            <p class="font-weight-bold">Załącznik (pdf, jpg, png): </p>
-            {{form.attachment|as_crispy_field}}
-        </div>
-        <div class="form-group row float-right">
+        {% endfor %}
+        <header class="flex items-start gap-3">
+            <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-stone-800 shadow-sm">
+                <svg class="h-6 w-6 shrink-0" aria-hidden="true">
+                    <use href="{% static 'img/svg/sprite.svg' %}#pencil"></use>
+                </svg>
+            </span>
             <div>
-                <a href="{% url 'requests_app:hrallrequests'%}" role="button" class="btn btn-light btn-md float-right mt-3 mb-3 mr-2">Wróć</a>
+                <h1 class="text-2xl font-bold text-[#545460]">
+                    Zmiana wniosku
+                </h1>
+                <p class="mt-1 text-sm text-slate-500">
+                    Edytuj wniosek o urlop lub dzień wolny.
+                </p>
             </div>
-            <div class>
-                <button type="submit" value="Update" class="btn btn-info btn-md float-right mt-3 mr-2 mb-3">Dokonaj zmiany we wniosku</button>
+        </header>
+        <form method="post" enctype="multipart/form-data" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div
+                class="m-5 rounded-lg border border-rose-800 bg-rose-800 px-4 py-3 text-sm text-white"
+                role="alert"
+            >
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
             </div>
-        </div>
-    </form>
-</div>
+            {% endif %}
+            <div class="space-y-6 p-5 sm:p-7">
+                <p class="text-sm text-slate-600">
+                    <span class="font-bold text-rose-700" aria-hidden="true">*</span>
+                    Pole wymagane.
+                </p>
+                <p
+                    id="request-form-status"
+                    class="sr-only"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+                <section aria-labelledby="applicant-heading">
+                    <h2 id="applicant-heading" class="text-sm font-bold uppercase tracking-wider text-[#545460]">Złożony przez</h2>
+                    <p class="mt-3 rounded-lg bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
+                        {{ leave_request.author.get_full_name }}
+                        <span class="font-normal text-slate-500">
+                            - {{ leave_request.author.position }}
+                        </span>
+                    </p>
+                </section>
+                <fieldset class="border-t border-slate-200 pt-6">
+                    <legend class="text-sm font-bold uppercase tracking-wider text-[#545460]">
+                        Wnioskowano o
+                    </legend>
+                    {% if form.leave_type.errors %}
+                    <p
+                        id="leave-type-errors"
+                        class="mt-2 text-sm text-rose-700"
+                        role="alert"
+                    >
+                        {{ form.leave_type.errors|join:", " }}
+                    </p>
+                    {% endif %}
+                    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                        {% for value, label in form.leave_type.field.choices %}
+                        <label
+                            class="flex cursor-pointer items-start gap-3 rounded-lg border border-slate-200 bg-white p-4 transition-colors hover:border-[#28a745] has-checked:border-[#28a745] has-checked:bg-emerald-50/60"
+                        >
+                            <input
+                                type="radio"
+                                name="leave_type"
+                                id="id_leave_type_{{ forloop.counter0 }}"
+                                value="{{ value }}"
+                                {% if form.leave_type.value == value %}checked{% endif %}
+                                {% if form.leave_type.errors %}aria-invalid="true" aria-describedby="leave-type-errors"{% endif %}
+                                class="mt-0.5 h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]"
+                            >
+                            <span class="text-sm font-medium text-slate-800">
+                                {{ label }}
+                            {% if value == 'WS' or value == 'WN' %}
+                                <span class="ml-1 font-bold text-amber-600">*</span>
+                            {% endif %}
+                            </span>
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+                <section
+                    class="box_ws {% if form.leave_type.value != 'WS' and form.leave_type.value != 'WN' %}hidden hide{% endif %} rounded-lg border border-amber-200 bg-amber-50/60 p-4"
+                    aria-labelledby="work-date-heading"
+                    {% if form.leave_type.value != 'WS' and form.leave_type.value != 'WN' %}hidden style="display: none;"{% endif %}
+                >
+                    <h2 id="work-date-heading" class="text-sm font-semibold text-amber-900">
+                        Data pracy
+                    </h2>
+                    <label
+                        for="id_work_date"
+                        class="mt-3 block text-sm font-medium text-slate-700"
+                    >
+                        Praca miała miejsce w dniu
+                        <span class="text-rose-700">*</span>
+                    </label>
+                    {{ form.work_date }}
+                    {% if form.work_date.errors %}
+                    <p
+                        id="id_work_date-errors"
+                        class="mt-1 text-sm text-rose-700"
+                        role="alert"
+                    >
+                        {{ form.work_date.errors|join:", " }}
+                    </p>
+                    {% endif %}
+                </section>
+                <section
+                    class="grid gap-5 border-t border-slate-200 pt-6 sm:grid-cols-2"
+                    aria-labelledby="period-heading"
+                >
+                    <h2 id="period-heading" class="sr-only">Okres wniosku</h2>
+                    <div>
+                        <label
+                            for="id_start_date"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Data od <span class="text-rose-700">*</span>
+                        </label>
+                        {{ form.start_date }}
+                        {% if form.start_date.errors %}
+                        <p
+                            id="id_start_date-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.start_date.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label
+                            for="id_end_date"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Data do
+                        </label>
+                        {{ form.end_date }}
+                        {% if form.end_date.errors %}
+                        <p
+                            id="id_end_date-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.end_date.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </section>
+                <section
+                    class="box_w {% if form.leave_type.value != 'W' %}hidden hide{% else %}grid{% endif %} gap-5 border-t border-slate-200 pt-6 sm:grid-cols-2"
+                    aria-labelledby="holiday-details-heading"
+                    {% if form.leave_type.value != 'W' %}hidden style="display: none;"{% endif %}
+                >
+                    <h2 id="holiday-details-heading" class="sr-only">
+                        Szczegóły urlopu
+                    </h2>
+                    <div>
+                        <label
+                            for="id_days"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Wymiar <span class="text-rose-700">*</span>
+                        </label>
+                        <div class="flex items-center gap-3">
+                            {{ form.days }}
+                            <span class="text-sm text-slate-600">
+                                {% if part %}godzin{% else %}dni roboczych{% endif %}
+                            </span>
+                        </div>
+                        {% if form.days.errors %}
+                        <p
+                            id="id_days-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.days.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                        <p class="mt-2 text-xs text-amber-800">
+                            Zmiana wymiaru wymaga także korekty bieżącego urlopu pracownika.
+                        </p>
+                    </div>
+                    <fieldset>
+                        <legend class="text-sm font-semibold text-slate-700">
+                            Urlop na żądanie
+                        </legend>
+                        <div class="mt-2 flex gap-4">
+                            <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                    type="radio"
+                                    name="duvet_day"
+                                    value="false"
+                                    {% if form.duvet_day.value == False or form.duvet_day.value == 'false' %}checked{% endif %}
+                                    class="h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]"
+                                >
+                                NIE
+                            </label>
+                            <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                    type="radio"
+                                    name="duvet_day"
+                                    value="true"
+                                    {% if form.duvet_day.value == True or form.duvet_day.value == 'true' %}checked{% endif %}
+                                    class="h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]"
+                                >
+                                TAK
+                            </label>
+                            <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+                                <input
+                                    type="radio"
+                                    name="duvet_day"
+                                    value=""
+                                    {% if form.duvet_day.value is None or form.duvet_day.value == 'None' %}checked{% endif %}
+                                    class="h-4 w-4 border-slate-300 text-[#28a745] focus:ring-[#28a745]"
+                                >
+                                Nie dotyczy
+                            </label>
+                        </div>
+                        {% if form.duvet_day.errors %}
+                        <p
+                            id="id_duvet_day-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.duvet_day.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </fieldset>
+                </section>
+                <section class="grid gap-5 border-t border-slate-200 pt-6 sm:grid-cols-2">
+                    <div>
+                        <label
+                            for="id_substitute"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Zastępstwo
+                        </label>
+                        {{ form.substitute }}
+                        {% if form.substitute.errors %}
+                        <p
+                            id="id_substitute-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.substitute.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label
+                            for="id_send_to_person"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Wysłano do <span class="text-rose-700">*</span>
+                        </label>
+                        {{ form.send_to_person }}
+                        {% if form.send_to_person.errors %}
+                        <p
+                            id="id_send_to_person-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.send_to_person.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label
+                            for="id_status"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Status
+                        </label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                        <p
+                            id="id_status-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.status.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="block text-sm font-semibold text-slate-700">
+                            Zaopiniowany przez
+                        </span>
+                        <p class="mt-1 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
+                            {{ leave_request.signed_by|default:"-" }}
+                        </p>
+                    </div>
+                    </section>
+                <section
+                    class="grid gap-5 border-t border-slate-200 pt-6 sm:grid-cols-2"
+                    aria-labelledby="change-heading"
+                >
+                    <h2 id="change-heading" class="sr-only">Szczegóły zmiany</h2>
+                    <div>
+                        <label
+                            for="id_history_change_reason"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Powód zmiany
+                        </label>
+                        {{ form.history_change_reason }}
+                        <p class="mt-1 text-xs text-slate-500">
+                            Ostatni powód: {{ history_changereason }}.
+                        </p>
+                        {% if form.history_change_reason.errors %}
+                        <p
+                            id="id_history_change_reason-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.history_change_reason.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label
+                            for="id_attachment"
+                            class="block text-sm font-semibold text-slate-700"
+                        >
+                            Załącznik
+                            <span class="font-normal text-slate-500">
+                                (PDF, JPG, PNG)
+                            </span>
+                        </label>
+                        {{ form.attachment }}
+                        {% if form.attachment.errors %}
+                        <p
+                            id="id_attachment-errors"
+                            class="mt-1 text-sm text-rose-700"
+                            role="alert"
+                        >
+                            {{ form.attachment.errors|join:", " }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+            <footer
+                class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-7"
+            >
+                <a
+                    href="{% url 'requests_app:hrallrequests' %}"
+                    class="inline-flex justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#28a745] focus:ring-offset-2"
+                >
+                    Wróć
+                </a>
+                <button
+                    type="submit"
+                    class="inline-flex justify-center rounded-lg bg-[#1f7a35] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#17612a] focus:outline-none focus:ring-2 focus:ring-[#28a745] focus:ring-offset-2"
+                >
+                    Zapisz zmiany
+                </button>
+            </footer>
+        </form>
+    </div>
+</main>
 {% endblock content %}
 {% block extra_js %}
-    <script src="{% static 'js/fillin-request.js' %}"></script>
+<script src="{% static 'js/fillin-request.js' %}?v=3"></script>
 {% endblock extra_js %}

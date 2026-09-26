@@ -1,0 +1,315 @@
+{% load static %}
+<div id="user-requests-list">
+    <div
+        id="user-requests-status"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+    >
+        Wnioski urlopowe.
+        Strona {{ page_obj.number }}
+        z {{ page_obj.paginator.num_pages }}.
+    </div>
+
+    <ul
+        class="space-y-3 py-4 sm:py-5"
+        aria-label="Wnioski urlopowe"
+    >
+        {% for leave_request in user_requests %}
+            <li>
+                <article
+                    class="relative overflow-hidden rounded-xl
+                           border border-slate-200 bg-white
+                           shadow-sm
+                           transition-[border-color,box-shadow]
+                           duration-150
+                           hover:border-slate-300
+                           hover:shadow-md
+                           motion-reduce:transition-none
+                           sm:py-4 px-6"
+                >
+                    <span
+                        class="absolute inset-y-0 left-0 w-1 bg-green-700"
+                        aria-hidden="true"
+                    ></span>
+
+                    <div class="p-5 sm:p-6">
+                        <header
+                            class="flex flex-col gap-3
+                                   sm:flex-row sm:items-center
+                                   sm:justify-between"
+                        >
+                            <p class="text-sm text-slate-500">
+                                Złożony
+                                <time
+                                    datetime="{{ leave_request.created|date:'Y-m-d' }}"
+                                    class="font-medium text-slate-700"
+                                >
+                                    {{ leave_request.created|date:"d.m.Y" }}
+                                </time>
+                            </p>
+
+                            <div class="shrink-0">
+                                {% if leave_request.status == "zaakceptowany" %}
+                                    <span
+                                        class="inline-flex items-center gap-1.5
+                                               rounded-full bg-emerald-50
+                                               px-3 py-1.5 text-xs
+                                               font-semibold text-emerald-800
+                                               ring-1 ring-inset ring-emerald-200"
+                                    >
+                                        <span
+                                            class="h-1.5 w-1.5 shrink-0
+                                                   rounded-full bg-emerald-600"
+                                            aria-hidden="true"
+                                        ></span>
+                                        Zaakceptowany
+                                    </span>
+                                {% elif leave_request.status == "odrzucony" %}
+                                    <span
+                                        class="inline-flex items-center gap-1.5
+                                               rounded-full bg-rose-50
+                                               px-3 py-1.5 text-xs
+                                               font-semibold text-rose-800
+                                               ring-1 ring-inset ring-rose-200"
+                                    >
+                                        <span
+                                            class="h-1.5 w-1.5 shrink-0
+                                                   rounded-full bg-rose-600"
+                                            aria-hidden="true"
+                                        ></span>
+                                        Odrzucony
+                                    </span>
+                                {% else %}
+                                    <span
+                                        class="inline-flex items-center gap-1.5
+                                               rounded-full bg-amber-50
+                                               px-3 py-1.5 text-xs
+                                               font-semibold text-amber-800
+                                               ring-1 ring-inset ring-amber-200"
+                                    >
+                                        <span
+                                            class="h-1.5 w-1.5 shrink-0
+                                                   rounded-full bg-amber-500"
+                                            aria-hidden="true"
+                                        ></span>
+                                        Oczekujący
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </header>
+
+                        <div
+                            class="mt-5 grid gap-3
+                                   sm:grid-cols-2
+                                   {% if request.user.role == 'K' or request.user.role == 'S' %}
+                                       lg:grid-cols-3
+                                   {% endif %}"
+                        >
+                            <div
+                                class="rounded-xl border border-slate-200
+                                       bg-slate-50 px-4 py-3.5"
+                            >
+                                <p
+                                    class="text-xs font-semibold
+                                           uppercase tracking-wide text-slate-500"
+                                >
+                                    Okres urlopu
+                                </p>
+
+                                <div
+                                    class="mt-1.5 flex flex-wrap items-center
+                                           gap-x-1.5 gap-y-1 text-base
+                                           font-semibold text-slate-900"
+                                >
+                                    <time
+                                        datetime="{{ leave_request.start_date|date:'Y-m-d' }}"
+                                    >
+                                        {{ leave_request.start_date|date:"d.m.Y" }}
+                                    </time>
+
+                                    {% if leave_request.start_date != leave_request.end_date %}
+                                        <span
+                                            class="text-slate-400"
+                                            aria-hidden="true"
+                                        >
+                                            –
+                                        </span>
+                                        <span class="sr-only">do</span>
+                                        <time
+                                            datetime="{{ leave_request.end_date|date:'Y-m-d' }}"
+                                        >
+                                            {{ leave_request.end_date|date:"d.m.Y" }}
+                                        </time>
+                                    {% endif %}
+                                </div>
+
+                                {% if leave_request.duvet_day == 1 %}
+                                    <div class="mt-2">
+                                        <span
+                                            class="inline-flex items-center
+                                                   rounded-full bg-amber-100
+                                                   px-2 py-0.5 text-xs
+                                                   font-semibold text-amber-800"
+                                        >
+                                            <span aria-hidden="true">Na żądanie</span>
+                                            <span class="sr-only">Urlop na żądanie</span>
+                                        </span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div
+                                class="rounded-xl border border-slate-200
+                                       bg-slate-50 px-4 py-3.5"
+                            >
+                                <p
+                                    class="text-xs font-semibold
+                                           uppercase tracking-wide text-slate-500"
+                                >
+                                    Czas trwania
+                                </p>
+                                <p
+                                    class="mt-1.5 text-base font-semibold
+                                           text-slate-900"
+                                >
+                                    {{ leave_request.days }}
+                                    <span class="font-normal text-slate-500">
+                                        {% if user.working_hours < 1 %}
+                                            godz.
+                                        {% elif leave_request.days == 1 %}
+                                            dzień
+                                        {% else %}
+                                            dni
+                                        {% endif %}
+                                    </span>
+                                </p>
+                            </div>
+
+                            {% if request.user.role == "K" or request.user.role == "S" %}
+                                <div
+                                    class="rounded-xl border border-slate-200
+                                           bg-slate-50 px-4 py-3.5"
+                                >
+                                    <p
+                                        class="text-xs font-semibold
+                                               uppercase tracking-wide text-slate-500"
+                                    >
+                                        Zastępuje
+                                    </p>
+
+                                    {% if leave_request.substitute %}
+                                        <p
+                                            class="mt-1.5 text-sm font-semibold
+                                                   text-slate-900"
+                                        >
+                                            {{ leave_request.substitute }}
+                                        </p>
+                                    {% else %}
+                                        <p class="mt-1.5 text-sm text-slate-400">
+                                            Brak
+                                        </p>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <footer
+                            class="mt-5 flex flex-col gap-3
+                                   border-t border-slate-200 pt-4
+                                   sm:flex-row sm:items-center
+                                   sm:justify-between"
+                        >
+                            <div class="min-w-0 text-sm">
+                                {% if leave_request.status == "oczekujący" %}
+                                    <p class="text-slate-500">
+                                        Wniosek oczekuje na zaopiniowanie.
+                                    </p>
+                                {% elif leave_request.signed_by %}
+                                    <p class="text-slate-500">
+                                        Zaopiniowany przez
+                                        <span class="font-medium text-slate-700">
+                                            {{ leave_request.signed_by_short }}
+                                        </span>
+                                    </p>
+                                {% else %}
+                                    <p class="text-slate-400">
+                                        Brak dodatkowych informacji.
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            {% if leave_request.status == "oczekujący" %}
+                                <div class="shrink-0">
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger min-h-11 w-full sm:w-auto"
+                                        onclick="document.getElementById('deleteModal{{ leave_request.id }}').showModal()"
+                                        aria-controls="deleteModal{{ leave_request.id }}"
+                                        aria-haspopup="dialog"
+                                        aria-label="Wycofaj wniosek urlopowy {{ forloop.counter0|add:page_obj.start_index }}"
+                                    >
+                                        Wycofaj wniosek
+                                    </button>
+
+                                    {% include 'includes/delete-modal.html' %}
+                                </div>
+                            {% endif %}
+                        </footer>
+                    </div>
+                </article>
+            </li>
+        {% empty %}
+            <li>
+                <div
+                    class="rounded-xl border border-dashed
+                           border-slate-300 bg-slate-50
+                           px-5 py-14 text-center sm:px-6"
+                >
+                    <div
+                        class="mx-auto mb-4 flex h-12 w-12
+                               items-center justify-center rounded-xl
+                               bg-white text-slate-400
+                               ring-1 ring-slate-200"
+                        aria-hidden="true"
+                    >
+                        <svg
+                            class="h-6 w-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h6l5 5v11a2 2 0 01-2 2z"
+                            />
+                        </svg>
+                    </div>
+
+                    <p class="text-base font-semibold text-slate-800">
+                        Brak złożonych wniosków urlopowych
+                    </p>
+
+                    <p
+                        class="mx-auto mt-1 max-w-md
+                               text-sm leading-5 text-slate-500"
+                    >
+                        Złożone wnioski pojawią się tutaj.
+                    </p>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if is_paginated %}
+        <nav
+            class="border-t border-slate-200 px-4 sm:px-5"
+            aria-label="Paginacja wniosków urlopowych"
+        >
+            {% include 'includes/pagination.html' with id="user-requests-holiday" htmx_target="#user-requests-list" %}
+        </nav>
+    {% endif %}
+</div>
