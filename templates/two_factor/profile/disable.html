@@ -1,0 +1,29 @@
+{% extends "two_factor/_base_focus.html" %}
+{% block content %}
+    <h1 class="mb-2 text-center text-2xl font-bold text-[#545460]">{% block title %}Wyłącz uwierzytelnianie dwuskładnikowe{% endblock %}</h1>
+    <p class="mb-6 text-center text-sm text-slate-600">Wyłączenie tej funkcji zmniejszy bezpieczeństwo Twojego konta. Czy na pewno chcesz kontynuować?</p>
+    <form method="post">
+        {% csrf_token %}
+        <label
+            for="id_understand"
+            class="flex w-full items-start justify-center gap-2 text-sm text-white mb-2"
+        >
+            <input
+                id="id_understand"
+                name="understand"
+                type="checkbox"
+                required
+                class="mt-4 h-4 w-4 flex-none"
+            >
+
+            <span class="min-w-0 flex-1">
+                Tak, chcę wyłączyć uwierzytelnianie dwuskładnikowe.
+            </span>
+        </label>
+
+        {% if form.understand.errors %}
+            <p class="mt-2 text-sm text-red-200">{{ form.understand.errors }}</p>
+        {% endif %}
+        <button class="btn btn-primary w-full" type="submit">Wyłącz</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load two_factor_tags %}
+
+{% block extra_media %}{{ form.media }}{% endblock %}
+
+{% block content %}
+    <h1 class="mb-2 text-center text-2xl font-bold text-[#545460]">{% block title %}Zaloguj się{% endblock %}</h1>
+    {% if wizard.steps.current == 'auth' %}
+        <p class="mb-6 text-center text-slate-600">Podaj nazwę użytkownika i hasło.</p>
+    {% elif wizard.steps.current == 'token' %}
+        <p class="mb-6 text-center text-slate-600">{{ device|as_verbose_action }}</p>
+    {% elif wizard.steps.current == 'backup' %}
+        <p class="mb-6 text-center text-slate-600">Wprowadź jeden z zapisanych kodów zapasowych.</p>
+    {% endif %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% include "two_factor/_wizard_forms.html" %}
+        <input type="submit" value="" hidden>
+        {% if other_devices %}
+            <p class="mb-3 text-sm text-slate-600">Możesz też użyć innej metody uwierzytelniania:</p>
+            {% for other in other_devices %}
+                <button name="challenge_device" value="{{ other.persistent_id }}" class="mb-2 w-full btn btn-secondary" type="submit">
+                    {{ other|as_action }}
+                </button>
+            {% endfor %}
+        {% endif %}
+        {% include "two_factor/_wizard_actions.html" %}
+    </form>
+    {% if wizard.steps.current == 'auth' %}
+        <a
+            href="{% url 'reset_password' %}"
+            class="mt-5 inline-block text-sm font-semibold text-white underline underline-offset-4 hover:text-green-100"
+        >
+            Nie pamiętasz hasła?
+        </a>
+    {% endif %}
+    {% if backup_tokens %}
+        <form action="" method="post" class="mt-5 border-t border-slate-200 pt-4">
+            {% csrf_token %}
+            <p class="mb-3 text-sm text-slate-600">Nie masz dostępu do aplikacji? Użyj kodu zapasowego.</p>
+            <button name="wizard_goto_step" type="submit" value="backup" class="btn btn-secondary">Użyj kodu zapasowego</button>
+        </form>
+    {% endif %}
+{% endblock %}

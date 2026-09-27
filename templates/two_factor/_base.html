@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% include 'includes/head-icons.html' %}
+    <title>{% block title %}Bezpieczeństwo konta{% endblock %} | Pracownik MBP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Signika+Negative&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <style>
+        .mfa-form input:not([type="hidden"]):not([type="checkbox"]) {
+            width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            padding: 0.65rem 0.75rem;
+            color: #0f172a;
+        }
+        .mfa-form input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+            padding: 0;
+            margin: 0;
+            flex: none;
+            border-radius: 0.25rem;
+        }
+        .mfa-form select {
+            width: auto;
+            max-width: 100%;
+            border-radius: 0.5rem;
+            border: 1px solid #cbd5e1;
+            background: white;
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            color: #0f172a;
+        }
+        .mfa-form input:not([type="checkbox"]):focus,
+        .mfa-form select:focus {
+            outline: 2px solid #28a745;
+            outline-offset: 1px;
+        }
+        .mfa-form input[type="checkbox"]:focus {
+            outline: 2px solid #28a745;
+            outline-offset: 2px;
+        }
+        .mfa-form ul.errorlist {
+            margin: 0.35rem 0;
+            color: #fecaca;
+            font-size: 0.875rem;
+        }
+        .mfa-form h1,
+        .mfa-form p,
+        .mfa-form label,
+        .mfa-form a {
+            color: white;
+        }
+        .mfa-form .text-slate-600,
+        .mfa-form .text-slate-700,
+        .mfa-form .text-slate-500 {
+            color: white !important;
+        }
+        .mfa-form .mfa-secret {
+            color: #0f172a !important;
+        }
+        .mfa-form .mfa-backup-tokens {
+            color: #0f172a !important;
+        }
+
+        .mfa-form .mfa-error {
+            color: #fecaca !important;
+        }
+
+        .mfa-form .mfa-required {
+            color: #fecaca !important;
+        }
+
+        .mfa-form .border-slate-200 {
+            border-color: rgba(255, 255, 255, 0.55);
+        }
+    </style>
+
+
+    {% block extra_media %}{% endblock %}
+</head>
+<body class="min-h-screen bg-[#545460] font-['Signika_Negative',sans-serif]">
+    <main class="!my-0 !flex !min-h-screen !h-auto !w-full !flex-nowrap !flex-col
+        !items-center !justify-center gap-10 px-6 py-10 md:!flex-row md:gap-12">
+        <section class="mfa-form w-full max-w-md border-b-2 border-white/80 pb-10
+        md:border-b-0 md:border-r-2 md:pb-0 md:pr-12">
+            {% block content_wrapper %}
+                {% block content %}{% endblock %}
+            {% endblock %}
+        </section>
+        <a href="https://mbp.opole.pl/"
+            class="block rounded-md focus-visible:outline focus-visible:outline-3
+            focus-visible:outline-offset-4 focus-visible:outline-white">
+            <img src="{% static 'img/logo_white.png' %}"
+            alt="Miejska Biblioteka Publiczna w Opolu"
+            class="h-auto w-52 max-w-full">
+        </a>
+    </main>
+</body>
+</html>

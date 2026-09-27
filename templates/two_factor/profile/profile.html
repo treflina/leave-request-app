@@ -1,0 +1,27 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load two_factor_tags %}
+
+{% block content %}
+    <h1 class="mb-2 text-center text-2xl font-bold text-[#545460]">{% block title %}Bezpieczeństwo konta{% endblock %}</h1>
+    {% if default_device %}
+        <p class="mb-5 text-center text-sm text-slate-600">Aktywna metoda: {{ default_device|as_action }}</p>
+        <div class="space-y-3">
+            <a
+                href="{% url 'two_factor:backup_tokens' %}"
+                class="block rounded-md border border-white/80 px-4 py-2 text-center font-semibold text-white underline underline-offset-4 hover:bg-white/10"
+            >
+                Pokaż kody zapasowe
+            </a>
+            <a href="{% url 'two_factor:disable' %}" class="block text-center text-sm font-semibold text-red-800 underline">Wyłącz uwierzytelnianie dwuskładnikowe</a>
+        </div>
+    {% else %}
+        <p class="mb-5 text-center text-sm text-slate-600">Uwierzytelnianie dwuskładnikowe nie jest jeszcze włączone.</p>
+        <a href="{% url 'two_factor:setup' %}" class="block btn btn-primary text-center">Włącz uwierzytelnianie dwuskładnikowe</a>
+    {% endif %}
+    <a
+        href="{% url 'home_app:index' %}"
+        class="btn btn-secondary mt-6 block text-center !text-stone-800"
+    >
+        Wróć do aplikacji
+    </a>
+{% endblock %}

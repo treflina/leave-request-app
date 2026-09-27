@@ -1,0 +1,6 @@
+{% extends "two_factor/_base_focus.html" %}
+{% block content %}
+    <h1 class="mb-4 text-2xl font-bold text-[#545460]">{% block title %}Uwierzytelnianie włączone{% endblock %}</h1>
+    <p class="mb-6 text-slate-600">Uwierzytelnianie dwuskładnikowe zostało pomyślnie włączone dla Twojego konta.</p>
+    <a href="{% url 'two_factor:profile' %}" class="btn btn-primary">Wróć do ustawień bezpieczeństwa</a>
+{% endblock %}

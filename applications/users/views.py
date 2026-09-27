@@ -24,6 +24,7 @@ from django.views.generic.edit import (
 )
 from django.forms.widgets import TextInput
 from django_ratelimit.decorators import ratelimit
+from two_factor.views import LoginView as TwoFactorLoginView
 
 from .forms import (
     UserRegisterForm,
@@ -74,37 +75,17 @@ class UserRegisterView(StaffAndDirectorPermissionMixin, FormView):
 
 
 @method_decorator(
-    ratelimit(key="ip", rate="20/m", method="POST", block=False),
+    ratelimit(key="ip", rate="20/m", method="POST", block=True),
     name="dispatch",
 )
 @method_decorator(
-    ratelimit(key="post:username", rate="5/m", method="POST", block=False),
+    ratelimit(key="post:username", rate="5/m", method="POST", block=True),
     name="dispatch",
 )
-class LoginUser(FormView):
+class LoginUser(TwoFactorLoginView):
     """User login page"""
 
-    template_name = "users/login.html"
-    form_class = LoginForm
-    success_url = reverse_lazy("home_app:index")
-
-    def post(self, request, *args, **kwargs):
-        if getattr(request, "limited", False):
-            form = self.get_form()
-            form.add_error(
-                None,
-                "Zbyt wiele prób logowania. Spróbuj ponownie za kilka minut.",
-            )
-            return self.form_invalid(form)
-        return super().post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        user = authenticate(
-            username=form.cleaned_data["username"],
-            password=form.cleaned_data["password"],
-        )
-        login(self.request, user)
-        return super(LoginUser, self).form_valid(form)
+    template_name = "two_factor/core/login.html"
 
 
 class LogoutView(View):

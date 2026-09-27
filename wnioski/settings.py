@@ -57,9 +57,13 @@ THIRD_PARTY_APPS = [
     "django_filters",
     "django_htmx",
     "django_tables2",
+    "django_otp",
+    "django_otp.plugins.otp_static",
+    "django_otp.plugins.otp_totp",
     "rest_framework",
     "rest_framework.authtoken",
     "simple_history",
+    "two_factor",
     "webpush",
 ]
 
@@ -74,6 +78,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django_otp.middleware.OTPMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -103,6 +108,10 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = "wnioski.wsgi.application"
+
+LOGIN_URL = "users_app:user-login"
+LOGIN_REDIRECT_URL = "home_app:index"
+TWO_FACTOR_PATCH_ADMIN = False
 
 if get_secret("DEVIL"):
     DATABASES = {

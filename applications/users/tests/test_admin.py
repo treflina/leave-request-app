@@ -5,6 +5,8 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.test import Client
+from django_otp import DEVICE_ID_SESSION_KEY
+from django_otp.plugins.otp_totp.models import TOTPDevice
 
 
 class AdminSiteTests(TestCase):
@@ -17,7 +19,15 @@ class AdminSiteTests(TestCase):
             username="admin",
             password="testpass123",
         )
+        self.otp_device = TOTPDevice.objects.create(
+            user=self.admin_user,
+            name="test-device",
+            confirmed=True,
+        )
         self.client.force_login(self.admin_user)
+        session = self.client.session
+        session[DEVICE_ID_SESSION_KEY] = self.otp_device.persistent_id
+        session.save()
         self.user = get_user_model().objects.create_user(
             username="user",
             password="testpass123",

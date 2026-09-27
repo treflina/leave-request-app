@@ -5,11 +5,29 @@ from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from django.views.generic import TemplateView
 from django.views.i18n import JavaScriptCatalog
+from two_factor import urls as two_factor_urls
+from two_factor.admin import AdminSiteOTPRequired
+
+
+otp_admin_site = AdminSiteOTPRequired(name="admin")
+for model, model_admin in admin.site._registry.items():
+    otp_admin_site.register(model, model_admin.__class__)
+
+otp_admin_site.site_header = "Pracownik MBP - Panel administracyjny"
+otp_admin_site.site_title = "Pracownik MBP - Panel administracyjny"
+otp_admin_site.index_title = "Panel administracyjny"
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("admin/", otp_admin_site.urls),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path(
+        "",
+        include(
+            (two_factor_urls.urlpatterns[0], "two_factor"),
+            namespace="two_factor",
+        ),
+    ),
     path("", include("applications.requests.urls")),
     path("", include("applications.users.urls")),
     path("", include("applications.sickleaves.urls")),
@@ -63,6 +81,3 @@ urlpatterns = [
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-admin.site.site_header = "Pracownik MBP - Panel administracyjny"
-admin.site.site_title = "Pracownik MBP - Panel administracyjny"
-admin.site.index_title = "Panel administracyjny"

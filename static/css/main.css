@@ -8,6 +8,9 @@
       "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
+    --color-red-50: oklch(97.1% 0.013 17.38);
+    --color-red-200: oklch(88.5% 0.062 18.334);
+    --color-red-800: oklch(44.4% 0.177 26.899);
     --color-amber-50: oklch(98.7% 0.022 95.277);
     --color-amber-100: oklch(96.2% 0.059 95.617);
     --color-amber-200: oklch(92.4% 0.12 95.746);
@@ -410,6 +413,9 @@
   .ml-1\.5 {
     margin-left: calc(var(--spacing) * 1.5);
   }
+  .ml-3 {
+    margin-left: calc(var(--spacing) * 3);
+  }
   .line-clamp-3 {
     overflow: hidden;
     display: -webkit-box;
@@ -664,6 +670,9 @@
   }
   .flex-1 {
     flex: 1;
+  }
+  .flex-none {
+    flex: none;
   }
   .flex-shrink {
     flex-shrink: 1;
@@ -1023,6 +1032,9 @@
       background-color: color-mix(in oklab, var(--color-green-700) 2.5%, transparent);
     }
   }
+  .bg-red-50 {
+    background-color: var(--color-red-50);
+  }
   .bg-rose-50 {
     background-color: var(--color-rose-50);
   }
@@ -1124,6 +1136,12 @@
   }
   .p-1\.5 {
     padding: calc(var(--spacing) * 1.5);
+  }
+  .p-2 {
+    padding: calc(var(--spacing) * 2);
+  }
+  .p-3 {
+    padding: calc(var(--spacing) * 3);
   }
   .p-4 {
     padding: calc(var(--spacing) * 4);
@@ -1242,6 +1260,9 @@
   .font-\[\'Signika_Negative\'\,sans-serif\] {
     font-family: 'Signika Negative',sans-serif;
   }
+  .font-mono {
+    font-family: var(--font-mono);
+  }
   .text-2xl {
     font-size: var(--text-2xl);
     line-height: var(--tw-leading, var(--text-2xl--line-height));
@@ -1332,8 +1353,14 @@
   .break-words {
     overflow-wrap: break-word;
   }
+  .break-all {
+    word-break: break-all;
+  }
   .whitespace-nowrap {
     white-space: nowrap;
+  }
+  .\!text-stone-800 {
+    color: var(--color-stone-800) !important;
   }
   .text-\[\#1f7a35\] {
     color: #1f7a35;
@@ -1382,6 +1409,12 @@
   }
   .text-green-800 {
     color: var(--color-green-800);
+  }
+  .text-red-200 {
+    color: var(--color-red-200);
+  }
+  .text-red-800 {
+    color: var(--color-red-800);
   }
   .text-rose-600 {
     color: var(--color-rose-600);
@@ -1965,6 +1998,9 @@
     }
     .sm\:p-8 {
       padding: calc(var(--spacing) * 8);
+    }
+    .sm\:p-10 {
+      padding: calc(var(--spacing) * 10);
     }
     .sm\:px-5 {
       padding-inline: calc(var(--spacing) * 5);

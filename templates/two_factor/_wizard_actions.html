@@ -1,0 +1,8 @@
+<div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+    {% if cancel_url %}
+        <a href="{{ cancel_url }}" class="text-sm font-semibold text-slate-600 underline">Anuluj</a>
+    {% elif wizard.steps.prev %}
+        <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}" class="btn btn-secondary">Wstecz</button>
+    {% endif %}
+    <button type="submit" class="btn btn-primary">Dalej</button>
+</div>

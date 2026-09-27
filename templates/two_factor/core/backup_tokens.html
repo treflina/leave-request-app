@@ -1,0 +1,23 @@
+{% extends "two_factor/_base_focus.html" %}
+{% block content %}
+    <h1 class="mb-4 text-2xl font-bold text-[#545460]">{% block title %}Kody zapasowe{% endblock %}</h1>
+    <p class="mb-5 text-slate-600">Kody zapasowe pozwalają zalogować się bez dostępu do głównego urządzenia. Zapisz je w bezpiecznym miejscu.</p>
+    {% if device.token_set.count %}
+        <ul class="mfa-backup-tokens mb-5 grid gap-2 rounded-md bg-slate-100 p-4 font-mono text-sm sm:grid-cols-2">
+            {% for token in device.token_set.all %}<li>{{ token.token }}</li>{% endfor %}
+        </ul>
+        <p class="mb-5 text-sm text-slate-600">Po wykorzystaniu wszystkich kodów możesz wygenerować nowy zestaw.</p>
+    {% else %}
+        <p class="mb-5 text-slate-600">Nie masz jeszcze kodów zapasowych.</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {% include "two_factor/_wizard_forms.html" %}
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <button class="text-sm font-semibold text-white underline underline-offset-4" type="submit">
+                Wygeneruj nowe kody
+            </button>
+            <a href="{% url 'two_factor:profile' %}" class="btn btn-primary">Wróć</a>
+        </div>
+    </form>
+{% endblock %}

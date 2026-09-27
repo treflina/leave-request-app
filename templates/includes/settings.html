@@ -1,4 +1,4 @@
-{% load static %}
+{% load i18n static %}
 
 <dialog
     id="settingsModal"
@@ -91,6 +91,20 @@
                 Zapisz
             </button>
         </form>
+        <div class="mt-6 border-t border-slate-200 pt-4">
+            <p class="text-sm font-semibold text-slate-700">
+                {% trans "Bezpieczeństwo konta" %}
+            </p>
+            <p class="mt-1 text-sm text-slate-600">
+                {% trans "Używaj aplikacji uwierzytelniającej jako dodatkowej ochrony konta." %}
+            </p>
+            <a
+                href="{% url 'two_factor:profile' %}"
+                class="mt-3 btn btn-primary"
+            >
+                {% trans "Zarządzaj uwierzytelnianiem dwuskładnikowym" %}
+            </a>
+        </div>
         <div class="mt-6 border-t border-slate-200 pt-4">
             <p class="text-sm font-semibold text-slate-700">
                 Powiadomienia push

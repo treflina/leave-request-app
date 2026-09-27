@@ -1,0 +1,8 @@
+{% extends "two_factor/_base_focus.html" %}
+{% load i18n %}
+
+{% block content %}
+    <h1 class="mb-2 text-center text-2xl font-bold text-[#545460]">{% block title %}{% trans "Wymagane uwierzytelnianie" %}{% endblock %}</h1>
+    <p class="mb-6 text-center text-sm text-slate-600">{% trans "Aby otworzyć tę stronę, musisz potwierdzić uwierzytelnianie dwuskładnikowe." %}</p>
+    <a href="{% url 'two_factor:login' %}" class="block btn btn-primary text-center">{% trans "Zaloguj się ponownie" %}</a>
+{% endblock %}

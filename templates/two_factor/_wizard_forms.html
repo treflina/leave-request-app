@@ -1,0 +1,18 @@
+{% if wizard.management_form %}{{ wizard.management_form }}{% endif %}
+{% for hidden in wizard.form.hidden_fields %}{{ hidden }}{% endfor %}
+{% if wizard.form.non_field_errors %}
+    <div class="mfa-error mb-4 rounded-md bg-red-50 px-3 py-2 text-sm" role="alert">
+        {{ wizard.form.non_field_errors }}
+    </div>
+{% endif %}
+{% for field in wizard.form.visible_fields %}
+    <div class="mb-4">
+        <label for="{{ field.id_for_label }}" class="mb-1 block text-sm font-semibold text-slate-700">
+            {{ field.label }}
+            {% if field.field.required %}<span class="mfa-required" aria-hidden="true">*</span><span class="sr-only">pole wymagane</span>{% endif %}
+        </label>
+        {{ field }}
+        {% if field.help_text %}<p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>{% endif %}
+        {% if field.errors %}<div class="mfa-error mt-1 text-sm" role="alert">{{ field.errors }}</div>{% endif %}
+    </div>
+{% endfor %}
