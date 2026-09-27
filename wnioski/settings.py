@@ -146,6 +146,13 @@ AUTH_PASSWORD_VALIDATORS = [
 DEFAULT_FROM_EMAIL = get_secret("DEFAULT_FROM_EMAIL")
 # DEFAULT_FROM_EMAIL = get_secret("EMAIL_HOST_USER")
 
+REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "60/min",
+        "anon": "20/min",
+    },
+}
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_USE_TLS = True
 EMAIL_HOST = get_secret("EMAIL_HOST")

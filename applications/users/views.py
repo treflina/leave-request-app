@@ -12,6 +12,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
+from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import (
     View,
@@ -22,6 +23,7 @@ from django.views.generic.edit import (
     FormView,
 )
 from django.forms.widgets import TextInput
+from django_ratelimit.decorators import ratelimit
 
 from .forms import (
     UserRegisterForm,
@@ -71,12 +73,30 @@ class UserRegisterView(StaffAndDirectorPermissionMixin, FormView):
         return super(UserRegisterView, self).form_valid(form)
 
 
+@method_decorator(
+    ratelimit(key="ip", rate="20/m", method="POST", block=False),
+    name="dispatch",
+)
+@method_decorator(
+    ratelimit(key="post:username", rate="5/m", method="POST", block=False),
+    name="dispatch",
+)
 class LoginUser(FormView):
     """User login page"""
 
     template_name = "users/login.html"
     form_class = LoginForm
     success_url = reverse_lazy("home_app:index")
+
+    def post(self, request, *args, **kwargs):
+        if getattr(request, "limited", False):
+            form = self.get_form()
+            form.add_error(
+                None,
+                "Zbyt wiele prób logowania. Spróbuj ponownie za kilka minut.",
+            )
+            return self.form_invalid(form)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         user = authenticate(

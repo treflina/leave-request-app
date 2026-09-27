@@ -5,11 +5,13 @@ from django.contrib.auth import get_user_model
 from rest_framework.decorators import (
         api_view,
         authentication_classes,
-        permission_classes
+        permission_classes,
+        throttle_classes,
 )
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
 from rest_framework import status
 
 from applications.users.permissions import IsHRService
@@ -22,6 +24,7 @@ User = get_user_model()
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated, IsHRService])
+@throttle_classes([UserRateThrottle])
 def hr_leave_month_api(request, year, month):
     if not (1 <= month <= 12):
         return Response(
