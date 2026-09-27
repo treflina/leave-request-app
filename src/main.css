@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@source "../templates";
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition duration-150 select-none;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    @apply disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-sm {
+    @apply inline-flex cursor-pointer items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition duration-150 select-none;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+    @apply disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-green-700 text-white hover:bg-green-800 active:bg-green-900;
+  }
+
+  .btn-secondary {
+    @apply border border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300;
+  }
+
+  .btn-tertiary {
+    @apply border border-slate-300 bg-white text-[#545460] shadow-sm hover:border-green-700 hover:bg-slate-50 hover:text-green-700;
+  }
+
+  .btn-pagination {
+    @apply min-h-11 min-w-11 px-3;
+  }
+
+  .btn-danger {
+    @apply border border-rose-300 bg-white text-rose-800 shadow-sm hover:border-rose-400 hover:bg-rose-50 hover:text-rose-900 focus-visible:ring-rose-700;
+  }
+
+  .btn-recipient {
+    @apply inline-flex min-h-7 cursor-pointer items-center justify-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-800 transition hover:bg-green-100;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white;
+  }
+
+  .form-input {
+    @apply block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-green-700 focus:outline-none;
+    @apply focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-1;
+  }
+
+  .form-select {
+    @apply block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-green-700 focus:outline-none;
+    @apply focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-1;
+  }
+
+  .form-file {
+    @apply block w-full rounded-lg border border-slate-300 bg-white text-sm text-slate-700 shadow-sm;
+    @apply file:mr-4 file:border-0 file:border-r file:border-slate-300 file:bg-slate-50 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-100;
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-1;
+  }
+}
