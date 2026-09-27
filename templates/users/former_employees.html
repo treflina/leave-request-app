@@ -1,13 +1,25 @@
 {% extends "base.html" %}
 {% load static %}
+
 {% block title %} - Byli pracownicy{% endblock title %}
+
 {% block content %}
 {% include 'includes/navbar.html' %}
-<main class="min-h-screen bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8">
-    <section class="mx-auto max-w-7xl space-y-5" aria-labelledby="former-employees-heading">
-        <header class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div class="flex items-center gap-3">
-                <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-stone-800 shadow-sm">
+
+<main
+    class="min-h-screen w-full min-w-0 bg-slate-100/70 px-4 py-6 font-['Signika_Negative',sans-serif] sm:px-6 lg:px-8"
+>
+    <section
+        class="mx-auto w-full min-w-0 max-w-7xl space-y-5"
+        aria-labelledby="former-employees-heading"
+    >
+        <header
+            class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"
+        >
+            <div class="flex min-w-0 items-center gap-3">
+                <span
+                    class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-stone-800 shadow-sm"
+                >
                     <svg
                         class="h-6 w-6"
                         aria-hidden="true"
@@ -16,53 +28,150 @@
                         <use href="{% static 'img/svg/sprite.svg' %}#user"></use>
                     </svg>
                 </span>
-                <div>
-                    <h1 id="former-employees-heading" class="text-2xl font-bold text-[#545460]">Lista byłych pracowników</h1>
-                    <p class="mt-1 text-sm text-slate-500">Archiwalne dane pracowników.</p>
+
+                <div class="min-w-0">
+                    <h1
+                        id="former-employees-heading"
+                        class="text-2xl font-bold text-[#545460]"
+                    >
+                        Lista byłych pracowników
+                    </h1>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Archiwalne dane pracowników.
+                    </p>
                 </div>
             </div>
-            <a href="{% url 'users_app:admin-all-employees' %}"
-            class="group btn btn-tertiary">Aktualni pracownicy
-                <span class="ml-1 transition-transform duration-150 group-hover:translate-x-0.5"
-                            aria-hidden="true"
-                        >
-                            &rarr;
+
+            <a
+                href="{% url 'users_app:admin-all-employees' %}"
+                class="group btn btn-tertiary shrink-0"
+            >
+                Aktualni pracownicy
+
+                <span
+                    class="ml-1 transition-transform duration-150 group-hover:translate-x-0.5"
+                    aria-hidden="true"
+                >
+                    &rarr;
                 </span>
             </a>
         </header>
-        <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
-            <div class="overflow-x-auto">
-                <table class="responsive-table w-full min-w-[1000px] divide-y divide-slate-200 text-left text-sm text-slate-700">
-                    <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-[#545460]">
+
+        <div
+            class="w-full min-w-0 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80"
+        >
+            <div class="w-full min-w-0 overflow-x-auto">
+                <table
+                    class="min-w-[1000px] divide-y divide-slate-200 text-left text-sm text-slate-700"
+                >
+                    <thead
+                        class="bg-slate-50 text-xs font-semibold uppercase tracking-wider text-[#545460]"
+                    >
                         <tr>
-                            <th scope="col" class="px-4 py-3">Lp.</th>
-                            <th scope="col" class="px-4 py-3">Nazwisko i imię</th>
-                            <th scope="col" class="px-4 py-3">Stanowisko</th>
-                            <th scope="col" class="px-4 py-3">Urlop</th>
-                            <th scope="col" class="px-4 py-3">Etat</th>
-                            <th scope="col" class="px-4 py-3">Miejsce pracy</th>
-                            <th scope="col" class="px-4 py-3">Umowa do</th>
-                            <th scope="col" class="px-4 py-3">Uwagi</th>
-                            <th scope="col" class="px-4 py-3"><span class="sr-only">Akcje</span></th>
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Lp.
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Nazwisko i imię
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Stanowisko
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Urlop
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Etat
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Miejsce pracy
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Umowa do
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                Uwagi
+                            </th>
+
+                            <th scope="col" class="whitespace-nowrap px-4 py-3">
+                                <span class="sr-only">Akcje</span>
+                            </th>
                         </tr>
                     </thead>
+
                     <tbody class="divide-y divide-slate-100 bg-white">
                         {% for employee in employees %}
                             <tr class="transition-colors hover:bg-slate-50">
-                                <td data-title="Lp." class="px-4 py-3.5 font-medium text-slate-500">{{ forloop.counter }}.</td>
-                                <td data-title="Nazwisko i imię" class="px-4 py-3.5 font-semibold text-slate-900">{{ employee.last_name }} {{ employee.first_name }}</td>
-                                <td data-title="Stanowisko" class="px-4 py-3.5">{{ employee.position|default:"-" }}</td>
-                                <td data-title="Urlop" class="px-4 py-3.5">{{ employee.current_leave }}</td>
-                                <td data-title="Etat" class="px-4 py-3.5">{{ employee.working_hours }}</td>
-                                <td data-title="Miejsce pracy" class="px-4 py-3.5">{{ employee.workplace|default:"-" }}</td>
-                                <td data-title="Umowa do" class="px-4 py-3.5">{{ employee.contract_end|date:"d.m.y"|default:"-" }}</td>
-                                <td data-title="Uwagi" class="px-4 py-3.5">{{ employee.additional_info|default:"-" }}</td>
-                                <td data-title="Akcje" class="px-4 py-3.5"><a href="{% url 'users_app:update_employee' employee.id %}"
-                                    class="btn-sm bg-amber-100 hover:bg-amber-200">Edytuj</a></td>
+                                <td
+                                    class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-500"
+                                >
+                                    {{ forloop.counter }}.
+                                </td>
+
+                                <td
+                                    class="whitespace-nowrap px-4 py-3.5 font-semibold text-slate-900"
+                                >
+                                    {{ employee.last_name }}
+                                    {{ employee.first_name }}
+                                </td>
+
+                                <td class="px-4 py-3.5">
+                                    {{ employee.position|default:"-" }}
+                                </td>
+
+                                <td
+                                    class="whitespace-nowrap px-4 py-3.5"
+                                >
+                                    {{ employee.current_leave }}
+                                </td>
+
+                                <td
+                                    class="whitespace-nowrap px-4 py-3.5"
+                                >
+                                    {{ employee.working_hours }}
+                                </td>
+
+                                <td class="px-4 py-3.5">
+                                    {{ employee.workplace|default:"-" }}
+                                </td>
+
+                                <td
+                                    class="whitespace-nowrap px-4 py-3.5"
+                                >
+                                    {{ employee.contract_end|date:"d.m.y"|default:"-" }}
+                                </td>
+
+                                <td class="px-4 py-3.5">
+                                    {{ employee.additional_info|default:"-" }}
+                                </td>
+
+                                <td
+                                    class="whitespace-nowrap px-4 py-3.5"
+                                >
+                                    <a
+                                        href="{% url 'users_app:update_employee' employee.id %}?from=former"
+                                        class="btn-sm bg-amber-100 hover:bg-amber-200"
+                                    >
+                                        Edytuj
+                                    </a>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="9" class="px-4 py-12 text-center text-slate-500">Brak byłych pracowników.</td>
+                                <td
+                                    colspan="9"
+                                    class="px-4 py-12 text-center text-slate-500"
+                                >
+                                    Brak byłych pracowników.
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>

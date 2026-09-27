@@ -283,7 +283,6 @@ class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
     model = User
     template_name = "users/update_employee.html"
     login_url = reverse_lazy("users_app:user-login")
-    success_url = reverse_lazy("users_app:admin-all-employees")
 
     fields = [
         "username",
@@ -306,8 +305,15 @@ class EmployeeUpdateView(StaffAndDirectorPermissionMixin, UpdateView):
         "email_notifications"
     ]
 
+    def get_success_url(self):
+        from_param = self.request.GET.get("from") or self.request.POST.get("from")
+        if from_param == "former":
+            return reverse_lazy("users_app:former-employees")
+        return reverse_lazy("users_app:admin-all-employees")
+
     def get_context_data(self, **kwargs):
         context = super(EmployeeUpdateView, self).get_context_data(**kwargs)
+        context["back_url"] = self.get_success_url()
         context["form"].fields["manager"].queryset = User.objects.filter(
             ~Q(role="P") & Q(is_active=True)
         ).order_by("last_name")

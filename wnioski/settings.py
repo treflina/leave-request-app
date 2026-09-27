@@ -162,10 +162,7 @@ EMAIL_PORT = get_secret("EMAIL_PORT")
 
 STATIC_URL = "/static/"
 
-if get_secret("DEVIL"):
-    STATICFILES_DIRS = [BASE_DIR.child("public").child("static")]
-else:
-    STATICFILES_DIRS = [BASE_DIR.child("static")]
+STATICFILES_DIRS = [BASE_DIR.child("static")]
 
 MEDIA_URL = "/media/"
 

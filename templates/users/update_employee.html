@@ -20,6 +20,7 @@
 
         <form method="post" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
             {% csrf_token %}
+            {% if request.GET.from %}<input type="hidden" name="from" value="{{ request.GET.from }}">{% endif %}
             {% if form.non_field_errors %}<div class="m-5 rounded-lg border border-rose-800 bg-rose-800 px-4 py-3 text-sm text-white" role="alert">
                 {% for error in form.non_field_errors %}
                 <p>{{ error }}</p>
@@ -97,7 +98,7 @@
                     </fieldset>
             </div>
             <footer class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
-                <a href="{% url 'users_app:admin-all-employees' %}"
+                <a href="{{ back_url }}"
                 class="inline-flex justify-center rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm
                 font-semibold text-slate-700 transition-colors hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#28a745]
                 focus:ring-offset-2">Anuluj</a>
