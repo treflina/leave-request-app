@@ -105,29 +105,6 @@
                 >
                     Zmień hasło
                 </a>
-                <form method="post" action="{% url 'users_app:user-logout' %}">
-                    {% csrf_token %}
-                    <button
-                        type="submit"
-                        class="inline-flex items-center rounded-full
-                            bg-green-700
-                            px-4 py-2
-                            text-sm font-semibold
-                            text-white
-                            shadow-sm
-                            transition-colors
-                            cursor-pointer
-                            hover:bg-green-800
-                            focus:outline-none
-                            focus-visible:ring-2
-                            focus-visible:ring-white
-                            focus-visible:ring-offset-2
-                            focus-visible:ring-offset-[#575864]
-                            active:bg-emerald-900"
-                    >
-                        Wyloguj się
-                    </button>
-                </form>
             {% else %}
                 <a
                     href="{% url 'home_app:index' %}"
@@ -163,7 +140,29 @@
                 </a>
 
             {% endif %}
-
+            <form method="post" action="{% url 'users_app:user-logout' %}">
+                    {% csrf_token %}
+                    <button
+                        type="submit"
+                        class="inline-flex items-center rounded-full
+                            bg-green-700
+                            px-4 py-2
+                            text-sm font-semibold
+                            text-white
+                            shadow-sm
+                            transition-colors
+                            cursor-pointer
+                            hover:bg-green-800
+                            focus:outline-none
+                            focus-visible:ring-2
+                            focus-visible:ring-white
+                            focus-visible:ring-offset-2
+                            focus-visible:ring-offset-[#575864]
+                            active:bg-emerald-900"
+                    >
+                        Wyloguj się
+                    </button>
+                </form>
         </div>
     </div>
 </nav>

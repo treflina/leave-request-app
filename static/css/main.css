@@ -668,12 +668,6 @@
   .table-auto {
     table-layout: auto;
   }
-  .border-collapse {
-    border-collapse: collapse;
-  }
-  .transform {
-    transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
-  }
   .animate-pulse {
     animation: var(--animate-pulse);
   }
@@ -918,16 +912,13 @@
   .border-slate-300 {
     border-color: var(--color-slate-300);
   }
+  .border-transparent {
+    border-color: transparent;
+  }
   .border-white\/50 {
     border-color: color-mix(in srgb, #fff 50%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       border-color: color-mix(in oklab, var(--color-white) 50%, transparent);
-    }
-  }
-  .border-white\/80 {
-    border-color: color-mix(in srgb, #fff 80%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      border-color: color-mix(in oklab, var(--color-white) 80%, transparent);
     }
   }
   .bg-\[\#1f7a35\] {
@@ -1474,10 +1465,6 @@
       --tw-ring-color: color-mix(in oklab, var(--color-slate-200) 80%, transparent);
     }
   }
-  .outline {
-    outline-style: var(--tw-outline-style);
-    outline-width: 1px;
-  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
@@ -1980,6 +1967,14 @@
       border-bottom-style: var(--tw-border-style);
       border-bottom-width: 0px;
     }
+    .md\:border-white\/80 {
+      border-color: color-mix(in srgb, #fff 80%, transparent);
+    }
+    @supports (color: color-mix(in lab, red, red)) {
+      .md\:border-white\/80 {
+        border-color: color-mix(in oklab, var(--color-white) 80%, transparent);
+      }
+    }
     .md\:pr-12 {
       padding-right: calc(var(--spacing) * 12);
     }
@@ -2391,26 +2386,6 @@
     }
   }
 }
-@property --tw-rotate-x {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-rotate-y {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-rotate-z {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-skew-x {
-  syntax: "*";
-  inherits: false;
-}
-@property --tw-skew-y {
-  syntax: "*";
-  inherits: false;
-}
 @property --tw-space-y-reverse {
   syntax: "*";
   inherits: false;
@@ -2545,11 +2520,6 @@
   inherits: false;
   initial-value: 0 0 #0000;
 }
-@property --tw-outline-style {
-  syntax: "*";
-  inherits: false;
-  initial-value: solid;
-}
 @property --tw-blur {
   syntax: "*";
   inherits: false;
@@ -2658,6 +2628,11 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
 @keyframes pulse {
   50% {
     opacity: 0.5;
@@ -2666,11 +2641,6 @@
 @layer properties {
   @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
     *, ::before, ::after, ::backdrop {
-      --tw-rotate-x: initial;
-      --tw-rotate-y: initial;
-      --tw-rotate-z: initial;
-      --tw-skew-x: initial;
-      --tw-skew-y: initial;
       --tw-space-y-reverse: 0;
       --tw-divide-y-reverse: 0;
       --tw-border-style: solid;
@@ -2700,7 +2670,6 @@
       --tw-ring-offset-width: 0px;
       --tw-ring-offset-color: #fff;
       --tw-ring-offset-shadow: 0 0 #0000;
-      --tw-outline-style: solid;
       --tw-blur: initial;
       --tw-brightness: initial;
       --tw-contrast: initial;
@@ -2727,6 +2696,7 @@
       --tw-backdrop-opacity: initial;
       --tw-backdrop-saturate: initial;
       --tw-backdrop-sepia: initial;
+      --tw-outline-style: solid;
     }
   }
 }
