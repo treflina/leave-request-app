@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.views.generic import TemplateView, CreateView, FormView
@@ -113,7 +113,7 @@ class ReportView(StaffAndDirectorPermissionMixin, FormView):
         )
 
 
-class UploadFileView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+class UploadFileView(LoginRequiredMixin, CreateView):
     """Uploaded documents listing view. HR, topmanagers
     and users who are employed
     as informaticians can upload and delete files."""
@@ -123,9 +123,6 @@ class UploadFileView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     fields = ["file", "description", "category", "priority"]
     success_url = "."
     login_url = reverse_lazy("users_app:user-login")
-
-    def test_func(self):
-        return can_manage_documents(self.request.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
