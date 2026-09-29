@@ -12,7 +12,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.http import HttpResponseRedirect, HttpResponse
-from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.views.generic import (
     View,
@@ -23,7 +22,6 @@ from django.views.generic.edit import (
     FormView,
 )
 from django.forms.widgets import TextInput
-from django_ratelimit.decorators import ratelimit
 from two_factor.views import LoginView as TwoFactorLoginView
 
 from .forms import (
@@ -74,14 +72,6 @@ class UserRegisterView(StaffAndDirectorPermissionMixin, FormView):
         return super(UserRegisterView, self).form_valid(form)
 
 
-@method_decorator(
-    ratelimit(key="ip", rate="20/m", method="POST", block=True),
-    name="dispatch",
-)
-@method_decorator(
-    ratelimit(key="post:username", rate="5/m", method="POST", block=True),
-    name="dispatch",
-)
 class LoginUser(TwoFactorLoginView):
     """User login page"""
 
