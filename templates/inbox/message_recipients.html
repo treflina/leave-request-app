@@ -172,13 +172,13 @@
 
             <div
                 id="recipient-list"
-                class="grid grid-cols-1 gap-px bg-slate-100 sm:grid-cols-2 lg:grid-cols-3"
+                class="columns-1 gap-px bg-slate-100 sm:columns-2 lg:columns-3"
             >
                 {% for employee in message.employees.all %}
                     <label
                         data-employee-row
-                        data-name="{{ employee.get_full_name|default:employee.username|lower }}"
-                        class="recipient-row flex cursor-pointer items-center gap-3 bg-white px-5 py-3.5 transition-colors hover:bg-slate-50 has-[:checked]:bg-rose-50 sm:px-6"
+                        data-name="{{ employee|lower }}"
+                        class="recipient-row mb-px flex cursor-pointer items-center gap-3 break-inside-avoid bg-white px-5 py-3.5 transition-colors hover:bg-slate-50 has-[:checked]:bg-rose-50 sm:px-6"
                     >
                         <input
                             type="checkbox"
@@ -188,7 +188,7 @@
                         >
 
                         <span class="min-w-0 truncate text-sm font-medium text-slate-800">
-                            {{ employee.get_full_name|default:employee.username }}
+                            {{ employee }}
                         </span>
                     </label>
                 {% empty %}
