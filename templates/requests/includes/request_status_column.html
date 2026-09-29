@@ -55,6 +55,26 @@
         {% endif %}
 
 
+
+    {% elif record.status == 'anulowany' %}
+
+        {# Rejected #}
+
+        <span class="inline-flex items-center gap-1.5
+                     text-xs font-medium text-rose-700">
+
+            <span class="h-1.5 w-1.5 shrink-0 rounded-full
+                         bg-rose-500"
+                  aria-hidden="true">
+            </span>
+
+            <span>
+                Anulowany
+            </span>
+
+        </span>
+
+
     {% elif record.status == 'oczekujący' and record.author != request.user %}
 
         {# Pending — actions make the state obvious #}
