@@ -435,14 +435,19 @@
 
                 <div class="p-6 sm:p-8">
                     {% if upcoming_leaves and not show_director %}
-                    <ul class="space-y-3">
+                    <ul class="divide-y divide-slate-200">
                         {% for leave in upcoming_leaves %}
                         <li
-                            class="rounded-xl border p-4 {% if leave.status == 'zaakceptowany' %}border-green-200 bg-green-50/50{% else %}border-slate-200 bg-slate-50{% endif %}"
+                            class="border-l-4 px-4 py-4 {% if leave.author_id == user.id and manager %}border-emerald-600 {% else %}border-transparent{% endif %}"
                         >
                             <div class="flex items-center justify-between gap-4">
                                 <div class="min-w-0">
+                                    {% if manager %}
                                     <p class="text-sm font-semibold text-slate-800">
+                                        {{ leave.author.first_name }} {{ leave.author.last_name }}{% if leave.author_id == user.id  %} (Ty){% endif %}
+                                    </p>
+                                    {% endif %}
+                                    <p class="mt-1 text-sm text-slate-700">
                                         {% if leave.leave_type == 'W' %}
                                             Urlop wypoczynkowy
                                         {% elif leave.leave_type == 'WS' %}
@@ -465,7 +470,7 @@
                                 </div>
 
                                 <div class="shrink-0">
-                                    {% if leave_request.status == "zaakceptowany" %}
+                                    {% if leave.status == "zaakceptowany" %}
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-200"
                                     >
@@ -475,7 +480,7 @@
                                         ></span>
                                         Zaakceptowany
                                     </span>
-                                    {% elif leave_request.status == "odrzucony" %}
+                                    {% elif leave.status == "odrzucony" %}
                                     <span
                                         class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-800 ring-1 ring-inset ring-rose-200"
                                     >
@@ -501,11 +506,27 @@
                         </li>
                         {% endfor %}
                     </ul>
+                    {% if upcoming_leaves_count and upcoming_leaves_count > 3 %}
+                    <div class="pt-4 text-center">
+                        <a
+                            href="{% url 'requests_app:allrequests' %}?start_date={% now 'Y-m-d' %}"
+                            class="group inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-sm font-semibold text-green-700 transition-all duration-150 hover:bg-green-50 hover:text-green-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
+                        >
+                            Wszystkie nadchodzące dni wolne
+                            <span
+                                class="transition-transform duration-150 group-hover:translate-x-0.5"
+                                aria-hidden="true"
+                            >
+                                →
+                            </span>
+                        </a>
+                    </div>
+                    {% endif %}
                     {% elif show_director %}
                         {% if upcoming_end_of_contracts %}
-                        <ul class="space-y-3">
+                        <ul class="divide-y divide-slate-200">
                             {% for employee in upcoming_end_of_contracts %}
-                            <li class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                            <li class="border-l-4 border-transparent px-4 py-4">
                                 <p class="font-semibold text-slate-800">
                                     {{ employee.first_name }} {{ employee.last_name }}
                                 </p>

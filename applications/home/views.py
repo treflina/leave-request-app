@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.views.generic import TemplateView, CreateView, FormView
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -43,13 +44,24 @@ class HomePage(LoginRequiredMixin, TemplateView):
         context["show_manager"] = user.role in ("T", "K")
 
         if user.role != "S":
-            user_requests = Request.objects.filter(
-                author=user,
+            upcoming_leaves_all = Request.objects.filter(
                 start_date__year=current_year
+            ).filter(
+                start_date__gte=date.today()
+            ).exclude(status="odrzucony"
+                      ).exclude(status="anulowany")
+
+            if user.role in {"K", "T"} and user.user.all():
+                upcoming_leaves_count = upcoming_leaves_all.count()
+                upcoming_leaves = upcoming_leaves_all.filter(
+                    Q(author=user) | Q(author__manager=user)
                 )
+                context["manager"] = True
+                context["upcoming_leaves_count"] = upcoming_leaves_count
+            else:
+                upcoming_leaves = upcoming_leaves_all.filter(author=user)
             context["upcoming_leaves"] = (
-                user_requests.filter(start_date__gte=date.today())
-                .exclude(status="odrzucony")
+                upcoming_leaves.select_related("author")
                 .order_by("start_date")[:3]
             )
         else:
