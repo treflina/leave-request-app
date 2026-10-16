@@ -90,3 +90,27 @@ document.querySelectorAll("dialog").forEach((dialog) => {
         }
     });
 });
+
+document.addEventListener("submit", (event) => {
+    const form = event.target;
+
+    if (
+        !(form instanceof HTMLFormElement) ||
+        !form.matches("[data-disable-on-submit]")
+    ) {
+        return;
+    }
+
+    if (form.dataset.submitting === "true") {
+        event.preventDefault();
+        return;
+    }
+
+    form.dataset.submitting = "true";
+
+    form.querySelectorAll(
+        'button[type="submit"], input[type="submit"]'
+    ).forEach((button) => {
+        button.disabled = true;
+    });
+}, true);

@@ -35,6 +35,7 @@
             </button>
             <form
                 method="post"
+                data-disable-on-submit
                 action="{% url 'requests_app:delete_request' leave_request.id %}"
             >
                 {% csrf_token %}

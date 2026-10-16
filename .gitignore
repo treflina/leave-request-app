@@ -23,6 +23,7 @@ requirements2.txt
 /applications/sickleaves/raporty.xml
 /applications/home/migrations/*
 /applications/inbox/migrations/*
+/applications/schedules/migrations/*
 
 /media/*
 staticfiles/

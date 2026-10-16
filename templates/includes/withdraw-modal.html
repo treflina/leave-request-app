@@ -36,6 +36,7 @@
 
             <form
                 method="post"
+                data-disable-on-submit
                 action="{% url 'requests_app:reject_request' leave_request.id %}{% if redirect_to %}?next={{ redirect_to }}{% endif %}"
             >
                 {% csrf_token %}

@@ -30,7 +30,9 @@
         </header>
 
         <form id="send-request-form"
-            method="post" class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
+            method="post"
+            data-disable-on-submit
+            class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80">
             {% csrf_token %}
             <div class="space-y-6 p-5 sm:p-7">
             <p class="text-sm text-slate-600"><span class="font-bold text-rose-700" aria-hidden="true">*</span> Pole wymagane.</p>
