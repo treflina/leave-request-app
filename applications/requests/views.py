@@ -328,7 +328,6 @@ class RequestsFilter(django_filters.FilterSet):
                     | Q(author__last_name__icontains=word)
                     | Q(status__icontains=word)
                     | Q(leave_type__icontains=word)
-                    | Q(substitute__icontains=word)
                     for word in query_words
                 ),
             )
