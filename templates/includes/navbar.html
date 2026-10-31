@@ -166,5 +166,6 @@
         </div>
     </div>
 </nav>
-
+{% if request.user.is_authenticated %}
 {% include 'includes/settings.html' %}
+{% endif %}

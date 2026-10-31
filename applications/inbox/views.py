@@ -35,7 +35,7 @@ class MessageUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy("inbox_app:message_list")
 
 
-class MessageRecipientsView(DetailView):
+class MessageRecipientsView(LoginRequiredMixin, DetailView):
     model = Message
     template_name = "inbox/message_recipients.html"
     context_object_name = "message"
